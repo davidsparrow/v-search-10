@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Typography, Row, Col, Layout, Space, Input, Divider } from 'antd'
+import { Button, Typography, Row, Col, Layout, Space, Input, Divider, Modal, message } from 'antd'
 import { SettingOutlined } from '@ant-design/icons'
 import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
@@ -182,9 +182,51 @@ export function HomePage() {
     window.open('https://bite.bendersaas.ai', '_blank')
   }
 
+  // Password reset modal state
+  const [isResetModalVisible, setIsResetModalVisible] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetError, setResetError] = useState('')
+  const [resetSuccess, setResetSuccess] = useState(false)
+  const resetTimerRef = useRef<NodeJS.Timeout | null>(null)
+
   const handleForgotPassword = () => {
-    // Handle forgot password
-    console.log('Forgot password clicked')
+    setIsResetModalVisible(true)
+    setResetEmail('')
+    setResetError('')
+    setResetSuccess(false)
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+  }
+
+  const handleResetModalCancel = () => {
+    setIsResetModalVisible(false)
+    setResetEmail('')
+    setResetError('')
+    setResetSuccess(false)
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+  }
+
+  const handleResetPassword = async () => {
+    setResetLoading(true)
+    setResetError('')
+    setResetSuccess(false)
+    try {
+      const { error } = await auth.resetPasswordForEmail(resetEmail)
+      if (error) {
+        setResetError(error.message)
+      } else {
+        setResetSuccess(true)
+        // Auto-close after 5 seconds
+        resetTimerRef.current = setTimeout(() => {
+          setIsResetModalVisible(false)
+          setResetSuccess(false)
+        }, 5000)
+      }
+    } catch (err: any) {
+      setResetError(err.message || 'Something went wrong.')
+    } finally {
+      setResetLoading(false)
+    }
   }
 
   const handleThemeChange = (theme: 'default' | 'dark' | 'compact') => {
@@ -897,6 +939,46 @@ export function HomePage() {
         </div>
         </>
       )}
+
+      {/* Password Reset Modal */}
+      <Modal
+        title="Reset Password"
+        open={isResetModalVisible}
+        onCancel={handleResetModalCancel}
+        footer={null}
+        centered
+      >
+        {resetSuccess ? (
+          <div style={{ textAlign: 'center', color: '#52c41a', margin: '16px 0' }}>
+            Check your email for a reset link!<br/>
+            (This window will close automatically.)
+          </div>
+        ) : (
+          <>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={resetEmail}
+              onChange={e => setResetEmail(e.target.value)}
+              disabled={resetLoading}
+              onPressEnter={handleResetPassword}
+              style={{ marginBottom: 12 }}
+            />
+            {resetError && (
+              <div style={{ color: 'red', marginBottom: 8 }}>{resetError}</div>
+            )}
+            <Button
+              type="primary"
+              block
+              loading={resetLoading}
+              onClick={handleResetPassword}
+              disabled={!resetEmail || resetLoading}
+            >
+              Send Reset Link
+            </Button>
+          </>
+        )}
+      </Modal>
     </Layout>
   )
 } 

@@ -281,3 +281,16 @@ input:-webkit-autofill:active {
     display: none !important;
   }
 } 
+
+/* Chat input field border radius override */
+.chat-input-rounded {
+  border-radius: 20px !important;
+}
+
+.chat-input-rounded .ant-input {
+  border-radius: 20px !important;
+}
+
+.chat-input-rounded .ant-input:focus {
+  border-radius: 20px !important;
+} 

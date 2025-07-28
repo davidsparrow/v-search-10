@@ -17,7 +17,7 @@ import { useCloudStore } from '../store/cloudStore'
 import { TierGate } from '../components/TierGate'
 import { AskBenderTier } from '../types/askbender'
 
-const { Header, Content, Footer } = Layout
+const { Header, Content } = Layout
 const { TextArea } = Input
 const { } = Typography
 
@@ -411,7 +411,7 @@ export function PreSearchPage1() {
         display: 'flex',
         flexDirection: 'column',
         padding: '24px',
-        maxWidth: '800px',
+        maxWidth: '480px', // 40% narrower (800px -> 480px)
         margin: '0 auto',
         width: '100%'
       }}>
@@ -442,10 +442,7 @@ export function PreSearchPage1() {
           flex: 1,
           overflowY: 'auto',
           marginBottom: '20px',
-          padding: '16px',
-          background: theme.cardBackground,
-          borderRadius: '12px',
-          border: `1px solid ${theme.cardBorder}`
+          padding: '16px'
         }}>
           {messages.map((message) => (
             <div
@@ -507,21 +504,22 @@ export function PreSearchPage1() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message here..."
-            autoSize={{ minRows: 1, maxRows: 4 }}
+            autoSize={{ minRows: 2, maxRows: 4 }}
+            autoFocus
             style={{
               flex: 1,
-              borderRadius: '8px',
-              border: `1px solid ${theme.cardBorder}`,
-              background: theme.cardBackground,
+              border: '1px solid rgba(255, 255, 255, 0.33)', // 33% white border around entire field
+              background: 'transparent',
               color: currentTheme === 'default' ? '#ffffff !important' : theme.textPrimary,
               fontSize: '12px',
               fontWeight: '300',
               resize: 'none',
               minHeight: '40px',
+              paddingLeft: '18px', // Add left padding to give text room from border
               paddingRight: '100px', // Make room for both microphone and send icons
               textShadow: currentTheme === 'default' ? '0 0 1px rgba(255,255,255,0.5)' : 'none'
             }}
-                           className={currentTheme === 'default' ? 'bright-placeholder' : currentTheme === 'compact' ? 'compact-placeholder' : ''}
+            className={`chat-input-rounded ${currentTheme === 'default' ? 'bright-placeholder' : currentTheme === 'compact' ? 'compact-placeholder' : ''}`}
           />
           {/* Microphone icon inside input field */}
           <div
@@ -546,14 +544,14 @@ export function PreSearchPage1() {
               }
             }}
             className="mic-icon"
-                         style={{
-               position: 'absolute',
-               right: '37px', // 25% back from arrowhead (was 25px, now 37px)
-               top: '50%', // Centered vertically
+                                     style={{
+              position: 'absolute',
+              right: '45px', // Adjusted for larger icon
+              top: '50%', // Centered vertically
               transform: 'translateY(-50%)',
               cursor: 'pointer',
-              width: '26px',
-              height: '26px',
+              width: '34px', // 30% larger (26px -> 34px)
+              height: '34px', // 30% larger (26px -> 34px)
               borderRadius: '50%',
               transition: 'all 0.2s ease',
               zIndex: 10,
@@ -568,15 +566,15 @@ export function PreSearchPage1() {
               e.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
-                         <FaMicrophone
-               style={{
-                 fontSize: '14px',
-                 color: isListening 
-                   ? (currentTheme === 'dark' ? '#ff4d4f' : '#000000') // Red when listening in dark theme, black in others
-                   : (currentTheme === 'dark' ? '#1890ff' : '#ffffff'), // Blue when not listening in dark theme, white in others
-                 animation: isListening ? 'pulse 1.5s infinite' : 'none'
-               }}
-             />
+                                     <FaMicrophone
+              style={{
+                fontSize: '18px', // 30% larger (14px -> 18px)
+                color: isListening 
+                  ? (currentTheme === 'dark' ? '#ff4d4f' : '#000000') // Red when listening in dark theme, black in others
+                  : (currentTheme === 'dark' ? '#1890ff' : '#ffffff'), // Blue when not listening in dark theme, white in others
+                animation: isListening ? 'pulse 1.5s infinite' : 'none'
+              }}
+            />
           </div>
           {/* Send icon inside input field */}
           <div
@@ -588,8 +586,8 @@ export function PreSearchPage1() {
               top: '50%', // Centered vertically
               transform: 'translateY(-50%)',
               cursor: 'pointer',
-              width: '22px',
-              height: '22px',
+              width: '29px', // 30% larger (22px -> 29px)
+              height: '29px', // 30% larger (22px -> 29px)
               borderRadius: '50%',
               transition: 'all 0.2s ease',
               zIndex: 10,
@@ -610,52 +608,23 @@ export function PreSearchPage1() {
           >
             <SendOutlined 
               style={{ 
-                fontSize: '11px',
+                fontSize: '14px', // 30% larger (11px -> 14px)
                 color: '#ffffff' // Always bright white
               }} 
             />
           </div>
         </div>
+        
+        {/* Separator Line */}
+        <div style={{
+          height: '0.5px',
+          background: '#888',
+          margin: '0',
+          opacity: '0.5'
+        }} />
       </Content>
 
-      {/* Footer */}
-      <Footer style={{ 
-        background: theme.headerBackground, 
-        borderTop: `1px solid ${theme.headerBorder}`,
-        padding: '8px 24px',
-        height: '60px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <div style={{ 
-          maxWidth: '1400px',
-          width: '100%',
-          textAlign: 'center'
-        }}>
-          {/* Navigation Links */}
-          <div style={{ 
-            marginBottom: '4px',
-            fontSize: '10px',
-            color: theme.textSecondary
-          }}>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Contact</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Press</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Boozeletter</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Terms</span>
-            <span style={{ cursor: 'pointer' }}>Privacy</span>
-          </div>
-          
-          {/* Copyright */}
-          <div style={{ 
-            fontSize: '10px',
-            color: theme.textSecondary
-          }}>
-            © 2025 bendersaas.ai all rights reserved
-          </div>
-        </div>
-      </Footer>
+
 
       {/* Settings Menu */}
       {isMenuVisible && (
