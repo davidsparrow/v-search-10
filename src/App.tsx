@@ -9,6 +9,7 @@ import { AboutPage } from './pages/AboutPage'
 import { SystemSettingsPage } from './pages/SystemSettingsPage'
 import { useCloudStore } from './store/cloudStore'
 import { supabase } from './lib/supabase'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function App() {
   const { currentTheme, setUser, setIsAuthenticated, setIsLoading } = useCloudStore()
@@ -71,6 +72,7 @@ function App() {
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin/system-settings" element={<SystemSettingsPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       </div>
     </ConfigProvider>

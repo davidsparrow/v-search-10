@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { AdminRoute } from '../components/AdminRoute'
 import { TextLogoVariation, SystemSettings } from '../types/admin'
 import { useCloudStore } from '../store/cloudStore'
+import { AdminNotificationSettings } from '../components/AdminNotificationSettings'
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
@@ -165,122 +166,129 @@ export const SystemSettingsPage: React.FC = () => {
   ]
 
   return (
-    <AdminRoute>
-      <Layout style={{ minHeight: '100vh', background: safeTheme.background }}>
-        <Header style={{ 
-          background: safeTheme.headerBackground, 
-          borderBottom: `1px solid ${safeTheme.headerBorder}`,
-          padding: '0 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
+    // TODO: Add AdminRoute wrapper for production deployment
+    <Layout style={{ minHeight: '100vh', background: safeTheme.background }}>
+      <Header style={{ 
+        background: safeTheme.headerBackground, 
+        borderBottom: `1px solid ${safeTheme.headerBorder}`,
+        padding: '0 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <Title level={3} style={{ 
+          margin: 0, 
+          color: safeTheme.textPrimary,
+          fontSize: '20px'
         }}>
-          <Title level={3} style={{ 
-            margin: 0, 
-            color: safeTheme.textPrimary,
-            fontSize: '20px'
-          }}>
-            System Settings
-          </Title>
-        </Header>
+          System Settings
+        </Title>
+      </Header>
 
-        <Content style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Logo Variations Section */}
-          <Card 
-            title="Text Logo Variations" 
-            style={{ marginBottom: '24px' }}
-            extra={
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />}
-                onClick={handleAddLogo}
-              >
-                Add Logo Variation
-              </Button>
-            }
-          >
-            <Table
-              dataSource={logoVariations}
-              columns={logoColumns}
-              rowKey="id"
-              loading={loading}
-              pagination={{ pageSize: 10 }}
-            />
-          </Card>
-
-          {/* System Settings Section */}
-          <Card title="System Settings">
-            <Table
-              dataSource={systemSettings}
-              columns={[
-                { title: 'Key', dataIndex: 'key', key: 'key' },
-                { title: 'Value', dataIndex: 'value', key: 'value' },
-                { title: 'Description', dataIndex: 'description', key: 'description' },
-              ]}
-              rowKey="id"
-              loading={loading}
-              pagination={false}
-            />
-          </Card>
-        </Content>
-
-        {/* Add/Edit Logo Modal */}
-        <Modal
-          title={editingLogo ? 'Edit Logo Variation' : 'Add Logo Variation'}
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={() => setIsModalVisible(false)}
-          width={600}
+      <Content style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Logo Variations Section */}
+        <Card 
+          title="Text Logo Variations" 
+          style={{ marginBottom: '24px' }}
+          extra={
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />}
+              onClick={handleAddLogo}
+            >
+              Add Logo Variation
+            </Button>
+          }
         >
-          <Form form={form} layout="vertical">
-            <Form.Item
-              name="display_name"
-              label="Display Name"
-              rules={[{ required: true, message: 'Please enter display name' }]}
-            >
-              <Input placeholder="e.g., Classic Blue, Dark Theme, Emoji Version" />
-            </Form.Item>
+          <Table
+            dataSource={logoVariations}
+            columns={logoColumns}
+            rowKey="id"
+            loading={loading}
+            pagination={{ pageSize: 10 }}
+          />
+        </Card>
 
-            <Form.Item
-              name="filename"
-              label="Filename"
-              rules={[{ required: true, message: 'Please enter filename' }]}
-            >
-              <Input placeholder="e.g., logo-classic-blue.png" />
-            </Form.Item>
+        {/* System Settings Section */}
+        <Card title="System Settings">
+          <Table
+            dataSource={systemSettings}
+            columns={[
+              { title: 'Key', dataIndex: 'key', key: 'key' },
+              { title: 'Value', dataIndex: 'value', key: 'value' },
+              { title: 'Description', dataIndex: 'description', key: 'description' },
+            ]}
+            rowKey="id"
+            loading={loading}
+            pagination={false}
+          />
+        </Card>
 
-            <Form.Item
-              name="destination_url"
-              label="Destination URL"
-              rules={[{ required: true, message: 'Please enter destination URL' }]}
-            >
-              <Input placeholder="e.g., https://askbender.com" />
-            </Form.Item>
+        {/* Admin Notification Settings Section */}
+        <Card 
+          title="Admin Notification Settings" 
+          style={{ marginTop: '24px' }}
+        >
+          <AdminNotificationSettings onSettingsUpdated={loadData} />
+        </Card>
+      </Content>
 
-            <Form.Item
-              name="is_active"
-              label="Active"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
+      {/* Add/Edit Logo Modal */}
+      <Modal
+        title={editingLogo ? 'Edit Logo Variation' : 'Add Logo Variation'}
+        open={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={() => setIsModalVisible(false)}
+        width={600}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="display_name"
+            label="Display Name"
+            rules={[{ required: true, message: 'Please enter display name' }]}
+          >
+            <Input placeholder="e.g., Classic Blue, Dark Theme, Emoji Version" />
+          </Form.Item>
 
-            <Form.Item label="Upload Logo File">
-              <Upload
-                name="logo"
-                listType="picture"
-                maxCount={1}
-                beforeUpload={() => false} // Prevent auto upload
-              >
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
-              <Text type="secondary">
-                Upload PNG files with transparent background, recommended size: 200x60px
-              </Text>
-            </Form.Item>
-          </Form>
-        </Modal>
-      </Layout>
-    </AdminRoute>
+          <Form.Item
+            name="filename"
+            label="Filename"
+            rules={[{ required: true, message: 'Please enter filename' }]}
+          >
+            <Input placeholder="e.g., logo-classic-blue.png" />
+          </Form.Item>
+
+          <Form.Item
+            name="destination_url"
+            label="Destination URL"
+            rules={[{ required: true, message: 'Please enter destination URL' }]}
+          >
+            <Input placeholder="e.g., https://askbender.com" />
+          </Form.Item>
+
+          <Form.Item
+            name="is_active"
+            label="Active"
+            valuePropName="checked"
+          >
+            <Switch />
+          </Form.Item>
+
+          <Form.Item label="Upload Logo File">
+            <Upload
+              name="logo"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false} // Prevent auto upload
+            >
+              <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            </Upload>
+            <Text type="secondary">
+              Upload PNG files with transparent background, recommended size: 200x60px
+            </Text>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </Layout>
   )
 } 

@@ -294,3 +294,12 @@ input:-webkit-autofill:active {
 .chat-input-rounded .ant-input:focus {
   border-radius: 20px !important;
 } 
+
+/* Add custom placeholder styles for COMPACT theme */
+.compact-theme .ant-input::placeholder {
+  color: #f0f0f0 !important;
+}
+
+.compact-theme .ant-input-password .ant-input::placeholder {
+  color: #f0f0f0 !important;
+} 

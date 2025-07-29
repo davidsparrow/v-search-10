@@ -4,6 +4,7 @@ import { Button, Typography, Row, Col, Layout, Space, Input, Divider, Modal, mes
 import { SettingOutlined } from '@ant-design/icons'
 import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
+import { FaSnowflake } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { auth } from '../lib/supabase'
 import {
@@ -14,6 +15,27 @@ import {
 
 const { Header, Content, Footer } = Layout
 const { } = Typography
+
+// Phone number formatting function
+const formatPhoneNumber = (value: string): string => {
+  // Remove all non-digits
+  const phoneNumber = value.replace(/\D/g, '')
+  
+  // Format based on length
+  if (phoneNumber.length <= 3) {
+    return phoneNumber
+  } else if (phoneNumber.length <= 6) {
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+  } else {
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+  }
+}
+
+// Check if input looks like a phone number
+const isPhoneNumber = (value: string): boolean => {
+  const digitsOnly = value.replace(/\D/g, '')
+  return digitsOnly.length >= 7 && digitsOnly.length <= 15
+}
 
 // Typing Animation Component
 function TypingAnimation() {
@@ -229,7 +251,7 @@ export function HomePage() {
     }
   }
 
-  const handleThemeChange = (theme: 'default' | 'dark' | 'compact') => {
+  const handleThemeChange = (theme: 'default' | 'dark' | 'compact' | 'white') => {
     setTheme(theme)
   }
 
@@ -257,12 +279,8 @@ export function HomePage() {
     borderRadius: '8px',
     border: `1px solid ${theme.cardBorder}`,
     background: theme.cardBackground,
-    color: theme.textPrimary,
+    color: currentTheme === 'white' ? '#000000' : theme.textPrimary, // Black text for white theme
     fontSize: '14px'
-  }
-
-  const inputPlaceholderStyle = {
-    color: theme.textSecondary
   }
 
   const searchPlaceholders = [
@@ -346,15 +364,17 @@ export function HomePage() {
         }}>
           {/* B Logo */}
           {!logoError ? (
-            <div style={{
-              width: '40px',
-              height: '40px',
-              background: 'url(/askbender-b-logo.png) no-repeat center center',
-              backgroundSize: 'contain',
-              cursor: 'pointer'
-            }}
-            onClick={() => navigate('/')}
-            // onError={() => setLogoError(true)} // onError does not work on div with background-image
+            <img
+              src="/askbender_b!_green_on_blk.png"
+              alt="AskBender"
+              style={{
+                height: '40px',
+                width: 'auto',
+                cursor: 'pointer',
+                objectFit: 'contain'
+              }}
+              onClick={() => navigate('/')}
+              onError={() => setLogoError(true)}
             />
           ) : (
             <div 
@@ -390,6 +410,16 @@ export function HomePage() {
                   fontSize: '16px'
                 }}
                 onClick={() => handleThemeChange('dark')}
+              />
+              <Button
+                type="text"
+                icon={<FaSnowflake style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
+                style={{ 
+                  color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px'
+                }}
+                onClick={() => handleThemeChange('white')}
               />
               <Button
                 type="text"
@@ -498,13 +528,14 @@ export function HomePage() {
               }}>
                 {!textLogoError ? (
                   <img
-                    src="/askbender-text-logo-transparent2.png"
+                    src="/askbender-text-logo!_rainbow.png"
                     alt="ask bender"
                     style={{
                       maxWidth: '300px',
                       width: '100%',
                       height: 'auto',
-                      animation: 'billiardFloat 35s linear infinite'
+                      animation: 'billiardFloat 35s linear infinite',
+                      filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))'
                     }}
                     onError={() => setTextLogoError(true)}
                   />
@@ -546,12 +577,22 @@ export function HomePage() {
                 flexDirection: 'column', 
                 alignItems: 'center',
                 gap: '8px' // Reduced from 12px to 8px for tighter spacing
-              }}>
+              }}
+              className={currentTheme === 'compact' ? 'compact-theme' : ''}
+              >
                 {/* Email/Phone Input */}
                 <Input
                   placeholder="Phone, Email or User Name"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    // Only format if it looks like a phone number
+                    if (isPhoneNumber(value)) {
+                      setEmail(formatPhoneNumber(value))
+                    } else {
+                      setEmail(value)
+                    }
+                  }}
                   style={inputStyle}
                 />
 
@@ -649,7 +690,7 @@ export function HomePage() {
                     fontWeight: 'normal',
                     background: 'transparent',
                     borderColor: 'transparent', // No border
-                    color: '#3B82F6', // Blue text
+                    color: currentTheme === 'compact' ? '#1e40af' : '#3B82F6', // Darker blue for compact theme
                     borderRadius: '88px', // Same as login button
                     display: 'flex',
                     alignItems: 'center',
@@ -700,28 +741,32 @@ export function HomePage() {
                 }}>
                   <span 
                     style={{ 
-                      color: '#3B82F6', // Blue
-                      fontSize: '12px',
-                      fontWeight: 'normal',
-                      cursor: 'pointer',
-                      textDecoration: 'underline'
-                    }}
-                    onClick={handleBiteMe}
-                  >
-                    Bite Me
-                  </span>
-                  <span 
-                    style={{ 
-                      color: 'white',
+                      color: currentTheme === 'white' ? '#666666' : (currentTheme === 'compact' ? '#ffffff' : 'white'),
                       fontSize: '12px',
                       fontWeight: 'normal',
                       cursor: 'pointer',
                       textDecoration: 'underline'
                     }}
                     onClick={handleForgotPassword}
+                    title="Passwords are a biiiiiiiiiii"
                   >
-                    The sticky's gone again?!
+                    Again with the lost Sticky?
                   </span>
+                  {!isAuthenticated && (
+                    <span 
+                      style={{ 
+                        color: currentTheme === 'compact' ? '#1e40af' : '#3B82F6', // Darker blue for compact theme
+                        fontSize: '12px',
+                        fontWeight: 'normal',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                      onClick={handleBiteMe}
+                      title="Mess around & find out"
+                    >
+                      Bite Me
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -904,37 +949,6 @@ export function HomePage() {
                 <option value="client">Client</option>
               </select>
             </div>
-          </div>
-
-          {/* Get a new Sticky! Link */}
-          <div style={{ 
-            marginTop: 'auto',
-            paddingTop: '16px',
-            borderTop: '1px solid #eee'
-          }}>
-            <span
-              style={{
-                color: '#1890ff',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'normal',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
-              onClick={() => {
-                // Check if user authenticated via Google
-                const isGoogleUser = user?.app_metadata?.provider === 'google'
-                if (isGoogleUser) {
-                  alert("You always use Google Auth. See you on the inside. Of my shiny...")
-                } else {
-                  // TODO: Implement reset password flow through Supabase
-                  console.log('Reset password clicked')
-                }
-              }}
-              title={user?.app_metadata?.provider === 'google' ? "You always use Google Auth. See you on the inside. Of my shiny..." : "Reset your password"}
-            >
-              Get a new Sticky!
-            </span>
           </div>
         </div>
         </>

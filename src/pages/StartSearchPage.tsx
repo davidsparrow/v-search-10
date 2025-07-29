@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Input, Layout, Typography, Space, Avatar } from 'antd'
+import React, { useState } from 'react'
+import { Layout, Input, Button, Avatar, Typography } from 'antd'
 import { SendOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import { useCloudStore } from '../store/cloudStore'
+import { processIncomingMessage, shouldInterruptSession, getCriticalMessageResponse } from '../lib/messageProcessor'
 
-const { Header, Content, Footer } = Layout
-const { TextArea } = Input
+const { Header, Content } = Layout
 const { Title, Text } = Typography
 
 interface ChatMessage {
@@ -13,6 +13,7 @@ interface ChatMessage {
   type: 'user' | 'ai'
   content: string
   timestamp: Date
+  isCritical?: boolean
 }
 
 export function StartSearchPage() {
@@ -45,7 +46,37 @@ export function StartSearchPage() {
     setInputValue('')
     setIsTyping(true)
 
-    // Simulate AI response
+    // Process the incoming message for critical message detection
+    try {
+      const processedMessage = await processIncomingMessage(
+        inputValue,
+        'test-user-id', // TODO: Replace with actual user ID
+        'test-session-id' // TODO: Replace with actual session ID
+      )
+
+      // Check if this is a critical message that should interrupt the session
+      if (shouldInterruptSession(processedMessage)) {
+        // Add critical message response
+        const criticalResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          type: 'ai',
+          content: getCriticalMessageResponse(processedMessage.criticalKeyword),
+          timestamp: new Date(),
+          isCritical: true
+        }
+        
+        setMessages(prev => [...prev, criticalResponse])
+        setIsTyping(false)
+        
+        // Don't proceed with normal flow - session is interrupted
+        return
+      }
+    } catch (error) {
+      console.error('Error processing message:', error)
+      // Continue with normal flow if processing fails
+    }
+
+    // Normal AI response (only if not a critical message)
     setTimeout(() => {
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -196,13 +227,20 @@ export function StartSearchPage() {
                     maxWidth: '70%',
                     padding: '12px 16px',
                     borderRadius: '16px',
-                    background: message.type === 'user' 
-                      ? theme.logoAccentColor 
-                      : theme.cardBackground,
+                    background: message.isCritical 
+                      ? '#ff4d4f' // Red background for critical messages
+                      : message.type === 'user' 
+                        ? theme.logoAccentColor 
+                        : theme.cardBackground,
                     border: message.type === 'ai' ? `1px solid ${theme.cardBorder}` : 'none',
-                    color: message.type === 'user' ? 'white' : theme.textPrimary,
+                    color: message.isCritical 
+                      ? 'white' // White text for critical messages
+                      : message.type === 'user' 
+                        ? 'white' 
+                        : theme.textPrimary,
                     fontSize: '14px',
-                    lineHeight: '1.5'
+                    lineHeight: '1.5',
+                    fontWeight: message.isCritical ? 'bold' : 'normal'
                   }}>
                     {message.content}
                   </div>
@@ -262,7 +300,7 @@ export function StartSearchPage() {
                 gap: '12px',
                 alignItems: 'flex-end'
               }}>
-                <TextArea
+                <Input.TextArea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -299,7 +337,7 @@ export function StartSearchPage() {
       </Content>
 
       {/* Footer */}
-      <Footer style={{
+      <Layout.Footer style={{
         background: theme.headerBackground,
         borderTop: `1px solid ${theme.headerBorder}`,
         padding: '8px 24px',
@@ -320,7 +358,7 @@ export function StartSearchPage() {
             © 2025 bendersaas.ai all rights reserved
           </Text>
         </div>
-      </Footer>
+      </Layout.Footer>
     </Layout>
   )
 } 

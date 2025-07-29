@@ -12,6 +12,8 @@ import { Layout, Input, Button, Typography, Space, Switch } from 'antd'
 import { SendOutlined, SettingOutlined } from '@ant-design/icons'
 import { FaMicrophone } from 'react-icons/fa'
 import { AiFillStar, AiFillExperiment, AiFillBulb } from 'react-icons/ai'
+import { GiBatMask } from 'react-icons/gi'
+import { FaSnowflake } from 'react-icons/fa'
 import { FaSearch } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { TierGate } from '../components/TierGate'
@@ -87,7 +89,7 @@ export function PreSearchPage1() {
     'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC','PR'
   ]
   
-  const handleThemeChange = (theme: 'default' | 'dark' | 'compact') => {
+  const handleThemeChange = (theme: 'default' | 'dark' | 'compact' | 'white') => {
     setTheme(theme)
   }
   
@@ -362,13 +364,23 @@ export function PreSearchPage1() {
             <Space size="small">
               <Button
                 type="text"
-                icon={<AiFillStar style={{ fontSize: '16px' }} />}
+                icon={<GiBatMask style={{ fontSize: '16px' }} />}
                 className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
                 style={{ 
                   color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
                   fontSize: '16px'
                 }}
                 onClick={() => handleThemeChange('dark')}
+              />
+              <Button
+                type="text"
+                icon={<FaSnowflake style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
+                style={{ 
+                  color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px'
+                }}
+                onClick={() => handleThemeChange('white')}
               />
               <Button
                 type="text"
@@ -432,7 +444,7 @@ export function PreSearchPage1() {
               height: 'auto', 
               width: 'auto',
               maxWidth: '100%', // Mobile responsive
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+              filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
               animation: 'billiardFloat 35s linear infinite'
             }}
           />
@@ -503,12 +515,12 @@ export function PreSearchPage1() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type your message here..."
+            placeholder="Hey B, Build My Event VisionBoard and Send Quote requests to my chosen Artists/Vendors"
             autoSize={{ minRows: 2, maxRows: 4 }}
             autoFocus
             style={{
               flex: 1,
-              border: '1px solid rgba(255, 255, 255, 0.33)', // 33% white border around entire field
+              border: currentTheme === 'white' ? '1px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(255, 255, 255, 0.33)', // 20% grey for white theme, 33% white for others
               background: 'transparent',
               color: currentTheme === 'default' ? '#ffffff !important' : theme.textPrimary,
               fontSize: '12px',
@@ -614,14 +626,6 @@ export function PreSearchPage1() {
             />
           </div>
         </div>
-        
-        {/* Separator Line */}
-        <div style={{
-          height: '0.5px',
-          background: '#888',
-          margin: '0',
-          opacity: '0.5'
-        }} />
       </Content>
 
 

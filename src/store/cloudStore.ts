@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { Business, CloudConfig, SearchFilters } from '../types/business'
+import { Message, SessionInterruption } from '../types/message'
 import { sampleBusinesses } from '../data/sampleBusinesses'
 
 // Theme configuration interface
@@ -63,7 +64,7 @@ const themeConfigs: Record<string, ThemeConfig> = {
     cardBackground: 'rgba(255, 255, 255, 0.15)',
     cardBorder: 'rgba(255, 255, 255, 0.25)',
     textPrimary: '#ffffff',
-    textSecondary: 'rgba(255, 255, 255, 0.9)',
+    textSecondary: '#f0f0f0', // Changed from #ffffff to off-white
     accentColor: '#f5576c',
     buttonPrimary: '#f5576c',
     buttonSecondary: 'rgba(245, 87, 108, 0.2)',
@@ -73,6 +74,23 @@ const themeConfigs: Record<string, ThemeConfig> = {
     logoAccentColor: '#f5576c',
     modalBackground: 'rgba(255, 255, 255, 0.95)',
     modalBorder: 'rgba(255, 255, 255, 0.25)'
+  },
+  white: {
+    name: 'White Theme',
+    background: '#ffffff',
+    cardBackground: 'rgba(0, 0, 0, 0.05)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    textPrimary: '#000000',
+    textSecondary: '#8c8c8c', // Changed to darker grey for better visibility
+    accentColor: '#1890ff',
+    buttonPrimary: '#1890ff',
+    buttonSecondary: 'rgba(24, 144, 255, 0.1)',
+    headerBackground: 'rgba(255, 255, 255, 0.95)',
+    headerBorder: 'rgba(0, 0, 0, 0.1)',
+    logoColor: '#000000',
+    logoAccentColor: '#1890ff',
+    modalBackground: 'rgba(255, 255, 255, 0.98)',
+    modalBorder: 'rgba(0, 0, 0, 0.1)'
   }
 }
 
@@ -99,7 +117,7 @@ interface CloudState {
   searchResults: Business[]
   
   // Theme state
-  currentTheme: 'default' | 'dark' | 'compact'
+  currentTheme: 'default' | 'dark' | 'compact' | 'white'
   
   // Actions
   selectBusiness: (business: Business | null) => void
@@ -112,13 +130,69 @@ interface CloudState {
   setSearchFilters: (filters: Partial<SearchFilters>) => void
   performSearch: () => void
   resetSearch: () => void
-  setTheme: (theme: 'default' | 'dark' | 'compact') => void
+  setTheme: (theme: 'default' | 'dark' | 'compact' | 'white') => void
   getThemeConfig: () => ThemeConfig
   
   // Auth actions
   setUser: (user: any | null) => void
   setIsAuthenticated: (isAuthenticated: boolean) => void
   setIsLoading: (isLoading: boolean) => void
+}
+
+// Add critical message state to the store
+interface CloudStore {
+  // Auth state
+  user: any | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  
+  // Business data
+  businesses: Business[]
+  selectedBusiness: Business | null
+  hoveredBusiness: Business | null
+  
+  // Physics configuration
+  config: CloudConfig
+  
+  // Animation state
+  isAnimating: boolean
+  animationSpeed: number
+  
+  // Search and filters
+  searchFilters: SearchFilters
+  searchResults: Business[]
+  
+  // Theme state
+  currentTheme: 'default' | 'dark' | 'compact' | 'white'
+  
+  // Critical messages
+  criticalMessages: Message[];
+  sessionInterruptions: SessionInterruption[];
+  
+  // Actions
+  selectBusiness: (business: Business | null) => void
+  hoverBusiness: (business: Business | null) => void
+  updateBusinessPosition: (id: string, x: number, y: number) => void
+  updateBusinessVelocity: (id: string, vx: number, vy: number) => void
+  toggleAnimation: () => void
+  setAnimationSpeed: (speed: number) => void
+  updateConfig: (updates: Partial<CloudConfig>) => void
+  setSearchFilters: (filters: Partial<SearchFilters>) => void
+  performSearch: () => void
+  resetSearch: () => void
+  setTheme: (theme: 'default' | 'dark' | 'compact' | 'white') => void
+  getThemeConfig: () => ThemeConfig
+  
+  // Auth actions
+  setUser: (user: any | null) => void
+  setIsAuthenticated: (isAuthenticated: boolean) => void
+  setIsLoading: (isLoading: boolean) => void
+  
+  // Critical message actions
+  addCriticalMessage: (message: Message) => void;
+  updateCriticalMessageStatus: (messageId: string, status: Message['status']) => void;
+  addSessionInterruption: (interruption: SessionInterruption) => void;
+  resumeSessionInterruption: (interruptionId: string) => void;
 }
 
 const defaultConfig: CloudConfig = {
@@ -141,7 +215,7 @@ const defaultSearchFilters: SearchFilters = {
   featuredOnly: false
 }
 
-export const useCloudStore = create<CloudState>((set, get) => ({
+export const useCloudStore = create<CloudStore>((set, get) => ({
   // Initial state
   user: null,
   isAuthenticated: false,
@@ -155,6 +229,8 @@ export const useCloudStore = create<CloudState>((set, get) => ({
   searchFilters: defaultSearchFilters,
   searchResults: sampleBusinesses,
   currentTheme: 'dark', // Changed to dark as default
+  criticalMessages: [],
+  sessionInterruptions: [],
   
   // Actions
   selectBusiness: (business) => set({ selectedBusiness: business }),
@@ -214,5 +290,36 @@ export const useCloudStore = create<CloudState>((set, get) => ({
   // Auth actions
   setUser: (user) => set({ user }),
   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-  setIsLoading: (isLoading) => set({ isLoading })
+  setIsLoading: (isLoading) => set({ isLoading }),
+  
+  // Critical message actions
+  addCriticalMessage: (message: Message) => {
+    set((state) => ({
+      criticalMessages: [...state.criticalMessages, message]
+    }));
+  },
+
+  updateCriticalMessageStatus: (messageId: string, status: Message['status']) => {
+    set((state) => ({
+      criticalMessages: state.criticalMessages.map(msg =>
+        msg.id === messageId ? { ...msg, status } : msg
+      )
+    }));
+  },
+
+  addSessionInterruption: (interruption: SessionInterruption) => {
+    set((state) => ({
+      sessionInterruptions: [...state.sessionInterruptions, interruption]
+    }));
+  },
+
+  resumeSessionInterruption: (interruptionId: string) => {
+    set((state) => ({
+      sessionInterruptions: state.sessionInterruptions.map(interruption =>
+        interruption.id === interruptionId 
+          ? { ...interruption, resumed_at: new Date() }
+          : interruption
+      )
+    }));
+  },
 })) 
