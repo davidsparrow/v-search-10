@@ -312,11 +312,13 @@ export function PreSearchPage1() {
       {/* Sticky Header */}
       <Header style={{ 
         background: theme.headerBackground, 
-        borderBottom: `1px solid ${theme.headerBorder}`,
-        padding: '0 24px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
+        padding: 0,
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: 'none',
+        zIndex: 100
       }}>
         <div style={{ 
           display: 'flex', 
@@ -1616,6 +1618,35 @@ export function PreSearchPage1() {
           </div>
         </>
       )}
+      {/* Footer */}
+      <div style={{ 
+        background: 'transparent',
+        padding: 0,
+        height: '27px',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <div style={{ 
+          maxWidth: '1400px',
+          width: '100%',
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%'
+        }}>
+          <div style={{ 
+            fontSize: '10px',
+            color: theme.textSecondary,
+            lineHeight: '17px',
+            paddingBottom: '10px'
+          }}>
+            © 2025 bendersaas.ai all rights reserved
+          </div>
+        </div>
+      </div>
     </Layout>
   )
 } 

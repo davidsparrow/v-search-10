@@ -105,8 +105,8 @@ export function HomePage() {
   const theme = getThemeConfig()
   
   // State for modal and menu
-
   const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const [activeTab, setActiveTab] = useState('links')
   const [logoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
@@ -114,6 +114,7 @@ export function HomePage() {
   // Form state
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   // Add toggle state at the top of the component:
   const [excludeLoafers, setExcludeLoafers] = useState(false)
@@ -302,7 +303,6 @@ export function HomePage() {
   const [searchValue, setSearchValue] = useState('')
   const [searchPlaceholder, setSearchPlaceholder] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   useEffect(() => {
     setSearchPlaceholder(searchPlaceholders[Math.floor(Math.random() * searchPlaceholders.length)])
     if (isMenuVisible && searchInputRef.current) {
@@ -343,129 +343,130 @@ export function HomePage() {
     }
   }, [isMenuVisible, country])
 
+  const handleCloseMenu = () => {
+    setIsMenuVisible(false)
+  }
+
+  const handleOpenMenu = () => {
+    setIsMenuVisible(true)
+    setActiveTab('links') // Always reset to main menu when opening
+  }
+
   return (
     <Layout style={{ height: '100vh', overflow: 'hidden', background: theme.background }}>
       {/* Sticky Header */}
-      <Header style={{ 
-        background: theme.headerBackground, 
-        borderBottom: `1px solid ${theme.headerBorder}`,
-        padding: '0 24px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
+      <Header style={{
+        background: theme.headerBackground,
+        padding: '0 20px',
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: 'none',
+        zIndex: 100
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          height: '100%',
-          maxWidth: '1400px',
-          margin: '0 auto'
-        }}>
-          {/* B Logo */}
-          {!logoError ? (
-            <img
-              src="/askbender_b!_green_on_blk.png"
-              alt="AskBender"
-              style={{
-                height: '40px',
-                width: 'auto',
-                cursor: 'pointer',
-                objectFit: 'contain'
-              }}
-              onClick={() => navigate('/')}
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <div 
-              style={{ 
-                width: '40px', 
-                height: '40px',
-                background: theme.logoAccentColor,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '20px',
-                cursor: 'pointer'
-              }}
-              onClick={() => navigate('/')}
-            >
-              B
-            </div>
-          )}
-          
-          {/* Theme Icons and Settings */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {/* Theme Icons */}
-            <Space size="small">
-              <Button
-                type="text"
-                icon={<GiBatMask style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
-                style={{ 
-                  color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px'
-                }}
-                onClick={() => handleThemeChange('dark')}
-              />
-              <Button
-                type="text"
-                icon={<FaSnowflake style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
-                style={{ 
-                  color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px'
-                }}
-                onClick={() => handleThemeChange('white')}
-              />
-              <Button
-                type="text"
-                icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
-                style={{ 
-                  color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px'
-                }}
-                onClick={() => handleThemeChange('default')}
-              />
-              <Button
-                type="text"
-                icon={<AiFillBulb style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
-                style={{ 
-                  color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px'
-                }}
-                onClick={() => handleThemeChange('compact')}
-              />
-            </Space>
-            
-            {/* Settings Icon */}
+        {/* B Logo */}
+        {!logoError ? (
+          <img
+            src="/askbender_b!_green_on_blk.png"
+            alt="AskBender"
+            style={{
+              height: '40px',
+              width: 'auto',
+              cursor: 'pointer',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))'
+            }}
+            onClick={() => navigate('/')}
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          <div 
+            style={{ 
+              width: '40px', 
+              height: '40px',
+              background: theme.logoAccentColor,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '20px',
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/')}
+          >
+            B
+          </div>
+        )}
+        {/* Theme Icons and Settings */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Theme Icons */}
+          <Space size="small">
             <Button
               type="text"
-              icon={<SettingOutlined />}
-              style={{ color: theme.textPrimary, fontSize: '18px' }}
-              onClick={() => setIsMenuVisible(true)}
+              icon={<GiBatMask style={{ fontSize: '16px' }} />}
+              className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
+              style={{ 
+                color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
+                fontSize: '16px'
+              }}
+              onClick={() => handleThemeChange('dark')}
             />
-          </div>
+            <Button
+              type="text"
+              icon={<FaSnowflake style={{ fontSize: '16px' }} />}
+              className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
+              style={{ 
+                color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
+                fontSize: '16px'
+              }}
+              onClick={() => handleThemeChange('white')}
+            />
+            <Button
+              type="text"
+              icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
+              className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
+              style={{ 
+                color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
+                fontSize: '16px'
+              }}
+              onClick={() => handleThemeChange('default')}
+            />
+            <Button
+              type="text"
+              icon={<AiFillBulb style={{ fontSize: '16px' }} />}
+              className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
+              style={{ 
+                color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
+                fontSize: '16px'
+              }}
+              onClick={() => handleThemeChange('compact')}
+            />
+          </Space>
+          {/* Settings Icon */}
+          <Button
+            type="text"
+            icon={<SettingOutlined />}
+            style={{ color: theme.textPrimary, fontSize: '18px' }}
+            onClick={handleOpenMenu}
+          />
         </div>
       </Header>
 
       {/* Main Content - Responsive Scroll */}
       <Content className="homepage-content" style={{ height: 'calc(100vh - 64px - 60px)', overflow: 'hidden' }}>
-        <Row style={{ height: '100%' }}>
+        <Row style={{ height: '100%' }} gutter={8}>
           {/* Visual Side - Left (Desktop) / Top (Mobile) */}
-          <Col xs={24} md={12} className="homepage-image" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Col xs={24} md={14} className="homepage-image" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ 
-              width: '100%', 
-              height: '100%',
+              width: '100%',
+              margin: 0,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px'
+              justifyContent: 'flex-end',
+              height: '100%'
             }}>
               {/* Instagram Test Image - Centered and 20% larger */}
               {!instaImageError ? (
@@ -473,9 +474,7 @@ export function HomePage() {
                   src="/instatest.png" 
                   alt="Instagram test sample"
                   style={{ 
-                    maxWidth: '120%', // 20% larger
-                    maxHeight: '120%', // 20% larger
-                    width: 'auto',
+                    maxWidth: '100%',
                     height: 'auto',
                     objectFit: 'contain'
                   }}
@@ -508,7 +507,7 @@ export function HomePage() {
           </Col>
 
           {/* Form Side - Right (Desktop) / Bottom (Mobile) */}
-          <Col xs={24} md={12} style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Col xs={24} md={10} style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ 
               textAlign: 'center',
               padding: '24px 16px',
@@ -690,7 +689,7 @@ export function HomePage() {
                     fontWeight: 'normal',
                     background: 'transparent',
                     borderColor: 'transparent', // No border
-                    color: currentTheme === 'compact' ? '#1e40af' : '#3B82F6', // Darker blue for compact theme
+                    color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#3B82F6'), // Yellow for COMPACT and CLASSIC theme
                     borderRadius: '88px', // Same as login button
                     display: 'flex',
                     alignItems: 'center',
@@ -721,41 +720,49 @@ export function HomePage() {
                   Continue with Google
                 </Button>
 
-                {/* Second Divider */}
-                <Divider style={{ 
-                  color: theme.textSecondary, 
-                  fontSize: '12px',
-                  margin: '4px 0', // Reduced from 8px to 4px
-                  borderColor: theme.cardBorder
-                }}>
-                  or
-                </Divider>
-
-                {/* Bite Me Link */}
-                <div style={{ 
-                  marginTop: '8px', // Reduced from 16px to 8px
-                  textAlign: 'center',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '20px'
-                }}>
-                  <span 
-                    style={{ 
-                      color: currentTheme === 'white' ? '#666666' : (currentTheme === 'compact' ? '#ffffff' : 'white'),
+                  {/* Second separator replaced with "Again with the lost Sticky?" link */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    margin: '12px 0',
+                    gap: '16px'
+                  }}>
+                    <div style={{ 
+                      flex: 1, 
+                      height: '1px', 
+                      background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
+                    }} />
+                    <span style={{
+                      color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
+                      fontFamily: 'Poppins, sans-serif',
                       fontSize: '12px',
                       fontWeight: 'normal',
                       cursor: 'pointer',
-                      textDecoration: 'underline'
+                      textDecoration: 'underline',
+                      whiteSpace: 'nowrap'
                     }}
-                    onClick={handleForgotPassword}
-                    title="Passwords are a biiiiiiiiiii"
-                  >
-                    Again with the lost Sticky?
-                  </span>
-                  {!isAuthenticated && (
-                    <span 
-                      style={{ 
-                        color: currentTheme === 'compact' ? '#1e40af' : '#3B82F6', // Darker blue for compact theme
+                    title="Passwords. Glassware. Easy."
+                    >
+                      Again with the lost Sticky?
+                    </span>
+                    <div style={{ 
+                      flex: 1, 
+                      height: '1px', 
+                      background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
+                    }} />
+                  </div>
+
+                  {/* Bite Me link centered at bottom */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    marginTop: '6px'
+                  }}>
+                    <span
+                      style={{
+                        color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
+                        fontFamily: 'Poppins, sans-serif',
                         fontSize: '12px',
                         fontWeight: 'normal',
                         cursor: 'pointer',
@@ -766,8 +773,7 @@ export function HomePage() {
                     >
                       Bite Me
                     </span>
-                  )}
-                </div>
+                  </div>
               </div>
             </div>
           </Col>
@@ -776,37 +782,27 @@ export function HomePage() {
 
       {/* Footer */}
       <Footer style={{ 
-        background: theme.headerBackground, 
-        borderTop: `1px solid ${theme.headerBorder}`,
-        padding: '8px 24px',
-        height: '60px',
+        background: 'transparent',
+        padding: 0,
+        height: '27px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
       }}>
         <div style={{ 
-          maxWidth: '1400px',
           width: '100%',
-          textAlign: 'center'
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%'
         }}>
-          {/* Navigation Links */}
-          <div style={{ 
-            marginBottom: '4px',
-            fontSize: '10px',
-            color: theme.textSecondary
-          }}>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Contact</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Press</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Boozeletter</span>
-            <span style={{ cursor: 'pointer', marginRight: '16px' }}>Terms</span>
-            <span style={{ cursor: 'pointer' }}>Privacy</span>
-          </div>
-          
-          {/* Copyright */}
           <div style={{ 
             fontSize: '10px',
-            color: theme.textSecondary
+            color: theme.textSecondary,
+            lineHeight: '17px',
+            paddingBottom: '10px'
           }}>
             © 2025 bendersaas.ai all rights reserved
           </div>
@@ -845,111 +841,382 @@ export function HomePage() {
             onClick={(e) => e.stopPropagation()}
           >
           {/* Header with Close button */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '32px' }}>
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#222' }}>
-              User Profile
-            </div>
-            <Button
-              type="text"
-              onClick={() => setIsMenuVisible(false)}
-              style={{ color: '#333', fontSize: '20px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-              aria-label="Close menu"
-            >
-              ✕
-            </Button>
-          </div>
-
-          {/* Account Name */}
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center' 
-            }}>
-              <span style={{
-                color: '#888',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'normal'
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
+              {/* Avatar placeholder */}
+              <div style={{
+                width: '128px',
+                height: '128px',
+                backgroundColor: '#f0f0f0',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid #ddd'
               }}>
-                Account Name:
-              </span>
-              <span style={{
+                <span style={{ color: '#999', fontSize: '12px' }}>Avatar</span>
+              </div>
+              {/* Username with updated styling */}
+              <div style={{ 
+                fontSize: '16px', 
+                fontWeight: '300',
                 color: '#222',
                 fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'bold'
+                letterSpacing: '1px'
               }}>
-                {user?.email || 'test@example.com'}
-              </span>
+                <span>{user?.email || 'test@example.com'}</span>
+              </div>
             </div>
-          </div>
-
-          {/* Subscription */}
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center' 
-            }}>
-              <span style={{
-                color: '#888',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'normal'
-              }}>
-                Subscription:
-              </span>
-              <span style={{
-                color: '#222',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'normal'
-              }}>
-                {getTierDisplayName(userTier)} (${(getTierPrice(userTier) / 100).toFixed(2)}/month)
-              </span>
-            </div>
-          </div>
-
-          {/* My Role */}
-          <div style={{ marginBottom: '24px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center' 
-            }}>
-              <span style={{
-                color: '#888',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '12px',
-                fontWeight: 'normal'
-              }}>
-                My Role:
-              </span>
-              <select
-                defaultValue="event-planner"
-                style={{
-                  width: '120px',
-                  height: '24px',
-                  paddingLeft: '8px',
-                  fontFamily: 'Poppins, sans-serif',
-                  fontSize: '12px',
-                  fontWeight: 'normal',
-                  color: '#222',
-                  background: 'transparent',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+              <Button
+                type="text"
+                onClick={handleCloseMenu}
+                style={{ color: '#666', fontSize: '20px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+                aria-label="Close menu"
               >
-                <option value="event-planner">Event Planner</option>
-                <option value="vendor">Vendor</option>
-                <option value="venue-owner">Venue Owner</option>
-                <option value="client">Client</option>
-              </select>
+                ✕
+              </Button>
             </div>
           </div>
+
+          {/* Invisible Tab Navigation */}
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid #eee', paddingBottom: '12px', opacity: 0, pointerEvents: 'none' }}>
+            <span
+              style={{
+                color: activeTab === 'profile' ? '#1890ff' : '#666',
+                fontSize: '14px',
+                fontWeight: activeTab === 'profile' ? 'bold' : 'normal',
+                cursor: 'pointer',
+                textDecoration: activeTab === 'profile' ? 'underline' : 'none'
+              }}
+              onClick={() => setActiveTab('profile')}
+            >
+              Account Profile
+            </span>
+            <span
+              style={{
+                color: activeTab === 'settings' ? '#1890ff' : '#666',
+                fontSize: '14px',
+                fontWeight: activeTab === 'settings' ? 'bold' : 'normal',
+                cursor: 'pointer',
+                textDecoration: activeTab === 'settings' ? 'underline' : 'none'
+              }}
+              onClick={() => setActiveTab('settings')}
+            >
+              Settings
+            </span>
+            <span
+              style={{
+                color: activeTab === 'billing' ? '#1890ff' : '#666',
+                fontSize: '14px',
+                fontWeight: activeTab === 'billing' ? 'bold' : 'normal',
+                cursor: 'pointer',
+                textDecoration: activeTab === 'billing' ? 'underline' : 'none'
+              }}
+              onClick={() => setActiveTab('billing')}
+            >
+              Billing
+            </span>
+          </div>
+
+            {/* Tab Content Area */}
+            <div style={{ minHeight: '150px' }}>
+              {activeTab === 'links' && (
+                <div>
+                  {/* Stacked Text Links */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => setActiveTab('profile')}
+                    >
+                      Account Profile
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => setActiveTab('settings')}
+                    >
+                      Settings
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => setActiveTab('billing')}
+                    >
+                      Billing
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Press clicked')}
+                    >
+                      Press
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Boozletter clicked')}
+                    >
+                      Boozeletter
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Support clicked')}
+                    >
+                      Support
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Terms clicked')}
+                    >
+                      Terms
+                    </span>
+                    <span
+                      style={{
+                        color: '#444',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Privacy clicked')}
+                    >
+                      Privacy
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'profile' && (
+                <div>
+                  {/* Tab Header with Close Button */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Account Profile</h3>
+                    <Button
+                      type="text"
+                      onClick={() => setActiveTab('links')}
+                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+                      aria-label="Close tab"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+
+                  {/* Account Name */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center' 
+                    }}>
+                      <span style={{
+                        color: '#888',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      }}>
+                        Account Name:
+                      </span>
+                      <span style={{
+                        color: '#222',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}>
+                        {user?.email || 'test@example.com'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Subscription */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center' 
+                    }}>
+                      <span style={{
+                        color: '#888',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      }}>
+                        Subscription:
+                      </span>
+                      <span style={{
+                        color: '#222',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      }}>
+                        {getTierDisplayName(userTier)} (${(getTierPrice(userTier) / 100).toFixed(2)}/month)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* My Role */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center' 
+                    }}>
+                      <span style={{
+                        color: '#888',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      }}>
+                        My Role:
+                      </span>
+                      <select
+                        defaultValue="event-planner"
+                        style={{
+                          width: '120px',
+                          height: '24px',
+                          paddingLeft: '8px',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '12px',
+                          fontWeight: 'normal',
+                          color: '#222',
+                          background: 'transparent',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          outline: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="event-planner">Event Planner</option>
+                        <option value="vendor">Vendor</option>
+                        <option value="venue-owner">Venue Owner</option>
+                        <option value="client">Client</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Cancel Account */}
+                  <div style={{ 
+                    marginTop: 'auto',
+                    paddingTop: '16px',
+                    borderTop: '1px solid #eee'
+                  }}>
+                    <span
+                      style={{
+                        color: '#ff4d4f',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: '300',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                      onClick={() => console.log('Cancel Account clicked')}
+                    >
+                      Cancel Account
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'settings' && (
+                <div>
+                  {/* Tab Header with Close Button */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Settings</h3>
+                    <Button
+                      type="text"
+                      onClick={() => setActiveTab('links')}
+                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+                      aria-label="Close tab"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <p style={{ color: '#666', fontSize: '14px' }}>Settings content coming soon...</p>
+                </div>
+              )}
+
+              {activeTab === 'billing' && (
+                <div>
+                  {/* Tab Header with Close Button */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Billing</h3>
+                    <Button
+                      type="text"
+                      onClick={() => setActiveTab('links')}
+                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
+                      aria-label="Close tab"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <p style={{ color: '#666', fontSize: '14px' }}>Billing content coming soon...</p>
+                </div>
+              )}
+            </div>
         </div>
         </>
       )}
