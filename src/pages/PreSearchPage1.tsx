@@ -9,7 +9,7 @@ declare global {
 }
 import { useNavigate } from 'react-router-dom'
 import { Layout, Input, Button, Typography, Space, Switch } from 'antd'
-import { SendOutlined, SettingOutlined } from '@ant-design/icons'
+import { SendOutlined } from '@ant-design/icons'
 import { FaMicrophone } from 'react-icons/fa'
 import { AiFillStar, AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
@@ -409,7 +409,7 @@ export function PreSearchPage1() {
             {/* Settings Menu Button */}
             <Button
               type="text"
-              icon={<SettingOutlined />}
+              icon={<FaHamburger />}
               onClick={() => setIsMenuVisible(true)}
               style={{ 
                 color: theme.textSecondary,

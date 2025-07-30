@@ -1,3 +1,20 @@
+/*
+SEARCH DETAIL SCREEN SPECIFICATIONS
+
+- The Search Detail Screen does NOT use a traditional carousel, but visually resembles one.
+- Each Business Detail is a Pane within this page (not a separate page). Artists/Vendors will eventually have their own dedicated, larger, scrollable pages linked from these fake carousel panes.
+- The "fake carousel" works as follows:
+  - Uses animation to allow the user to control how the panes change (left/right in a loop, or vertical scrolling with cards moving upward and looping).
+  - User controls the speed of the animation.
+  - Animation starts slow, then "snaps" or "pops" into place at the end (magnet effect).
+  - User can disable animation and use manual controls to move between panes (left/right/up/down). Manual navigation can be via L/R Up/Down icons to click (or swiping in any direction on mobile), and the behavior is exactly like the animated version: the new pane has magnetic snap-to-place when it appears.
+  - Left and up go to the same image; right and down go to the same image (just different animation direction).
+- Panes fill the entire window (left to right, top to bottom), except for the small header and the mini category cards at the bottom.
+- Clicking a mini category card at the bottom opens the detail view for that category, showing only the businesses saved in that category as panes in this fake carousel.
+- The cards and panes are persistent per event (Supabase data stored).
+- This design is intended to be visually engaging, highly interactive, and modular for future expansion (e.g., dedicated artist/vendor pages, advanced chat, quote requests, etc.).
+*/
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BusinessCloudCanvas } from '../components/BusinessCloudCanvas'
