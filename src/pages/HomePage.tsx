@@ -94,7 +94,6 @@ export function HomePage() {
     currentTheme, 
     setTheme, 
     getThemeConfig,
-    user,
     isLoading,
     setIsLoading
   } = useCloudStore()
@@ -111,39 +110,8 @@ export function HomePage() {
   const [password, setPassword] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
-  // Add toggle state at the top of the component:
-  const [excludeLoafers, setExcludeLoafers] = useState(false)
-  const [fourStars, setFourStars] = useState(false)
-
-  // Add state for city and state fields at the top of the component:
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
-  const [country, setCountry] = useState('')
-  const [genre, setGenre] = useState('')
-  const [driveMiles, setDriveMiles] = useState('')
-
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
-  const [hasPortablePower, setHasPortablePower] = useState(false)
-  const [isUnionCompliant, setIsUnionCompliant] = useState(false)
-  const [requiresDeposit, setRequiresDeposit] = useState(false)
-  const [cancellationFee, setCancellationFee] = useState('')
-  
-  // Track original filter values when menu opens
-  const [originalFilters, setOriginalFilters] = useState({
-    searchValue: '',
-    city: '',
-    state: '',
-    country: '',
-    excludeLoafers: false,
-    fourStars: false,
-    genre: '',
-    driveMiles: '',
-    hasPortablePower: false,
-    isUnionCompliant: false,
-    requiresDeposit: false,
-    cancellationFee: ''
-  })
 
 
   const handleLogin = async () => {
@@ -254,63 +222,8 @@ export function HomePage() {
     fontSize: '14px'
   }
 
-  const searchPlaceholders = [
-    "Type some words. Thought I cared?",
-    "Your opinion matters! To others.",
-    "Shhhhhhhhhhhh, no one cares",
-    "I'm listening...just not to you",
-    "Go ahead Make my Day flesh puppet",
-    "Let's make magic. Whoops! Never mind.",
-    "I'm here for you. My favorite lie",
-    "Don't just search, search HARD",
-    "Now you're just rage searching.",
-    "Searching is like Stocks, annnd you're cooked",
-    "I've had your social since like 1999",
-    "Why do humans search? Ooooh, that sucks.",
-    "Find your inner Search. I'll Roast it good",
-    "Did jealous little Google just de-index me again?"
-  ]
-  const [searchValue, setSearchValue] = useState('')
 
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => {
-    if (isMenuVisible && searchInputRef.current) {
-      searchInputRef.current.focus()
-      // Auto-fill Country to USA unless user has already selected a different country
-      if (!country || country === '') {
-        setCountry('USA')
-      }
-      // Capture original filter values when menu opens
-      setOriginalFilters({
-        searchValue,
-        city,
-        state,
-        country: country || 'USA',
-        excludeLoafers,
-        fourStars,
-        genre,
-        driveMiles,
-        hasPortablePower,
-        isUnionCompliant,
-        requiresDeposit,
-        cancellationFee
-      })
-    } else if (!isMenuVisible) {
-      // Revert all filter values to original when menu closes
-      setSearchValue(originalFilters.searchValue)
-      setCity(originalFilters.city)
-      setState(originalFilters.state)
-      setCountry(originalFilters.country)
-      setExcludeLoafers(originalFilters.excludeLoafers)
-      setFourStars(originalFilters.fourStars)
-      setGenre(originalFilters.genre)
-      setDriveMiles(originalFilters.driveMiles)
-      setHasPortablePower(originalFilters.hasPortablePower)
-      setIsUnionCompliant(originalFilters.isUnionCompliant)
-      setRequiresDeposit(originalFilters.requiresDeposit)
-      setCancellationFee(originalFilters.cancellationFee)
-    }
-  }, [isMenuVisible, country])
+
 
 
 
