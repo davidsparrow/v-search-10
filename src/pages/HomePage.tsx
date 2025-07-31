@@ -60,6 +60,12 @@ export function HomePage() {
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
 
+  // Reset image error states on component mount
+  useEffect(() => {
+    setInstaImageError(false)
+    setTextLogoError(false)
+    setLogoError(false)
+  }, [])
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -313,9 +319,17 @@ export function HomePage() {
                   style={{ 
                     maxWidth: '100%',
                     height: 'auto',
-                    objectFit: 'contain'
+                    objectFit: 'contain',
+                    borderRadius: '8px'
                   }}
-                  onError={() => setInstaImageError(true)}
+                  onError={(e) => {
+                    console.error('Failed to load instatest.png:', e)
+                    setInstaImageError(true)
+                  }}
+                  onLoad={() => {
+                    console.log('Successfully loaded instatest.png')
+                    setInstaImageError(false)
+                  }}
                 />
               ) : (
                 <div style={{
