@@ -1,14 +1,17 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'antd'
 import { useCloudStore } from '../store/cloudStore'
-import { PricingPageTemplate } from '../components/templates/PricingPageTemplate'
-import { GiChicken, GiLoveHowl } from 'react-icons/gi'
+import { MainPageTemplate } from '../components/templates/MainPageTemplate'
+import { GiChicken, GiLoveHowl, GiBrainDump } from 'react-icons/gi'
 import { IoMdBeer } from 'react-icons/io'
 
 export function PricingPageV2() {
+  const navigate = useNavigate()
   const { 
     currentTheme, 
-    getThemeConfig
+    getThemeConfig,
+    user
   } = useCloudStore()
 
   const theme = getThemeConfig()
@@ -17,22 +20,23 @@ export function PricingPageV2() {
   const [textLogoError, setTextLogoError] = useState(false)
 
   return (
-    <PricingPageTemplate>
-      {/* Top Black Section Content */}
-      <div style={{
-        width: '100%',
+    <MainPageTemplate allowScrolling={true}>
+      {/* Main Content Area */}
+      <div style={{ 
+        minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         padding: '40px 20px',
-        textAlign: 'center'
+        textAlign: 'center',
+        overflow: 'auto',
+        height: '100%'
       }}>
 
         {/* AskBender Logo */}
         <div style={{ 
           marginBottom: '80px',
-          marginTop: '-50px',
           textAlign: 'center',
           width: '100%',
           display: 'flex',
@@ -68,7 +72,14 @@ export function PricingPageV2() {
         </div>
 
         {/* Responsive Pricing Layout */}
-        <div className="pricing-grid-responsive">
+        <div 
+          className="pricing-grid"
+          style={{
+            width: '100%',
+            position: 'relative',
+            maxWidth: '1200px'
+          }}
+        >
           {/* Column 1: Free Range */}
           <div style={{ 
             padding: '20px',
@@ -121,15 +132,14 @@ export function PricingPageV2() {
                   margin: '0 0 16px 0',
                   fontWeight: 'bold'
                 }}>
-                  Get a taste of the chill-chick life. Drop (on) Evite. Then rage about $7/month.
+                  Get a taste of the chill life. Then rage about $7/month.
                 </p>
               </div>
               <ul style={{
                 color: currentTheme === 'dark' ? 'white' : theme.textSecondary,
-                fontSize: '12px',
+                fontSize: '11px',
                 lineHeight: '1.3',
                 fontFamily: 'Poppins, sans-serif',
-                fontWeight: '600',
                 marginBottom: '16px',
                 paddingLeft: '16px',
                 textAlign: 'left'
@@ -224,15 +234,14 @@ export function PricingPageV2() {
                   margin: '0 0 16px 0',
                   fontWeight: 'bold'
                 }}>
-                  Get drunk. On the power of our AI. Puke mostly all over Partiful. Upgrade for a logo-towel (you need it).
+                  Get drunk. On the power of our AI. And powerful hangovers.
                 </p>
               </div>
               <ul style={{
                 color: 'white',
-                fontSize: '12px',
+                fontSize: '11px',
                 lineHeight: '1.3',
                 fontFamily: 'Poppins, sans-serif',
-                fontWeight: '600',
                 marginBottom: '16px',
                 paddingLeft: '16px',
                 textAlign: 'left'
@@ -330,15 +339,13 @@ export function PricingPageV2() {
               </div>
               <ul style={{
                 color: currentTheme === 'dark' ? 'white' : theme.textSecondary,
-                fontSize: '12px',
+                fontSize: '11px',
                 lineHeight: '1.3',
                 fontFamily: 'Poppins, sans-serif',
-                fontWeight: '600',
                 marginBottom: '16px',
                 paddingLeft: '16px',
                 textAlign: 'left'
               }}>
-                <li style={{ marginBottom: '8px' }}>• Logo-towel</li>
                 <li style={{ marginBottom: '8px' }}>• Unlimited quizzes, 500 participants</li>
                 <li style={{ marginBottom: '8px' }}>• All FREE BEER features</li>
                 <li style={{ marginBottom: '8px' }}>• Memory retention advanced</li>
@@ -376,9 +383,119 @@ export function PricingPageV2() {
             </div>
           </div>
         </div>
+
+        {/* Eventria Info Blurb */}
+        <div style={{
+          marginTop: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%'
+        }}>
+          <div style={{
+            width: '500px',
+            background: '#0a0a0a',
+            borderRadius: '16px',
+            padding: '40px',
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            border: currentTheme === 'white' ? '1px solid #666666' : '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            {/* Eventria Logo */}
+            <div style={{
+              marginBottom: '30px',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+                          <img
+              src="/eventria _logo_green.png"
+              alt="eventria"
+              style={{
+                maxWidth: '300px',
+                width: '100%',
+                height: 'auto'
+              }}
+              onError={() => {
+                // Fallback to text if image fails to load
+                const img = document.querySelector('img[alt="eventria"]') as HTMLImageElement;
+                if (img) {
+                  img.style.display = 'none';
+                  const fallback = img.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'block';
+                }
+              }}
+            />
+            <div style={{
+              display: 'none',
+              fontSize: '36px',
+              fontWeight: 'bold',
+              color: '#90EE90',
+              fontFamily: 'Poppins, sans-serif',
+              textShadow: '2px 2px 4px rgba(139, 0, 0, 0.8)'
+            }}>
+              eventria
+            </div>
+            </div>
+
+            {/* Title */}
+            <h2 style={{
+              color: theme.textPrimary,
+              fontSize: '28px',
+              fontWeight: 'bold',
+              fontFamily: 'Poppins, sans-serif',
+              marginBottom: '16px'
+            }}>
+              Ready to Build Your Vision?
+            </h2>
+
+            {/* Subtitle */}
+            <p style={{
+              color: theme.textSecondary,
+              fontSize: '16px',
+              fontFamily: 'Poppins, sans-serif',
+              marginBottom: '24px',
+              lineHeight: '1.5'
+            }}>
+              Transform your ideas into reality with Eventria's powerful event planning platform
+            </p>
+
+            {/* Description */}
+            <p style={{
+              color: currentTheme === 'dark' ? 'white' : theme.textSecondary,
+              fontSize: '14px',
+              fontFamily: 'Poppins, sans-serif',
+              marginBottom: '32px',
+              lineHeight: '1.6'
+            }}>
+              Create stunning events, manage vendors, track budgets, and deliver unforgettable experiences. 
+              Join thousands of event planners who trust Eventria to bring their visions to life.
+            </p>
+
+            {/* Build My Vision Button */}
+            <div style={{ textAlign: 'center' }}>
+              <Button
+                type="primary"
+                size="large"
+                style={{
+                  background: '#90EE90',
+                  borderColor: '#90EE90',
+                  color: '#000',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  fontSize: '16px',
+                  padding: '12px 32px',
+                  height: 'auto'
+                }}
+                onClick={() => window.open('https://eventria.ai', '_blank')}
+              >
+                🧠⚡️🗺🎨✏️📤🧾✍️💰🎉 for me
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
 
-    </PricingPageTemplate>
+    </MainPageTemplate>
   )
 } 
