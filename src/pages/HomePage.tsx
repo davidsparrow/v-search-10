@@ -12,6 +12,7 @@ import {
   getTierPrice,
   AskBenderTier
 } from '../types/askbender'
+import { AvatarComponent } from '../components/AvatarComponent'
 
 const { Header, Content, Footer } = Layout
 const { } = Typography
@@ -107,7 +108,7 @@ export function HomePage() {
   // State for modal and menu
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const [activeTab, setActiveTab] = useState('links')
-  const [logoError] = useState(false)
+  const [logoError, setLogoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
 
@@ -864,19 +865,13 @@ export function HomePage() {
           {/* Header with Close button */}
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '32px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
-              {/* Avatar placeholder */}
-              <div style={{
-                width: '128px',
-                height: '128px',
-                backgroundColor: '#f0f0f0',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '2px solid #ddd'
-              }}>
-                <span style={{ color: '#999', fontSize: '12px' }}>Avatar</span>
-              </div>
+              {/* User Avatar */}
+              <AvatarComponent 
+                size={128}
+                onAvatarChange={(avatarUrl) => {
+                  console.log('Avatar updated:', avatarUrl)
+                }}
+              />
               {/* Username with updated styling */}
               <div style={{ 
                 fontSize: '16px', 
