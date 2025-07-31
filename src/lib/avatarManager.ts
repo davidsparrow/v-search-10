@@ -128,3 +128,31 @@ export function getUserAvatarUrl(): string {
     baseColor: ['ffdbac']
   })
 } 
+
+// Extract colors and seed from avatar URL
+export function extractColorsFromUrl(avatarUrl: string): {
+  seed: string
+  backgroundColor: string
+  baseColor: string
+  topColor: string
+} {
+  try {
+    const url = new URL(avatarUrl)
+    const params = new URLSearchParams(url.search)
+    
+    return {
+      seed: params.get('seed') || generateRandomSeed(),
+      backgroundColor: params.get('backgroundColor') || 'b6e3f4',
+      baseColor: params.get('baseColor') || 'ffdbac',
+      topColor: params.get('topColor') || '0905b5'
+    }
+  } catch (error) {
+    console.error('Failed to extract colors from URL:', error)
+    return {
+      seed: generateRandomSeed(),
+      backgroundColor: 'b6e3f4',
+      baseColor: 'ffdbac',
+      topColor: '0905b5'
+    }
+  }
+} 

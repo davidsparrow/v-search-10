@@ -8,6 +8,7 @@ import {
   loadUserAvatar,
   getUserAvatarUrl,
   avatarCustomizationOptions,
+  extractColorsFromUrl,
   AvatarOptions
 } from '../lib/avatarManager'
 
@@ -26,17 +27,35 @@ export function AvatarComponent({
   const [selectedAvatar, setSelectedAvatar] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  
+  // Color state management
+  const [currentSeed, setCurrentSeed] = useState<string>('')
+  const [currentBackgroundColor, setCurrentBackgroundColor] = useState<string>('b6e3f4')
+  const [currentBaseColor, setCurrentBaseColor] = useState<string>('ffdbac')
+  const [currentTopColor, setCurrentTopColor] = useState<string>('0905b5')
 
   // Load current avatar on component mount
   useEffect(() => {
     const saved = loadUserAvatar()
     if (saved) {
       setCurrentAvatarUrl(saved)
+      // Extract colors from saved avatar
+      const colors = extractColorsFromUrl(saved)
+      setCurrentSeed(colors.seed)
+      setCurrentBackgroundColor(colors.backgroundColor)
+      setCurrentBaseColor(colors.baseColor)
+      setCurrentTopColor(colors.topColor)
       if (onAvatarChange) onAvatarChange(saved)
     } else {
       // Generate a default avatar
       const defaultUrl = getUserAvatarUrl()
       setCurrentAvatarUrl(defaultUrl)
+      // Extract colors from default avatar
+      const colors = extractColorsFromUrl(defaultUrl)
+      setCurrentSeed(colors.seed)
+      setCurrentBackgroundColor(colors.backgroundColor)
+      setCurrentBaseColor(colors.baseColor)
+      setCurrentTopColor(colors.topColor)
       if (onAvatarChange) onAvatarChange(defaultUrl)
     }
   }, [onAvatarChange])
@@ -54,6 +73,14 @@ export function AvatarComponent({
   // Open customize modal
   const handleCustomizeClick = () => {
     generateNewOptions()
+    // Extract current colors from the avatar URL
+    if (currentAvatarUrl) {
+      const colors = extractColorsFromUrl(currentAvatarUrl)
+      setCurrentSeed(colors.seed)
+      setCurrentBackgroundColor(colors.backgroundColor)
+      setCurrentBaseColor(colors.baseColor)
+      setCurrentTopColor(colors.topColor)
+    }
     setIsCustomizeModalVisible(true)
   }
 
@@ -63,13 +90,39 @@ export function AvatarComponent({
     const avatar = avatarOptions.find(a => a.id === avatarId)
     if (avatar) {
       setCurrentAvatarUrl(avatar.url)
+      // Extract colors from selected avatar
+      const colors = extractColorsFromUrl(avatar.url)
+      setCurrentSeed(colors.seed)
+      setCurrentBackgroundColor(colors.backgroundColor)
+      setCurrentBaseColor(colors.baseColor)
+      setCurrentTopColor(colors.topColor)
       if (onAvatarChange) onAvatarChange(avatar.url)
     }
   }
 
-  // Update custom options
+  // Update custom options - FIXED to preserve seed and all colors
   const handleOptionChange = (key: keyof AvatarOptions, value: any) => {
-    const newOptions: AvatarOptions = { [key]: [value] }
+    // Create new options with current seed and all current colors
+    const newOptions: AvatarOptions = {
+      seed: currentSeed,
+      backgroundColor: [currentBackgroundColor],
+      baseColor: [currentBaseColor],
+      topColor: [currentTopColor],
+      size
+    }
+    
+    // Update the specific color that changed
+    if (key === 'backgroundColor') {
+      newOptions.backgroundColor = [value]
+      setCurrentBackgroundColor(value)
+    } else if (key === 'baseColor') {
+      newOptions.baseColor = [value]
+      setCurrentBaseColor(value)
+    } else if (key === 'topColor') {
+      newOptions.topColor = [value]
+      setCurrentTopColor(value)
+    }
+    
     const url = generateAvatarUrl(newOptions)
     setCurrentAvatarUrl(url)
     if (onAvatarChange) onAvatarChange(url)
@@ -84,14 +137,21 @@ export function AvatarComponent({
 
   // Generate random avatar
   const handleRandomAvatar = () => {
+    const randomSeed = Math.random().toString(36).substring(2, 15)
     const randomUrl = generateAvatarUrl({
-      seed: Math.random().toString(36).substring(2, 15),
+      seed: randomSeed,
       size,
       backgroundColor: [avatarCustomizationOptions.backgroundColor[Math.floor(Math.random() * avatarCustomizationOptions.backgroundColor.length)].value],
       baseColor: [avatarCustomizationOptions.baseColor[Math.floor(Math.random() * avatarCustomizationOptions.baseColor.length)].value],
       topColor: [avatarCustomizationOptions.topColor[Math.floor(Math.random() * avatarCustomizationOptions.topColor.length)].value]
     })
     setCurrentAvatarUrl(randomUrl)
+    // Extract colors from random avatar
+    const colors = extractColorsFromUrl(randomUrl)
+    setCurrentSeed(colors.seed)
+    setCurrentBackgroundColor(colors.backgroundColor)
+    setCurrentBaseColor(colors.baseColor)
+    setCurrentTopColor(colors.topColor)
     if (onAvatarChange) onAvatarChange(randomUrl)
   }
 
@@ -254,7 +314,7 @@ export function AvatarComponent({
                 Background Color
               </label>
               <Select
-                value={'b6e3f4'}
+                value={currentBackgroundColor}
                 onChange={(value) => handleOptionChange('backgroundColor', value)}
                 style={{ width: '100%' }}
                 size="small"
@@ -282,7 +342,7 @@ export function AvatarComponent({
                 Skin Color
               </label>
               <Select
-                value={'ffdbac'}
+                value={currentBaseColor}
                 onChange={(value) => handleOptionChange('baseColor', value)}
                 style={{ width: '100%' }}
                 size="small"
@@ -310,7 +370,7 @@ export function AvatarComponent({
                 Hair Color
               </label>
               <Select
-                value={'0905b5'}
+                value={currentTopColor}
                 onChange={(value) => handleOptionChange('topColor', value)}
                 style={{ width: '100%' }}
                 size="small"
