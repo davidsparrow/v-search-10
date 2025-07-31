@@ -222,6 +222,9 @@ export function HomePage() {
     fontSize: '14px'
   }
 
+  // Placeholder styles for white theme
+  const placeholderStyle = currentTheme === 'white' ? { color: '#666666' } : {}
+
 
 
 
@@ -471,7 +474,10 @@ export function HomePage() {
                       setEmail(value)
                     }
                   }}
-                  style={inputStyle}
+                  style={{
+                    ...inputStyle,
+                    ...placeholderStyle
+                  }}
                 />
 
                 {/* Password Input */}
@@ -479,7 +485,10 @@ export function HomePage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={inputStyle}
+                  style={{
+                    ...inputStyle,
+                    ...placeholderStyle
+                  }}
                 />
 
                 {/* Success Message */}
