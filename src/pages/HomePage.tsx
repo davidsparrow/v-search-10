@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Typography, Row, Col, Layout, Space, Input, Divider, Modal, message } from 'antd'
+import { Button, Typography, Row, Col, Layout, Space, Input, Divider, Modal } from 'antd'
 import { SettingOutlined } from '@ant-design/icons'
 import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
@@ -8,11 +8,9 @@ import { FaSnowflake } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { auth } from '../lib/supabase'
 import {
-  getTierDisplayName,
-  getTierPrice,
   AskBenderTier
 } from '../types/askbender'
-import { AvatarComponent } from '../components/AvatarComponent'
+import { MenuTemplate } from '../components/MenuTemplate'
 
 const { Header, Content, Footer } = Layout
 const { } = Typography
@@ -97,17 +95,13 @@ export function HomePage() {
     setTheme, 
     getThemeConfig,
     user,
-    isAuthenticated,
     isLoading,
-    setUser,
-    setIsAuthenticated,
     setIsLoading
   } = useCloudStore()
   const theme = getThemeConfig()
   
   // State for modal and menu
   const [isMenuVisible, setIsMenuVisible] = useState(false)
-  const [activeTab, setActiveTab] = useState('links')
   const [logoError, setLogoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
@@ -130,7 +124,6 @@ export function HomePage() {
 
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
-  const [eventriaTier] = useState<string | undefined>(undefined)
   const [hasPortablePower, setHasPortablePower] = useState(false)
   const [isUnionCompliant, setIsUnionCompliant] = useState(false)
   const [requiresDeposit, setRequiresDeposit] = useState(false)
@@ -151,9 +144,7 @@ export function HomePage() {
     requiresDeposit: false,
     cancellationFee: ''
   })
-  const stateOptions = [
-    'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC','PR'
-  ]
+
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -189,7 +180,7 @@ export function HomePage() {
   const handleGoogleAuth = async () => {
     setIsLoading(true)
     try {
-      const { data, error } = await auth.signInWithGoogle()
+      const { error } = await auth.signInWithGoogle()
       if (error) {
         console.error('Google auth error:', error.message)
         // TODO: Show error message to user
@@ -214,13 +205,7 @@ export function HomePage() {
   const [resetSuccess, setResetSuccess] = useState(false)
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleForgotPassword = () => {
-    setIsResetModalVisible(true)
-    setResetEmail('')
-    setResetError('')
-    setResetSuccess(false)
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
-  }
+
 
   const handleResetModalCancel = () => {
     setIsResetModalVisible(false)
@@ -257,23 +242,7 @@ export function HomePage() {
     setTheme(theme)
   }
 
-  // Check if any filters have changed from original values
-  const hasFiltersChanged = () => {
-    return (
-      searchValue !== originalFilters.searchValue ||
-      city !== originalFilters.city ||
-      state !== originalFilters.state ||
-      country !== originalFilters.country ||
-      excludeLoafers !== originalFilters.excludeLoafers ||
-      fourStars !== originalFilters.fourStars ||
-      genre !== originalFilters.genre ||
-      driveMiles !== originalFilters.driveMiles ||
-      hasPortablePower !== originalFilters.hasPortablePower ||
-      isUnionCompliant !== originalFilters.isUnionCompliant ||
-      requiresDeposit !== originalFilters.requiresDeposit ||
-      cancellationFee !== originalFilters.cancellationFee
-    )
-  }
+
 
   // Input styles that match the selected theme
   const inputStyle = {
@@ -302,10 +271,9 @@ export function HomePage() {
     "Did jealous little Google just de-index me again?"
   ]
   const [searchValue, setSearchValue] = useState('')
-  const [searchPlaceholder, setSearchPlaceholder] = useState('')
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
-    setSearchPlaceholder(searchPlaceholders[Math.floor(Math.random() * searchPlaceholders.length)])
     if (isMenuVisible && searchInputRef.current) {
       searchInputRef.current.focus()
       // Auto-fill Country to USA unless user has already selected a different country
@@ -344,13 +312,10 @@ export function HomePage() {
     }
   }, [isMenuVisible, country])
 
-  const handleCloseMenu = () => {
-    setIsMenuVisible(false)
-  }
+
 
   const handleOpenMenu = () => {
     setIsMenuVisible(true)
-    setActiveTab('links') // Always reset to main menu when opening
   }
 
   return (
@@ -832,410 +797,12 @@ export function HomePage() {
       </Footer>
 
       {/* Settings Menu */}
-      {isMenuVisible && (
-        <>
-          {/* Backdrop for outside click */}
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              background: 'transparent',
-              zIndex: 999
-            }}
-            onClick={() => setIsMenuVisible(false)}
-          />
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              right: 0,
-              width: '350px',
-              height: '100vh',
-              background: 'white',
-              zIndex: 1000,
-              animation: 'slideInRight 0.4s ease-out',
-              padding: '24px',
-              overflowY: 'auto'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-          {/* Header with Close button */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '32px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
-              {/* User Avatar */}
-              <AvatarComponent 
-                size={128}
-                onAvatarChange={(avatarUrl) => {
-                  console.log('Avatar updated:', avatarUrl)
-                }}
-              />
-              {/* Username with updated styling */}
-              <div style={{ 
-                fontSize: '16px', 
-                fontWeight: '300',
-                color: '#222',
-                fontFamily: 'Poppins, sans-serif',
-                letterSpacing: '1px'
-              }}>
-                <span>{user?.email || 'test@example.com'}</span>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-              <Button
-                type="text"
-                onClick={handleCloseMenu}
-                style={{ color: '#666', fontSize: '20px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-                aria-label="Close menu"
-              >
-                ✕
-              </Button>
-            </div>
-          </div>
-
-          {/* Invisible Tab Navigation */}
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid #eee', paddingBottom: '12px', opacity: 0, pointerEvents: 'none' }}>
-            <span
-              style={{
-                color: activeTab === 'profile' ? '#1890ff' : '#666',
-                fontSize: '14px',
-                fontWeight: activeTab === 'profile' ? 'bold' : 'normal',
-                cursor: 'pointer',
-                textDecoration: activeTab === 'profile' ? 'underline' : 'none'
-              }}
-              onClick={() => setActiveTab('profile')}
-            >
-              Account Profile
-            </span>
-            <span
-              style={{
-                color: activeTab === 'settings' ? '#1890ff' : '#666',
-                fontSize: '14px',
-                fontWeight: activeTab === 'settings' ? 'bold' : 'normal',
-                cursor: 'pointer',
-                textDecoration: activeTab === 'settings' ? 'underline' : 'none'
-              }}
-              onClick={() => setActiveTab('settings')}
-            >
-              Settings
-            </span>
-            <span
-              style={{
-                color: activeTab === 'billing' ? '#1890ff' : '#666',
-                fontSize: '14px',
-                fontWeight: activeTab === 'billing' ? 'bold' : 'normal',
-                cursor: 'pointer',
-                textDecoration: activeTab === 'billing' ? 'underline' : 'none'
-              }}
-              onClick={() => setActiveTab('billing')}
-            >
-              Billing
-            </span>
-          </div>
-
-            {/* Tab Content Area */}
-            <div style={{ minHeight: '150px' }}>
-              {activeTab === 'links' && (
-                <div>
-                  {/* Stacked Text Links */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => setActiveTab('profile')}
-                    >
-                      Account Profile
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => setActiveTab('settings')}
-                    >
-                      Settings
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => setActiveTab('billing')}
-                    >
-                      Billing
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Press clicked')}
-                    >
-                      Press
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Boozletter clicked')}
-                    >
-                      Boozeletter
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Support clicked')}
-                    >
-                      Support
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Terms clicked')}
-                    >
-                      Terms
-                    </span>
-                    <span
-                      style={{
-                        color: '#444',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '16px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Privacy clicked')}
-                    >
-                      Privacy
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'profile' && (
-                <div>
-                  {/* Tab Header with Close Button */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Account Profile</h3>
-                    <Button
-                      type="text"
-                      onClick={() => setActiveTab('links')}
-                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-                      aria-label="Close tab"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-
-                  {/* Account Name */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center' 
-                    }}>
-                      <span style={{
-                        color: '#888',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                      }}>
-                        Account Name:
-                      </span>
-                      <span style={{
-                        color: '#222',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        {user?.email || 'test@example.com'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Subscription */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center' 
-                    }}>
-                      <span style={{
-                        color: '#888',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                      }}>
-                        Subscription:
-                      </span>
-                      <span style={{
-                        color: '#222',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                      }}>
-                        {getTierDisplayName(userTier)} (${(getTierPrice(userTier) / 100).toFixed(2)}/month)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* My Role */}
-                  <div style={{ marginBottom: '32px' }}>
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center' 
-                    }}>
-                      <span style={{
-                        color: '#888',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                      }}>
-                        My Role:
-                      </span>
-                      <select
-                        defaultValue="event-planner"
-                        style={{
-                          width: '120px',
-                          height: '24px',
-                          paddingLeft: '8px',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: '12px',
-                          fontWeight: 'normal',
-                          color: '#222',
-                          background: 'transparent',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          outline: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <option value="event-planner">Event Planner</option>
-                        <option value="vendor">Vendor</option>
-                        <option value="venue-owner">Venue Owner</option>
-                        <option value="client">Client</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Cancel Account */}
-                  <div style={{ 
-                    marginTop: 'auto',
-                    paddingTop: '16px',
-                    borderTop: '1px solid #eee'
-                  }}>
-                    <span
-                      style={{
-                        color: '#ff4d4f',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '14px',
-                        fontWeight: '300',
-                        cursor: 'pointer',
-                        textDecoration: 'none',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}
-                      onClick={() => console.log('Cancel Account clicked')}
-                    >
-                      Cancel Account
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'settings' && (
-                <div>
-                  {/* Tab Header with Close Button */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Settings</h3>
-                    <Button
-                      type="text"
-                      onClick={() => setActiveTab('links')}
-                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-                      aria-label="Close tab"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                  <p style={{ color: '#666', fontSize: '14px' }}>Settings content coming soon...</p>
-                </div>
-              )}
-
-              {activeTab === 'billing' && (
-                <div>
-                  {/* Tab Header with Close Button */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#222' }}>Billing</h3>
-                    <Button
-                      type="text"
-                      onClick={() => setActiveTab('links')}
-                      style={{ color: '#666', fontSize: '18px', background: 'none', border: 'none', boxShadow: 'none', outline: 'none', cursor: 'pointer' }}
-                      aria-label="Close tab"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                  <p style={{ color: '#666', fontSize: '14px' }}>Billing content coming soon...</p>
-                </div>
-              )}
-            </div>
-        </div>
-        </>
-      )}
+      <MenuTemplate
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        pageType="home"
+        userLevel={userTier}
+      />
 
       {/* Password Reset Modal */}
       <Modal
