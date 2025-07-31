@@ -210,6 +210,15 @@ export function HomePage() {
     setTheme(theme)
   }
 
+  // Apply white-theme class to body for placeholder styling
+  useEffect(() => {
+    if (currentTheme === 'white') {
+      document.body.classList.add('white-theme')
+    } else {
+      document.body.classList.remove('white-theme')
+    }
+  }, [currentTheme])
+
 
 
   // Input styles that match the selected theme
@@ -222,8 +231,7 @@ export function HomePage() {
     fontSize: '14px'
   }
 
-  // Placeholder styles for white theme
-  const placeholderStyle = currentTheme === 'white' ? { color: '#666666' } : {}
+
 
 
 
@@ -474,10 +482,7 @@ export function HomePage() {
                       setEmail(value)
                     }
                   }}
-                  style={{
-                    ...inputStyle,
-                    ...placeholderStyle
-                  }}
+                  style={inputStyle}
                 />
 
                 {/* Password Input */}
@@ -485,10 +490,7 @@ export function HomePage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{
-                    ...inputStyle,
-                    ...placeholderStyle
-                  }}
+                  style={inputStyle}
                 />
 
                 {/* Success Message */}

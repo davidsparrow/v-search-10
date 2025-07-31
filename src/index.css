@@ -98,6 +98,12 @@ body {
 
 /* Bright placeholder for Classic Theme Mode */
 .bright-placeholder::placeholder {
+
+/* White theme placeholder styling */
+.white-theme .ant-input::placeholder,
+.white-theme .ant-input-password .ant-input::placeholder {
+  color: #666666 !important;
+}
   color: #ffffff !important;
   opacity: 1 !important;
   text-shadow: none !important;
