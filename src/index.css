@@ -302,4 +302,38 @@ input:-webkit-autofill:active {
 
 .compact-theme .ant-input-password .ant-input::placeholder {
   color: #f0f0f0 !important;
+}
+
+/* Responsive Pricing Grid */
+.pricing-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+  position: relative;
+  max-width: 1200px;
+}
+
+/* Tablet & Mobile: 1 column */
+@media (max-width: 1023px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 0 140px;
+  }
+  
+  /* Make purple background respect container padding */
+  .pricing-grid > div {
+    margin: 0 20px;
+  }
+}
+
+/* Mobile: 1 column with less padding */
+@media (max-width: 540px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 0 10px;
+  }
 } 

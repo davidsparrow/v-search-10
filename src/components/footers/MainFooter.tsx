@@ -1,8 +1,10 @@
 import { useCloudStore } from '../../store/cloudStore'
+import { useNavigate } from 'react-router-dom'
 
 export function MainFooter() {
   const { getThemeConfig } = useCloudStore()
   const theme = getThemeConfig()
+  const navigate = useNavigate()
 
   return (
     <div style={{ 
@@ -28,7 +30,28 @@ export function MainFooter() {
           lineHeight: '17px',
           paddingBottom: '10px'
         }}>
-          © 2025 bendersaas.ai all rights reserved
+          © 2025 bendersaas.ai&nbsp;&nbsp;&nbsp;&nbsp;
+          <span 
+            style={{ 
+              color: theme.textSecondary,
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+            onClick={() => navigate('/privacy')}
+          >
+            privacy
+          </span>
+          &nbsp;&nbsp;
+          <span 
+            style={{ 
+              color: theme.textSecondary,
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+            onClick={() => navigate('/terms')}
+          >
+            terms
+          </span>
         </div>
       </div>
     </div>

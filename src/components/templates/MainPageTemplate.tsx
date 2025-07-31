@@ -12,6 +12,7 @@ interface MainPageTemplateProps {
   showSettingsIcon?: boolean
   showFooter?: boolean
   onMenuClick?: () => void
+  allowScrolling?: boolean
 }
 
 export function MainPageTemplate({ 
@@ -19,7 +20,8 @@ export function MainPageTemplate({
   showThemeIcons = true, 
   showSettingsIcon = true,
   showFooter = true,
-  onMenuClick
+  onMenuClick,
+  allowScrolling = false
 }: MainPageTemplateProps) {
   const { getThemeConfig } = useCloudStore()
   const theme = getThemeConfig()
@@ -40,7 +42,7 @@ export function MainPageTemplate({
       {/* Content */}
       <Content className="homepage-content" style={{ 
         height: showFooter ? 'calc(100vh - 64px - 60px)' : 'calc(100vh - 64px)', 
-        overflow: 'hidden' 
+        overflow: allowScrolling ? 'auto' : 'hidden' 
       }}>
         {children}
       </Content>

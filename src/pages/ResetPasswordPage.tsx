@@ -141,7 +141,28 @@ export default function ResetPasswordPage() {
             <span style={{ cursor: 'pointer' }}>Privacy</span>
           </div>
           <div style={{ fontSize: '10px', color: theme.textSecondary }}>
-            © 2025 bendersaas.ai all rights reserved
+            © 2025 bendersaas.ai&nbsp;&nbsp;&nbsp;&nbsp;
+            <span 
+              style={{ 
+                color: theme.textSecondary,
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+              onClick={() => navigate('/privacy')}
+            >
+              privacy
+            </span>
+            &nbsp;&nbsp;
+            <span 
+              style={{ 
+                color: theme.textSecondary,
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+              onClick={() => navigate('/terms')}
+            >
+              terms
+            </span>
           </div>
         </div>
       </Footer>

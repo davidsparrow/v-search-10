@@ -11,6 +11,7 @@ import { SystemSettingsPage } from './pages/SystemSettingsPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 import { PricingPage } from './pages/PricingPage'
+import { PricingPageV2 } from './pages/PricingPageV2'
 
 import { useCloudStore } from './store/cloudStore'
 import { supabase } from './lib/supabase'
@@ -91,6 +92,9 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/pricing-v2" element={<PricingPageV2 />} />
+            <Route path="/pricing-2" element={<PricingPageV2 />} />
+            <Route path="/pricing2" element={<PricingPageV2 />} />
 
             <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Routes>
