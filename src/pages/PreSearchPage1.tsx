@@ -10,7 +10,7 @@ declare global {
 import { useNavigate } from 'react-router-dom'
 import { Layout, Input, Button, Typography, Space, Switch } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
-import { FaMicrophone } from 'react-icons/fa'
+import { FaMicrophone, FaHamburger } from 'react-icons/fa'
 import { AiFillStar, AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
 import { FaSnowflake } from 'react-icons/fa'
@@ -255,29 +255,13 @@ export function PreSearchPage1() {
       console.log('Speech recognition started')
     }
     
-    recognition.onresult = (event) => {
-      let finalTranscript = ''
-      let interimTranscript = ''
-      
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript
-        } else {
-          interimTranscript += transcript
-        }
-      }
-      
-      // Update input with final results
-      if (finalTranscript) {
-        setInputValue(prev => prev + finalTranscript)
-      }
-      
-      // Show interim results in real-time (optional)
-      console.log('Interim:', interimTranscript)
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setSearchValue(transcript)
+      setIsListening(false)
     }
     
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error)
       setIsListening(false)
       if (event.error === 'not-allowed') {

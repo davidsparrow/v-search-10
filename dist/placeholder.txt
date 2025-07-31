@@ -1,0 +1,8 @@
+Logo files should be placed here:
+
+1. askbender-b-logo.png - The B logo for the header
+2. askbender-text-logo-transparent.png - The text logo for the form side
+3. instatest.png - The Instagram test image for the visual side
+4. google-g-icon-transparent.png - The Google G icon for the auth button
+
+These files should be placed in the public directory for the app to access them. 

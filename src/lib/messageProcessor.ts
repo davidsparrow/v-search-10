@@ -40,7 +40,7 @@ const sendAdminNotification = async (
     // This could be email, SMS, webhook, etc.
     console.log('ADMIN NOTIFICATION:', {
       messageId: criticalMessage.id,
-      content: criticalMessage.content,
+      context: criticalMessage.context,
       sessionInterrupted,
       timestamp: new Date().toISOString()
     })

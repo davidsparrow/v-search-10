@@ -1,16 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { Button, Input, Row, Col, Modal, Typography, Layout, Space, Divider } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { Button, Typography, Row, Col, Layout, Space, Input, Divider, Modal } from 'antd'
 import { SettingOutlined } from '@ant-design/icons'
 import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
 import { GiBatMask } from 'react-icons/gi'
 import { FaSnowflake } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { auth } from '../lib/supabase'
-import {
-  AskBenderTier
-} from '../types/askbender'
+import { TypingAnimation } from '../components/common/TypingAnimation'
 import { MenuTemplate } from '../components/MenuTemplate'
+import { AskBenderTier } from '../types/askbender'
 
 const { Header, Content, Footer } = Layout
 const { } = Typography
@@ -34,58 +33,6 @@ const formatPhoneNumber = (value: string): string => {
 const isPhoneNumber = (value: string): boolean => {
   const digitsOnly = value.replace(/\D/g, '')
   return digitsOnly.length >= 7 && digitsOnly.length <= 15
-}
-
-// Typing Animation Component
-function TypingAnimation() {
-  const actionWords = ['bulldoze', 'demolish', 'destroy', 'dishevel', 'decouple']
-  const timeWords = ['today?', 'tomorrow?', 'next week?', 'yesterday?', 'outside time?', 'in the Loo?']
-  
-  const [currentActionIndex, setCurrentActionIndex] = useState(0)
-  const [currentTimeIndex, setCurrentTimeIndex] = useState(0)
-  const [currentText, setCurrentText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    const typingSpeed = 150
-    const deletingSpeed = 50
-    const pauseTime = 1000
-
-    const timer = setTimeout(() => {
-      if (!isDeleting) {
-        // Typing the complete pair
-        const currentAction = actionWords[currentActionIndex]
-        const currentTime = timeWords[currentTimeIndex]
-        const fullText = `${currentAction} ${currentTime}`
-        
-        if (currentText.length < fullText.length) {
-          setCurrentText(fullText.slice(0, currentText.length + 1))
-        } else {
-          // Pause before deleting
-          setTimeout(() => setIsDeleting(true), pauseTime)
-        }
-      } else {
-        // Deleting the complete pair
-        if (currentText.length > 0) {
-          setCurrentText(currentText.slice(0, -1))
-        } else {
-          setIsDeleting(false)
-          // Move to next combination
-          setCurrentActionIndex((prev) => (prev + 1) % actionWords.length)
-          setCurrentTimeIndex((prev) => (prev + 1) % timeWords.length)
-        }
-      }
-    }, isDeleting ? deletingSpeed : typingSpeed)
-
-    return () => clearTimeout(timer)
-  }, [currentText, isDeleting, currentActionIndex, currentTimeIndex, actionWords, timeWords])
-
-  return (
-    <span style={{ color: 'white' }}>
-      What do you want to {currentText}
-      <span style={{ animation: 'blink 1s infinite' }}>|</span>
-    </span>
-  )
 }
 
 export function HomePage() {

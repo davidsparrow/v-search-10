@@ -9,6 +9,7 @@ interface ThemeConfig {
   background: string
   cardBackground: string
   cardBorder: string
+  cardShadow: string
   textPrimary: string
   textSecondary: string
   accentColor: string
@@ -29,6 +30,7 @@ const themeConfigs: Record<string, ThemeConfig> = {
     background: '#000000',
     cardBackground: 'rgba(255, 255, 255, 0.1)',
     cardBorder: 'rgba(255, 255, 255, 0.2)',
+    cardShadow: 'rgba(0, 0, 0, 0.5)',
     textPrimary: '#ffffff',
     textSecondary: 'rgba(255, 255, 255, 0.8)',
     accentColor: '#ff0000',
@@ -46,6 +48,7 @@ const themeConfigs: Record<string, ThemeConfig> = {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     cardBackground: 'rgba(255, 255, 255, 0.1)',
     cardBorder: 'rgba(255, 255, 255, 0.2)',
+    cardShadow: 'rgba(0, 0, 0, 0.1)',
     textPrimary: '#ffffff',
     textSecondary: 'rgba(255, 255, 255, 0.8)',
     accentColor: '#667eea',
@@ -63,6 +66,7 @@ const themeConfigs: Record<string, ThemeConfig> = {
     background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
     cardBackground: 'rgba(255, 255, 255, 0.15)',
     cardBorder: 'rgba(255, 255, 255, 0.25)',
+    cardShadow: 'rgba(0, 0, 0, 0.1)',
     textPrimary: '#ffffff',
     textSecondary: '#f0f0f0', // Changed from #ffffff to off-white
     accentColor: '#f5576c',
@@ -80,6 +84,7 @@ const themeConfigs: Record<string, ThemeConfig> = {
     background: '#ffffff',
     cardBackground: 'rgba(0, 0, 0, 0.05)',
     cardBorder: 'rgba(0, 0, 0, 0.1)',
+    cardShadow: 'rgba(0, 0, 0, 0.05)',
     textPrimary: '#000000',
     textSecondary: '#8c8c8c', // Changed to darker grey for better visibility
     accentColor: '#1890ff',
