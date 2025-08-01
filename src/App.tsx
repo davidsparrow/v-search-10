@@ -12,6 +12,9 @@ import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 import { PricingPage } from './pages/PricingPage'
 import { PricingPageV2 } from './pages/PricingPageV2'
+import { StarterJourney1 } from './pages/StarterJourney1'
+import { StarterJourney2 } from './pages/StarterJourney2'
+import { StarterJourney3 } from './pages/StarterJourney3'
 
 import { useCloudStore } from './store/cloudStore'
 import { supabase } from './lib/supabase'
@@ -95,6 +98,9 @@ function App() {
             <Route path="/pricing-v2" element={<PricingPageV2 />} />
             <Route path="/pricing-2" element={<PricingPageV2 />} />
             <Route path="/pricing2" element={<PricingPageV2 />} />
+            <Route path="/starter-journey-1" element={<StarterJourney1 />} />
+            <Route path="/starter-journey-2" element={<StarterJourney2 />} />
+            <Route path="/starter-journey-3" element={<StarterJourney3 />} />
 
             <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Routes>
