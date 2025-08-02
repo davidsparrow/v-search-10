@@ -17,7 +17,7 @@ import { StarterJourney2 } from './pages/StarterJourney2'
 import { StarterJourney3 } from './pages/StarterJourney3'
 
 import { useCloudStore } from './store/cloudStore'
-import { supabase } from './lib/supabase'
+import { supabase, participantService } from './lib/supabase'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { setupGlobalErrorHandling } from './lib/errorLogging'
@@ -41,6 +41,8 @@ function App() {
       if (session) {
         setUser(session.user)
         setIsAuthenticated(true)
+        // Handle participant creation for initial session
+        participantService.handleParticipantCreation(session.user)
       }
       setIsLoading(false)
     })
@@ -51,6 +53,13 @@ function App() {
         if (session) {
           setUser(session.user)
           setIsAuthenticated(true)
+          
+          // Handle participant creation for auth state changes
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            console.log('Auth state change - handling participant creation:', event)
+            const result = await participantService.handleParticipantCreation(session.user)
+            console.log('Participant creation result:', result)
+          }
         } else {
           setUser(null)
           setIsAuthenticated(false)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Input, Button, Typography, Row, Col, Divider } from 'antd'
+import { Layout, Input, Button, Typography, Row, Col, Divider, Modal, Form } from 'antd'
 import { useCloudStore } from '../store/cloudStore'
 import { supabase } from '../lib/supabase'
 
@@ -20,11 +20,15 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
   const [token, setToken] = useState('')
   const [tokenType, setTokenType] = useState('')
+  const [showParticipantForm, setShowParticipantForm] = useState(false)
+  const [participantForm] = Form.useForm()
 
   useEffect(() => {
-    // Extract access_token and type from URL (support both hash and query string)
+    // Extract token from URL - Supabase uses different parameter names
     let access_token = ''
     let type = ''
+    
+    // Check for Supabase password reset parameters
     if (location.hash && location.hash.includes('access_token')) {
       const hashParams = new URLSearchParams(location.hash.replace('#', '?'))
       access_token = hashParams.get('access_token') || ''
@@ -34,8 +38,24 @@ export default function ResetPasswordPage() {
       access_token = searchParams.get('access_token') || ''
       type = searchParams.get('type') || ''
     }
+    
+    // Also check for other common Supabase parameter names
+    if (!access_token) {
+      if (location.hash) {
+        const hashParams = new URLSearchParams(location.hash.replace('#', '?'))
+        access_token = hashParams.get('token') || hashParams.get('access_token') || ''
+        type = hashParams.get('type') || ''
+      }
+      if (location.search) {
+        const searchParams = new URLSearchParams(location.search)
+        access_token = searchParams.get('token') || searchParams.get('access_token') || ''
+        type = searchParams.get('type') || ''
+      }
+    }
+    
     setToken(access_token)
     setTokenType(type)
+    console.log('Token extraction:', { access_token, type, hash: location.hash, search: location.search })
   }, [location.hash, location.search])
 
   useEffect(() => {
@@ -46,6 +66,50 @@ export default function ResetPasswordPage() {
       return () => clearTimeout(timer)
     }
   }, [success, navigate])
+
+  // Create participant record in database
+  const createParticipant = async (userData: any, nickname: string, phoneNumber: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('participants')
+        .insert([{
+          eventria_user_id: userData.id,
+          email: userData.email,
+          nickname: nickname,
+          phone_number: phoneNumber,
+          real_score: 0,
+          display_score: 0,
+          joined_at: new Date().toISOString()
+        }])
+        .select()
+      
+      if (error) {
+        console.error('Error creating participant:', error)
+        return { success: false, error }
+      }
+      
+      console.log('Participant created successfully:', data)
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error creating participant:', err)
+      return { success: false, error: err }
+    }
+  }
+
+  // Check if participant already exists
+  const checkExistingParticipant = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('participants')
+        .select('id')
+        .eq('eventria_user_id', userId)
+        .single()
+      
+      return { exists: !!data, error }
+    } catch (err) {
+      return { exists: false, error: err }
+    }
+  }
 
   const handleSubmit = async () => {
     setError('')
@@ -63,16 +127,49 @@ export default function ResetPasswordPage() {
     }
     setLoading(true)
     try {
-      const { error } = await supabase.auth.updateUser({ password })
+      const { data, error } = await supabase.auth.updateUser({ password })
       if (error) {
         setError(error.message)
       } else {
-        setSuccess(true)
+        // Check if user needs to be added to participants table
+        const currentUser = await supabase.auth.getUser()
+        if (currentUser.data.user) {
+          const { exists } = await checkExistingParticipant(currentUser.data.user.id)
+          if (!exists) {
+            setShowParticipantForm(true)
+          } else {
+            setSuccess(true)
+          }
+        } else {
+          setSuccess(true)
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleParticipantFormSubmit = async (values: any) => {
+    try {
+      const currentUser = await supabase.auth.getUser()
+      if (currentUser.data.user) {
+        const result = await createParticipant(
+          currentUser.data.user,
+          values.nickname,
+          values.phoneNumber
+        )
+        
+        if (result.success) {
+          setShowParticipantForm(false)
+          setSuccess(true)
+        } else {
+          setError('Failed to create participant profile. Please try again.')
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong.')
     }
   }
 
@@ -166,6 +263,44 @@ export default function ResetPasswordPage() {
           </div>
         </div>
       </Footer>
+
+      {/* Participant Profile Form Modal */}
+      <Modal
+        title="Complete Your Profile"
+        open={showParticipantForm}
+        onCancel={() => setShowParticipantForm(false)}
+        footer={null}
+        closable={false}
+        maskClosable={false}
+      >
+        <Form
+          form={participantForm}
+          onFinish={handleParticipantFormSubmit}
+          layout="vertical"
+        >
+          <Form.Item
+            label="Nickname"
+            name="nickname"
+            rules={[{ required: true, message: 'Please enter a nickname!' }]}
+          >
+            <Input placeholder="Enter your nickname" />
+          </Form.Item>
+          
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[{ required: true, message: 'Please enter your phone number!' }]}
+          >
+            <Input placeholder="Enter your phone number" />
+          </Form.Item>
+          
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Complete Profile
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   )
 } 

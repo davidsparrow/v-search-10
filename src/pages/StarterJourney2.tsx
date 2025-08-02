@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { leaderboardService } from '../lib/leaderboard'
 import { LeaderboardEntry } from '../types/leaderboard'
 import { socialCredService } from '../lib/socialCredService'
-import { auth } from '../lib/supabase'
+import { auth, participantService, supabase } from '../lib/supabase'
+import { Form, Input } from 'antd'
 
 interface Checkbox {
   id: number
@@ -81,16 +82,25 @@ export function StarterJourney2() {
       if (currentUser) {
         console.log('User is authenticated, checking Supabase for nickname...')
         
-        // Check leaderboard table for user's nickname
+        // Check participants table for user's nickname
+        const { exists } = await participantService.checkExistingParticipant(currentUser.id)
+        if (exists) {
+          // If participant exists, get their nickname from the database
+          const { data: participantData } = await supabase
+            .from('participants')
+            .select('nickname')
+            .eq('eventria_user_id', currentUser.id)
+            .single()
+          
+          if (participantData && participantData.nickname) {
+            return participantData.nickname
+          }
+        }
+        
+        // Check leaderboard table as fallback
         const { data: leaderboardData } = await leaderboardService.getUserBestScore(currentUser.email || currentUser.id)
         if (leaderboardData && leaderboardData.length > 0) {
           return leaderboardData[0].username
-        }
-        
-        // Check participants table as fallback
-        const { data: participantData } = await socialCredService.getUserRating(currentUser.email || currentUser.id)
-        if (participantData && participantData.nickname) {
-          return participantData.nickname
         }
       }
       
@@ -100,8 +110,6 @@ export function StarterJourney2() {
       return null
     }
   }
-
-
 
   // Handle score submission
   const handleScoreSubmission = async (username: string, score: number) => {
@@ -165,9 +173,57 @@ export function StarterJourney2() {
   const [hasWonEasterEgg, setHasWonEasterEgg] = useState(false)
   const [hasExistingUsername, setHasExistingUsername] = useState(false)
   const [userNickname, setUserNickname] = useState<string>('')
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileForm] = Form.useForm()
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
   const checkboxIdRef = useRef(0)
+
+  // Update participant profile
+  const updateParticipantProfile = async (nickname: string, phoneNumber: string) => {
+    try {
+      const currentUser = await auth.getCurrentUser()
+      if (currentUser) {
+        const { data, error } = await supabase
+          .from('participants')
+          .update({
+            nickname: nickname,
+            phone_number: phoneNumber
+          })
+          .eq('eventria_user_id', currentUser.id)
+          .select()
+        
+        if (error) {
+          console.error('Error updating participant profile:', error)
+          return { success: false, error }
+        }
+        
+        console.log('Participant profile updated successfully:', data)
+        return { success: true, data }
+      }
+      return { success: false, error: 'No user found' }
+    } catch (err) {
+      console.error('Error updating participant profile:', err)
+      return { success: false, error: err }
+    }
+  }
+
+  const handleProfileUpdate = async (values: any) => {
+    try {
+      const result = await updateParticipantProfile(values.nickname, values.phoneNumber)
+      
+      if (result.success) {
+        setShowProfileModal(false)
+        setUserNickname(values.nickname)
+        // Show success message
+        alert('Profile updated successfully!')
+      } else {
+        alert('Failed to update profile. Please try again.')
+      }
+    } catch (err: any) {
+      alert(err.message || 'Something went wrong.')
+    }
+  }
 
   // Generate new checkbox
   const createCheckbox = () => {
@@ -350,6 +406,22 @@ export function StarterJourney2() {
           >
             {socialCredRating.toFixed(1)}
           </div>
+          <button
+            onClick={() => setShowProfileModal(true)}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}
+            title="Update your profile"
+          >
+            Profile
+          </button>
         </div>
       </header>
 
@@ -857,6 +929,100 @@ export function StarterJourney2() {
                 SKIP
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Update Modal */}
+      {showProfileModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            textAlign: 'center',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#007bff',
+              marginBottom: '16px'
+            }}>
+              Update Your Profile
+            </div>
+            <Form
+              form={profileForm}
+              onFinish={handleProfileUpdate}
+              layout="vertical"
+            >
+              <Form.Item
+                label="Nickname"
+                name="nickname"
+                rules={[{ required: true, message: 'Please enter a nickname!' }]}
+              >
+                <Input placeholder="Enter your nickname" />
+              </Form.Item>
+              
+              <Form.Item
+                label="Phone Number"
+                name="phoneNumber"
+                rules={[{ required: true, message: 'Please enter your phone number!' }]}
+              >
+                <Input placeholder="Enter your phone number" />
+              </Form.Item>
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '16px',
+                marginTop: '24px'
+              }}>
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => profileForm.submit()}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Update Profile
+                </button>
+              </div>
+            </Form>
           </div>
         </div>
       )}
