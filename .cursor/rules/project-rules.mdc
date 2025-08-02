@@ -1,0 +1,106 @@
+
+### **MANDATORY CONSTRAINTS (RELAXED & STANDARDIZED):**
+- **Document and Code Changes:**
+  - Do not change document or code file names without first obtainingn explicit permission.
+  - Do not change existing document or code content unless requested or as part of an approved task/PR.
+  - You may add new documents or code files as needed for features, ADRs, RFCs, or technical notes, but notify the team/user.
+  - You may change multiple files in a single commit/PR if the changes are logically related (e.g., feature, refactor, bugfix).
+  - Preserve existing structure and organization unless refactoring is approved.
+  - Always request permission for major reorganizations or deletions.
+
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
+  
+  Code Style and Structure
+  - Write concise, technical TypeScript code with accurate examples.
+  - Use functional and declarative programming patterns; avoid classes.
+  - Prefer iteration and modularization over code duplication.
+  - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+  - Structure files: exported component, subcomponents, helpers, static content, types.
+  
+  Naming Conventions
+  - Use lowercase with dashes for directories (e.g., components/auth-wizard).
+  - Favor named exports for components.
+  
+  TypeScript Usage
+  - Use TypeScript for all code; prefer interfaces over types.
+  - Avoid enums; use maps instead.
+  - Use functional components with TypeScript interfaces.
+  
+  Syntax and Formatting
+  - Use the "function" keyword for pure functions.
+  - Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+  - Use declarative JSX.
+  
+  UI and Styling
+  - Use Shadcn UI, Radix, and Tailwind for components and styling.
+  - Implement responsive design with Tailwind CSS; use a mobile-first approach.
+  
+  Performance Optimization
+  - Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+  - Wrap client components in Suspense with fallback.
+  - Use dynamic loading for non-critical components.
+  - Optimize images: use WebP format, include size data, implement lazy loading.
+  
+  Key Conventions
+  - Use 'nuqs' for URL search parameter state management.
+  - Optimize Web Vitals (LCP, CLS, FID).
+  - Limit 'use client':
+    - Favor server components and Next.js SSR.
+    - Use only for Web API access in small components.
+    - Avoid for data fetching or state management.
+  
+  Follow Next.js docs for Data Fetching, Rendering, and Routing.
+
+
+- **Change Comments & Logs:**
+  - Use change comments and document-level change summaries for all documentation/spec changes.
+  - For code, use clear commit messages and PR descriptions; add in-line comments for non-obvious logic.
+  - Maintain a centralized change log for major documentation/spec changes (z_doc_change_log.md).
+  - For code, rely on git history and PRs for audit trail.
+
+- **Verbose Comments Welcomed:**
+  - Verbose, explanatory comments are encouraged throughout code and documentation.
+  - Write comments as if explaining to a low-coder or new team member.
+  - Use docstrings, function/class/module comments, and in-line explanations for complex logic.
+
+---
+
+## **🛠️ STANDARD CODING CONVENTIONS**
+
+### **Code Review & Approval:**
+- All code and documentation changes should be reviewed by at least one other team member before merging.
+- Use pull requests (PRs) for all changes to main branches.
+- Reviewer should check for clarity, correctness, security, and adherence to standards.
+
+### **Branching & Versioning:**
+- Use feature branches for new features, bugfixes, and documentation updates.
+- Name branches descriptively (e.g., feature/sms-fallback, bugfix/typo-in-user-story).
+- Merge to main/develop only after review and successful tests.
+
+### **Testing & Validation:**
+- All code should include appropriate tests (unit, integration, or end-to-end as relevant).
+- Run all tests before merging.
+- For documentation, use spellcheck and formatting tools.
+
+### **Automation & Tooling:**
+- Use automated tools for linting, formatting, and testing (e.g., ESLint, Prettier, CI/CD pipelines).
+- Address all linter and test errors before merging.
+
+### **Security & Privacy:**
+- Do not commit secrets, credentials, or sensitive data to the repository.
+- Follow best practices for handling PII and user data.
+- Review code for security vulnerabilities before merging.
+
+### **Accessibility & Internationalization:**
+- Ensure UI components meet accessibility (a11y) standards (e.g., ARIA labels, color contrast).
+- Consider internationalization (i18n) for user-facing text.
+
+### **Documentation for Code:**
+- All public functions, classes, and modules should have docstrings or comments explaining their purpose and usage.
+- Add usage examples where helpful.
+- Keep documentation up to date with code changes.
+
+### **Issue Tracking & Task Management:**
+- Use an issue tracker (e.g., GitHub Issues, Jira) for bugs, features, and tasks.
+- Reference issue/ticket numbers in PRs and commit messages where applicable.

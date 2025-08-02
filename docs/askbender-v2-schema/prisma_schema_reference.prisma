@@ -1,0 +1,138 @@
+// Prisma schema for AskBender MVP - Reference Only
+// This file mirrors the tables defined in schema_core.md for developer handoff
+// Place in docs/schema/ for easy access and versioning
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String         @id @default(uuid()) @map("id")
+  name     String?        @map("name")
+  sessions UserSession[]
+  messages Message[]
+  threadParticipants ThreadParticipant[]
+  @@map("users")
+}
+
+model AdminUser {
+  id           String              @id @default(uuid()) @map("id")
+  name         String?             @map("name")
+  chatSessions AdminChatSession[]
+  threadParticipants ThreadParticipant[]
+  @@map("admin_users")
+}
+
+model Event {
+  id                String              @id @default(uuid()) @map("id")
+  name              String?             @map("name")
+  adminChatSessions AdminChatSession[]
+  userSessions      UserSession[]
+  threads           Thread[]
+  @@map("events")
+}
+
+model Quiz {
+  id           String         @id @default(uuid()) @map("id")
+  name         String?        @map("name")
+  userSessions UserSession[]
+  @@map("quizzes")
+}
+
+model Gaming {
+  id           String         @id @default(uuid()) @map("id")
+  groupId      String         @map("group_id")
+  name         String?        @map("name")
+  status       String?        @map("status")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  group        Event          @relation(fields: [groupId], references: [id])
+  userSessions UserSession[]
+  @@map("gaming")
+}
+
+model PromptTemplate {
+  id          String   @id @default(uuid()) @map("id")
+  tag         String   @map("tag")
+  flow        String   @map("flow")
+  step        String   @map("step")
+  context     String   @map("context")
+  promptText  String   @map("prompt_text")
+  active      Boolean  @default(true) @map("active")
+  lastUpdated DateTime @updatedAt @map("last_updated")
+  @@map("prompt_templates")
+}
+
+model AdminChatSession {
+  id          String    @id @default(uuid()) @map("id")
+  adminUserId String    @map("admin_user_id")
+  eventId     String    @map("event_id")
+  currentStep String    @map("current_step")
+  startedAt   DateTime  @default(now()) @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id])
+  event       Event     @relation(fields: [eventId], references: [id])
+  @@map("admin_chat_sessions")
+}
+
+model UserSession {
+  id           String        @id @default(uuid()) @map("id")
+  userId       String        @map("user_id")
+  eventId      String        @map("event_id")
+  quizId       String?       @map("quiz_id")
+  gamingId   String?       @map("gaming_id")
+  currentState String        @map("current_state")
+  startedAt    DateTime      @default(now()) @map("started_at")
+  endedAt      DateTime?     @map("ended_at")
+  user         User          @relation(fields: [userId], references: [id])
+  event        Event         @relation(fields: [eventId], references: [id])
+  quiz         Quiz?         @relation(fields: [quizId], references: [id])
+  Gaming       Gaming? @relation(fields: [gamingId], references: [id])
+  messages     Message[]
+  @@map("user_sessions")
+}
+
+model Thread {
+  id        String      @id @default(uuid()) @map("id")
+  type      String      @map("type") // 'group', 'dm', 'system'
+  groupId   String?     @map("group_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  group     Event?      @relation(fields: [groupId], references: [id])
+  participants ThreadParticipant[]
+  messages  Message[]
+  @@map("threads")
+}
+
+model ThreadParticipant {
+  id        String   @id @default(uuid()) @map("id")
+  threadId  String   @map("thread_id")
+  userId    String   @map("user_id")
+  role      String   @map("role") // 'admin', 'user'
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  @@map("thread_participants")
+}
+
+model Message {
+  id          String      @id @default(uuid()) @map("id")
+  userId      String      @map("user_id")
+  sessionId   String      @map("session_id")
+  threadId    String?     @map("thread_id")
+  messageText String      @map("message_text")
+  direction   String      @map("direction")
+  timestamp   DateTime    @default(now()) @map("timestamp")
+  flow        String      @map("flow")
+  step        String      @map("step")
+  context     String      @map("context")
+  user        User        @relation(fields: [userId], references: [id])
+  session     UserSession @relation(fields: [sessionId], references: [id])
+  thread      Thread?     @relation(fields: [threadId], references: [id])
+  @@map("messages")
+}
+
+// NOTE: For DMs, Thread.type = 'dm' and ThreadParticipant will have two users. For group chat, Thread.type = 'group' and ThreadParticipant will include all group members. Messages can be linked to a thread (for group/DM) or a session (for 1:1/system flows). 

@@ -1,0 +1,704 @@
+eventria schema JSON
+
+[
+  {
+    "table_name": "custom_questions",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "group_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "question_text",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "option_a",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "option_b",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "option_c",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "option_d",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "correct_answer",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "category",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "custom_questions",
+    "column_name": "reply_expiration_seconds",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "host_phone",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "twilio_number",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "z_mood",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'original'::text"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "z_personality_config",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "active",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "professional_mode_enabled",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "professional_auto_triggered",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "sobriety_level",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "50"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "professional_mode_context",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "professional_mode_enabled_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "professional_mode_enabled_by",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "grammar_preview_enabled",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "custom_grammar_rules",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "sms_fallback_enabled",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "preferred_fallback_method",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'email'::text"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "character_limit_warning_threshold",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "160"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "admin_optimization_suggestions",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "eventria_event_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "cross_domain_enabled",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "eventria_user_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "groups",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "default_reply_expiration_seconds",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "300"
+  },
+  {
+    "table_name": "leaderboard",
+    "column_name": "id",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "nextval('leaderboard_id_seq'::regclass)"
+  },
+  {
+    "table_name": "leaderboard",
+    "column_name": "username",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "leaderboard",
+    "column_name": "score",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "leaderboard",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "leaderboard",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "session_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "participant_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "direction",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "content",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "z_response",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "real_answer_correct",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "displayed_as_correct",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "sentiment",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'neutral'::text"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "manipulation_applied",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "intended_delivery_method",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'sms'::text"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "actual_delivery_method",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'sms'::text"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "fallback_triggered",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "fallback_reason",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "character_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "character_limit_applied",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "fallback_notification_sent",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "delivery_success",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "delivery_attempt_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "1"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "timestamp",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "reply_expiration_seconds",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "is_critical",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "critical_keyword",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "response_required",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "auto_reply",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "responded_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "status",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'pending'::character varying"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "message_type_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "type_name",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "display_name",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "priority_level",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "default_timeout_seconds",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "300"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "auto_interrupt",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "default_auto_reply",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "admin_configurable",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "messagetypes",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "phone_number",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "email",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "group_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "nickname",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "real_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "display_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "personality_profile",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "z_relationship",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'neutral'::text"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "manipulation_level",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "professional_mode_interaction",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "detected_carrier",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "sms_character_limit",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "160"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "preferred_communication_method",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "'sms'::text"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "last_fallback_notification",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "fallback_notification_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "participants",
+    "column_name": "eventria_user_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "cross_domain_profile",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "askbender_tier_override",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "participants",
+    "column_name": "joined_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "quiz_sessions",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  }
+]

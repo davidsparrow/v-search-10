@@ -317,7 +317,9 @@ export function HomePage() {
                   src="/instatest.png" 
                   alt="Instagram test sample"
                   style={{ 
-                    maxWidth: '100%',
+                    maxWidth: '600px',
+                    maxHeight: '100%',
+                    width: 'auto',
                     height: 'auto',
                     objectFit: 'contain',
                     borderRadius: '8px'

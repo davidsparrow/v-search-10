@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { leaderboardService } from '../lib/leaderboard'
 import { LeaderboardEntry } from '../types/leaderboard'
+import { socialCredService } from '../lib/socialCredService'
+import { auth } from '../lib/supabase'
 
 interface Checkbox {
   id: number
@@ -70,19 +72,36 @@ export function StarterJourney2() {
     return score > leaderboard[leaderboard.length - 1].score
   }
 
-  // Manual refresh function for debugging
-  const refreshLeaderboard = async () => {
-    console.log('Manually refreshing leaderboard...')
+  // Check if user has existing username from Supabase
+  const checkExistingUsername = async (): Promise<string | null> => {
     try {
-      const { data, error } = await leaderboardService.fetchLeaderboard()
-      console.log('Manual refresh result:', { data, error })
-      if (data && !error) {
-        setLeaderboard(data)
+      // Check if user is authenticated and look up in Supabase
+      const currentUser = await auth.getCurrentUser()
+      
+      if (currentUser) {
+        console.log('User is authenticated, checking Supabase for nickname...')
+        
+        // Check leaderboard table for user's nickname
+        const { data: leaderboardData } = await leaderboardService.getUserBestScore(currentUser.email || currentUser.id)
+        if (leaderboardData && leaderboardData.length > 0) {
+          return leaderboardData[0].username
+        }
+        
+        // Check participants table as fallback
+        const { data: participantData } = await socialCredService.getUserRating(currentUser.email || currentUser.id)
+        if (participantData && participantData.nickname) {
+          return participantData.nickname
+        }
       }
+      
+      return null
     } catch (error) {
-      console.error('Error refreshing leaderboard:', error)
+      console.error('Error checking existing username:', error)
+      return null
     }
   }
+
+
 
   // Handle score submission
   const handleScoreSubmission = async (username: string, score: number) => {
@@ -90,10 +109,25 @@ export function StarterJourney2() {
     console.log('Submitting score:', { username, score })
     
     try {
+      // Calculate social cred rating
+      const rating = socialCredService.calculateRating(score, showEasterEgg)
+      console.log('Calculated social cred rating:', rating)
+      
+      // Update social cred rating
+      const { data: ratingData, error: ratingError } = await socialCredService.updateUserRating(username, rating)
+      console.log('Social cred rating update result:', { ratingData, ratingError })
+      
+      // Update leaderboard score
       const { data, error } = await leaderboardService.updateUserScore(username, score)
       console.log('Score submission result:', { data, error })
       
       if (data && !error) {
+        // Update social cred rating display
+        setSocialCredRating(rating)
+        
+        // Store the nickname for display
+        setUserNickname(username.trim())
+        
         // Refresh leaderboard
         const { data: newLeaderboard } = await leaderboardService.fetchLeaderboard()
         console.log('New leaderboard data:', newLeaderboard)
@@ -127,6 +161,10 @@ export function StarterJourney2() {
   const [showUsernameModal, setShowUsernameModal] = useState(false)
   const [username, setUsername] = useState('')
   const [isSubmittingScore, setIsSubmittingScore] = useState(false)
+  const [socialCredRating, setSocialCredRating] = useState(0.0)
+  const [hasWonEasterEgg, setHasWonEasterEgg] = useState(false)
+  const [hasExistingUsername, setHasExistingUsername] = useState(false)
+  const [userNickname, setUserNickname] = useState<string>('')
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
   const checkboxIdRef = useRef(0)
@@ -193,19 +231,38 @@ export function StarterJourney2() {
         setTimeRemaining(timeRemaining - 1)
       }, interval)
       return () => clearTimeout(timer)
-    } else if (timeRemaining === 0 && !showTimeoutMessage && !showEasterEgg) {
-      // Check for Easter Egg (zero score)
-      if (score === 0) {
-        setShowEasterEgg(true)
-      } else {
-        // Check if score qualifies for leaderboard
-        if (checkScoreQualification(score)) {
-          setShowUsernameModal(true)
+          } else if (timeRemaining === 0 && !showTimeoutMessage && !showEasterEgg) {
+        // Check for Easter Egg (zero score) - only if haven't won it before
+        if (score === 0 && !hasWonEasterEgg) {
+          setShowEasterEgg(true)
+          setHasWonEasterEgg(true)
+          // Set social cred rating for Easter Egg
+          setSocialCredRating(1.5)
         } else {
-          setShowTimeoutMessage(true)
+          // Check if score qualifies for leaderboard
+          if (checkScoreQualification(score)) {
+            // Check for existing username before showing modal
+            const checkAndShowModal = async () => {
+              const existingUsername = await checkExistingUsername()
+              if (existingUsername) {
+                setUsername(existingUsername)
+                setUserNickname(existingUsername)
+                setHasExistingUsername(true)
+              } else {
+                setUsername('')
+                setUserNickname('')
+                setHasExistingUsername(false)
+              }
+              setShowUsernameModal(true)
+            }
+            checkAndShowModal()
+          } else {
+            setShowTimeoutMessage(true)
+            // Set social cred rating for normal completion
+            setSocialCredRating(0.5)
+          }
         }
       }
-    }
   }, [timeRemaining, showTimeoutMessage, showEasterEgg, score])
 
   // Generate checkboxes
@@ -246,7 +303,8 @@ export function StarterJourney2() {
         padding: '20px',
         borderBottom: '1px solid #eee',
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
         <img
           src="/askbender_b!_green_on_blk.png"
@@ -259,6 +317,40 @@ export function StarterJourney2() {
           }}
           onClick={() => window.history.back()}
         />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <span style={{
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#000'
+          }}>
+            {userNickname || 'My Social Cred:'}
+          </span>
+          <div 
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              cursor: 'help'
+            }}
+            title="Your Social Cred. Don't worry you've got a year or two before this + AI controls your society."
+          >
+            {socialCredRating.toFixed(1)}
+          </div>
+        </div>
       </header>
 
       {/* Progress Bar */}
@@ -352,7 +444,7 @@ export function StarterJourney2() {
             fontFamily: 'Poppins, sans-serif',
             marginBottom: '16px'
           }}>
-            Don't think. Just start Checking!
+            Personalized Compliance Assessment. Go!
           </h1>
         </div>
 
@@ -413,16 +505,11 @@ export function StarterJourney2() {
           padding: '0 20px'
         }}>
           <div style={{
-            fontSize: '28px',
+            fontSize: '20px',
             fontWeight: 'bold',
-            color: '#007bff',
-            backgroundColor: isScorePulsing ? '#ffff00' : 'transparent',
-            padding: isScorePulsing ? '12px 20px' : '0',
-            borderRadius: isScorePulsing ? '12px' : '0',
-            transition: 'all 0.3s ease',
-            animation: isScorePulsing ? 'pulse 0.5s ease-in-out infinite' : 'none'
+            color: '#007bff'
           }}>
-            My social credit Acceptance Score: {score}
+            My Social Acceptance v Dissent (SAD) Ratio: 0.{score.toString().padStart(5, '0')}
           </div>
         </div>
 
@@ -437,26 +524,9 @@ export function StarterJourney2() {
             fontSize: '18px',
             fontWeight: 'bold',
             color: '#007bff',
-            marginBottom: '8px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            marginBottom: '8px'
           }}>
             <span>Leader Board:</span>
-            <button
-              onClick={refreshLeaderboard}
-              style={{
-                padding: '4px 8px',
-                fontSize: '12px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              🔄 Refresh
-            </button>
           </div>
           <div style={{
             fontSize: '14px',
@@ -467,7 +537,7 @@ export function StarterJourney2() {
               leaderboard.map((entry, index) => (
                 <div key={entry.id} style={{ display: 'flex', marginBottom: '4px' }}>
                   <span style={{ width: '200px' }}>{index + 1}. {entry.username}</span>
-                  <span style={{ fontWeight: 'bold' }}>{entry.score}</span>
+                  <span style={{ fontWeight: 'bold' }}>0.{entry.score.toString().padStart(5, '0')}</span>
                 </div>
               ))
             ) : (
@@ -515,7 +585,7 @@ export function StarterJourney2() {
               color: '#007bff',
               marginBottom: '24px'
             }}>
-              Final Score: {score}
+              Final Score: 0.{score.toString().padStart(5, '0')}
             </div>
             <div style={{
               display: 'flex',
@@ -529,6 +599,10 @@ export function StarterJourney2() {
                   setCheckboxes([])
                   setShowTimeoutMessage(false)
                   setShowEasterEgg(false)
+                  setHasExistingUsername(false)
+                  setUsername('')
+                  // Note: We don't reset hasWonEasterEgg so user can't win Easter Egg again
+                  // Note: We don't reset userNickname so it persists across game sessions
                 }}
                 style={{
                   padding: '12px 24px',
@@ -616,7 +690,7 @@ export function StarterJourney2() {
               • Needs a Logo Down Jacket badly.<br/>
               • Looks gift horses right in the f'n mouth.<br/>
               • Didn't pickup dog's poop last Tuesday.<br/>
-              • Cholesterol levels slowly improving after the Bacon bender.
+              • Cholesterol levels slowly improving after the long bacon weekend.
             </div>
             
             <div style={{
@@ -624,6 +698,31 @@ export function StarterJourney2() {
               justifyContent: 'center',
               gap: '16px'
             }}>
+              <button
+                onClick={() => {
+                  setTimeRemaining(60)
+                  setScore(0)
+                  setCheckboxes([])
+                  setShowEasterEgg(false)
+                  setHasExistingUsername(false)
+                  setUsername('')
+                  // Note: We don't reset hasWonEasterEgg so user can't win Easter Egg again
+                  // Note: We don't reset userNickname so it persists across game sessions
+                }}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  minWidth: '80px'
+                }}
+              >
+                TRY AGAIN?
+              </button>
               <button
                 onClick={() => navigate('/starter-journey-3')}
                 style={{
@@ -681,30 +780,37 @@ export function StarterJourney2() {
               color: '#007bff',
               marginBottom: '24px'
             }}>
-              Your Score: {score}
+              Your Score: 0.{score.toString().padStart(5, '0')}
             </div>
             <div style={{
               fontSize: '16px',
               color: '#333',
               marginBottom: '24px'
             }}>
-              Enter your username to save your score:
+              {hasExistingUsername ? 'Your existing nickname:' : 'Enter your username to save your score:'}
             </div>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username..."
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #ddd',
-                borderRadius: '6px',
-                fontSize: '16px',
-                marginBottom: '24px'
-              }}
-              maxLength={20}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                value={username}
+                onChange={hasExistingUsername ? undefined : (e) => setUsername(e.target.value)}
+                placeholder={hasExistingUsername ? '' : "Enter username..."}
+                readOnly={hasExistingUsername}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: hasExistingUsername ? '2px solid #ccc' : '2px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  marginBottom: '24px',
+                  backgroundColor: hasExistingUsername ? '#f8f9fa' : 'white',
+                  cursor: hasExistingUsername ? 'not-allowed' : 'text',
+                  color: hasExistingUsername ? '#666' : '#000'
+                }}
+                maxLength={20}
+                title={hasExistingUsername ? "Recover from this bad decision in your User Profile after International Bank Transfers are confirmed." : undefined}
+              />
+            </div>
             <div style={{
               display: 'flex',
               justifyContent: 'center',
