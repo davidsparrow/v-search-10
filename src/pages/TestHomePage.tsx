@@ -449,6 +449,7 @@ export function TestHomePage() {
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap'
                 }}
+                onClick={handleForgotPassword}
                 title="Passwords. Glassware. Easy."
                 >
                   Again with the lost Sticky?

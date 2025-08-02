@@ -595,6 +595,7 @@ export function HomePage() {
                       textDecoration: 'underline',
                       whiteSpace: 'nowrap'
                     }}
+                    onClick={() => setIsResetModalVisible(true)}
                     title="Passwords. Glassware. Easy."
                     >
                       Again with the lost Sticky?
