@@ -816,10 +816,10 @@ export function StarterJourney1() {
               
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
                 <div 
-                  ref={(el) => {
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget;
                     if (el) {
                       el.style.scrollbarWidth = 'none';
-                      el.style.msOverflowStyle = 'none';
                       el.style.setProperty('--scrollbar-width', 'none');
                     }
                   }}
@@ -842,11 +842,7 @@ export function StarterJourney1() {
                     lineHeight: '1.2',
                     padding: '8px',
                     backgroundColor: '#ffff00',
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                    WebkitScrollbar: {
-                      display: 'none'
-                    }
+                    scrollbarWidth: 'none'
                   }}
                 >
                 <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '12px' }}>TERMS AND CONDITIONS</div>
@@ -1076,7 +1072,6 @@ export function StarterJourney1() {
         setInitials('')
         setIsCheckboxChecked(false)
         setCheckbox2Checked(false)
-        setCheckbox2bChecked(false)
         setCheckbox3Checked(false)
         setCheckbox4Checked(false)
         setCheckbox5Checked(false)
