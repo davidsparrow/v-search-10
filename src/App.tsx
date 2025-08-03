@@ -34,37 +34,61 @@ function App() {
 
   // Initialize auth state
   useEffect(() => {
-    setIsLoading(true)
+    let isInitialized = false
     
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUser(session.user)
-        setIsAuthenticated(true)
-        // Handle participant creation for initial session
-        participantService.handleParticipantCreation(session.user)
+    const initializeAuth = async () => {
+      if (isInitialized) return
+      isInitialized = true
+      
+      setIsLoading(true)
+      
+      // Get initial session
+      console.log('🔍 AUTH: Getting initial session...')
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log('🔍 AUTH: Initial session result:', !!session)
+        if (session) {
+          console.log('🔍 AUTH: Setting initial user and authenticated state')
+          setUser(session.user)
+          setIsAuthenticated(true)
+        }
+      } catch (error) {
+        console.error('🔍 AUTH: Initial session error:', error)
+      } finally {
+        console.log('🔍 AUTH: Setting initial loading to false')
+        setIsLoading(false)
       }
-      setIsLoading(false)
-    })
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session) {
-          setUser(session.user)
-          setIsAuthenticated(true)
-          
-          // Handle participant creation for auth state changes
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log('Auth state change - handling participant creation:', event)
-            const result = await participantService.handleParticipantCreation(session.user)
-            console.log('Participant creation result:', result)
-          }
-        } else {
-          setUser(null)
-          setIsAuthenticated(false)
+        console.log('🔍 AUTH: State change detected:', event, 'Session:', !!session)
+        
+        // Only handle SIGNED_IN and SIGNED_OUT events, ignore others
+        if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') {
+          console.log('🔍 AUTH: Ignoring event:', event)
+          return
         }
-        setIsLoading(false)
+        
+        try {
+          if (session) {
+            console.log('🔍 AUTH: Setting user and authenticated state')
+            setUser(session.user)
+            setIsAuthenticated(true)
+          } else {
+            console.log('🔍 AUTH: Clearing user and authenticated state')
+            setUser(null)
+            setIsAuthenticated(false)
+          }
+        } catch (error) {
+          console.error('🔍 AUTH: Auth state change error:', error)
+        } finally {
+          console.log('🔍 AUTH: Setting loading to false')
+          setIsLoading(false)
+        }
       }
     )
 
