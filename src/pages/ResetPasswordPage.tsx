@@ -24,6 +24,12 @@ export default function ResetPasswordPage() {
   const [participantForm] = Form.useForm()
 
   useEffect(() => {
+    // Only extract token if we don't already have one
+    if (token) {
+      console.log('Token already exists, skipping extraction')
+      return
+    }
+    
     // Extract token from URL - Supabase uses different parameter names
     let access_token = ''
     let type = ''
@@ -53,10 +59,14 @@ export default function ResetPasswordPage() {
       }
     }
     
-    setToken(access_token)
-    setTokenType(type)
-    console.log('Token extraction:', { access_token, type, hash: location.hash, search: location.search })
-  }, [location.hash, location.search])
+    if (access_token) {
+      setToken(access_token)
+      setTokenType(type)
+      console.log('Token extracted and set:', { access_token: access_token.substring(0, 20) + '...', type, hash: location.hash, search: location.search })
+    } else {
+      console.log('No token found in URL')
+    }
+  }, [location.hash, location.search, token])
 
   useEffect(() => {
     if (success) {
