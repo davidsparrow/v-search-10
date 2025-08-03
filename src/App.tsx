@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { ConfigProvider, theme } from 'antd'
 import { useEffect } from 'react'
 import { HomePage } from './pages/HomePage'
-import { TestHomePage } from './pages/TestHomePage'
+
 import { SearchResultsPage } from './pages/SearchResultsPage'
 import { StartSearchPage } from './pages/StartSearchPage'
 import { PreSearchPage1 } from './pages/PreSearchPage1'
@@ -119,7 +119,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/test-home" element={<TestHomePage />} />
+
             <Route path="/start-search" element={<StartSearchPage />} />
             <Route path="/pre-search-1" element={<PreSearchPage1 />} />
             <Route path="/search" element={<SearchResultsPage />} />
