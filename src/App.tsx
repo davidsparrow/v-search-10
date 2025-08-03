@@ -67,28 +67,46 @@ function App() {
       async (event, session) => {
         console.log('🔍 AUTH: State change detected:', event, 'Session:', !!session)
         
-        // Only handle SIGNED_IN and SIGNED_OUT events, ignore others
-        if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') {
-          console.log('🔍 AUTH: Ignoring event:', event)
-          return
-        }
-        
-        try {
-          if (session) {
-            console.log('🔍 AUTH: Setting user and authenticated state')
-            setUser(session.user)
-            setIsAuthenticated(true)
-          } else {
-            console.log('🔍 AUTH: Clearing user and authenticated state')
-            setUser(null)
-            setIsAuthenticated(false)
-          }
-        } catch (error) {
-          console.error('🔍 AUTH: Auth state change error:', error)
-        } finally {
-          console.log('🔍 AUTH: Setting loading to false')
-          setIsLoading(false)
-        }
+                    // Only handle SIGNED_IN and SIGNED_OUT events, ignore others
+            if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') {
+              console.log('🔍 AUTH: Ignoring event:', event)
+              return
+            }
+            
+            try {
+              if (session) {
+                console.log('🔍 AUTH: Setting user and authenticated state')
+                setUser(session.user)
+                setIsAuthenticated(true)
+                
+                // Handle participant creation for new users
+                if (event === 'SIGNED_IN') {
+                  console.log('🔍 AUTH: Handling participant creation for new sign-in')
+                  try {
+                    // Add timeout protection to prevent hanging
+                    const result = await Promise.race([
+                      participantService.handleParticipantCreation(session.user),
+                      new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Participant creation timeout')), 5000)
+                      )
+                    ])
+                    console.log('🔍 AUTH: Participant creation result:', result)
+                  } catch (error) {
+                    console.error('🔍 AUTH: Participant creation failed or timed out:', error)
+                    // Don't let participant creation failure break the auth flow
+                  }
+                }
+              } else {
+                console.log('🔍 AUTH: Clearing user and authenticated state')
+                setUser(null)
+                setIsAuthenticated(false)
+              }
+            } catch (error) {
+              console.error('🔍 AUTH: Auth state change error:', error)
+            } finally {
+              console.log('🔍 AUTH: Setting loading to false')
+              setIsLoading(false)
+            }
       }
     )
 
