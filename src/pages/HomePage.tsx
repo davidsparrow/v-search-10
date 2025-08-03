@@ -137,9 +137,15 @@ export function HomePage() {
   }
 
   const handleResetPassword = async () => {
+    if (!resetEmail) {
+      setResetError('Please enter your email address.')
+      return
+    }
+    
     setResetLoading(true)
     setResetError('')
     setResetSuccess(false)
+    
     try {
       const { error } = await auth.resetPasswordForEmail(resetEmail)
       if (error) {
@@ -147,7 +153,7 @@ export function HomePage() {
       } else {
         setResetSuccess(true)
         // Auto-close after 5 seconds
-        resetTimerRef.current = setTimeout(() => {
+        setTimeout(() => {
           setIsResetModalVisible(false)
           setResetSuccess(false)
         }, 5000)
