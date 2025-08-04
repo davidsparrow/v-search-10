@@ -26,7 +26,7 @@ export function PricingPageV2() {
   
   const handleOpenMenu = () => {
     console.log('Menu button clicked, setting isMenuVisible to true')
-    setIsMenuVisible(true)
+    setIsMenuVisible(true) // Trigger menu visibility
   }
 
       return (
