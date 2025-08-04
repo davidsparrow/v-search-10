@@ -588,7 +588,6 @@ export function HomePage() {
       <ProfileMenuTemplate
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
-        pageType="home"
         userLevel={userTier}
       />
 
