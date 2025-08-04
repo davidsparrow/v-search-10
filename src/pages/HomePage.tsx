@@ -11,6 +11,7 @@ import { TypingAnimation } from '../components/common/TypingAnimation'
 import { ProfileMenuTemplate } from '../components/menus/ProfileMenuTemplate'
 import { MainHeader } from '../components/headers/MainHeader'
 import { AskBenderTier } from '../types/askbender'
+import { getSessionLogo, preloadSessionLogo, getFallbackLogo } from '../lib/logoManager'
 
 const { Header, Content, Footer } = Layout
 const { } = Typography
@@ -52,6 +53,8 @@ export function HomePage() {
   const [logoError, setLogoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
+  const [sessionLogo, setSessionLogo] = useState<string>('')
+  const [logoLoaded, setLogoLoaded] = useState(false)
 
   // Form state
   const [email, setEmail] = useState('')
@@ -61,11 +64,27 @@ export function HomePage() {
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
 
-  // Reset image error states on component mount
+  // Reset image error states on component mount and preload session logo
   useEffect(() => {
     setInstaImageError(false)
     setTextLogoError(false)
     setLogoError(false)
+    
+    // Preload the session logo
+    const preloadLogo = async () => {
+      try {
+        const logoPath = getSessionLogo()
+        setSessionLogo(logoPath)
+        await preloadSessionLogo()
+        setLogoLoaded(true)
+      } catch (error) {
+        console.warn('Failed to preload session logo, using fallback:', error)
+        setSessionLogo(getFallbackLogo())
+        setLogoLoaded(true)
+      }
+    }
+    
+    preloadLogo()
   }, [])
 
   const handleLogin = async () => {
@@ -280,9 +299,9 @@ export function HomePage() {
                 display: 'flex',
                 justifyContent: 'center'
               }}>
-                {!textLogoError ? (
+                {logoLoaded && !textLogoError ? (
                   <img
-                    src="/askbender-text-logo!_rainbow.png"
+                    src={sessionLogo}
                     alt="ask bender"
                     style={{
                       maxWidth: '300px',

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from 'antd'
 import { useCloudStore } from '../store/cloudStore'
 import { PricingPageTemplate } from '../components/templates/PricingPageTemplate'
@@ -6,6 +6,7 @@ import { ProfileMenuTemplate } from '../components/menus/ProfileMenuTemplate'
 import { GiChicken, GiLoveHowl } from 'react-icons/gi'
 import { IoMdBeer } from 'react-icons/io'
 import { AskBenderTier } from '../types/askbender'
+import { getSessionLogo, preloadSessionLogo, getFallbackLogo } from '../lib/logoManager'
 
 export function PricingPage() {
   const { 
@@ -17,12 +18,32 @@ export function PricingPage() {
 
   // State for logo error handling
   const [textLogoError, setTextLogoError] = useState(false)
+  const [sessionLogo, setSessionLogo] = useState<string>('')
+  const [logoLoaded, setLogoLoaded] = useState(false)
   
   // Menu state
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
+  
+  // Preload session logo on component mount
+  useEffect(() => {
+    const preloadLogo = async () => {
+      try {
+        const logoPath = getSessionLogo()
+        setSessionLogo(logoPath)
+        await preloadSessionLogo()
+        setLogoLoaded(true)
+      } catch (error) {
+        console.warn('Failed to preload session logo, using fallback:', error)
+        setSessionLogo(getFallbackLogo())
+        setLogoLoaded(true)
+      }
+    }
+    
+    preloadLogo()
+  }, [])
   
   const handleOpenMenu = () => {
     setIsMenuVisible(true) // Trigger menu visibility
@@ -50,9 +71,9 @@ export function PricingPage() {
           display: 'flex',
           justifyContent: 'center'
         }}>
-          {!textLogoError ? (
+          {logoLoaded && !textLogoError ? (
             <img
-              src="/askbender-text-logo!_rainbow.png"
+              src={sessionLogo}
               alt="ask bender"
               style={{
                 maxWidth: '300px',

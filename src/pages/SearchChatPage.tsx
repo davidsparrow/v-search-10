@@ -20,6 +20,7 @@ import { TierGate } from '../components/TierGate'
 import { AskBenderTier } from '../types/askbender'
 import { MainHeader } from '../components/headers/MainHeader'
 import { SearchMenuTemplate } from '../components/menus/SearchMenuTemplate'
+import { getSessionLogo, preloadSessionLogo, getFallbackLogo } from '../lib/logoManager'
 
 const { Header, Content } = Layout
 const { TextArea } = Input
@@ -44,6 +45,8 @@ export function SearchChatPage() {
   // Menu state
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const [logoError] = useState(false)
+  const [sessionLogo, setSessionLogo] = useState<string>('')
+  const [logoLoaded, setLogoLoaded] = useState(false)
   
   // Chat state
   const [messages, setMessages] = useState<Message[]>([
@@ -65,6 +68,24 @@ export function SearchChatPage() {
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
   const [eventriaTier] = useState<string | undefined>(undefined)
+  
+  // Preload session logo on component mount
+  useEffect(() => {
+    const preloadLogo = async () => {
+      try {
+        const logoPath = getSessionLogo()
+        setSessionLogo(logoPath)
+        await preloadSessionLogo()
+        setLogoLoaded(true)
+      } catch (error) {
+        console.warn('Failed to preload session logo, using fallback:', error)
+        setSessionLogo(getFallbackLogo())
+        setLogoLoaded(true)
+      }
+    }
+    
+    preloadLogo()
+  }, [])
   
   const handleThemeChange = (theme: 'default' | 'dark' | 'compact' | 'white') => {
     setTheme(theme)
@@ -182,19 +203,21 @@ export function SearchChatPage() {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          <img
-            src="/askbender-text-logo-transparent2.png"
-            alt="ask bender"
-            className="text-logo-large"
-            style={{ 
-              maxHeight: '120px', // 50% larger than HomePage (80px -> 120px)
-              height: 'auto', 
-              width: 'auto',
-              maxWidth: '100%', // Mobile responsive
-              filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
-              animation: 'billiardFloat 35s linear infinite'
-            }}
-          />
+          {logoLoaded && (
+            <img
+              src={sessionLogo}
+              alt="ask bender"
+              className="text-logo-large"
+              style={{ 
+                maxHeight: '120px', // 50% larger than HomePage (80px -> 120px)
+                height: 'auto', 
+                width: 'auto',
+                maxWidth: '100%', // Mobile responsive
+                filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
+                animation: 'billiardFloat 35s linear infinite'
+              }}
+            />
+          )}
         </div>
         {/* Chat Messages */}
         <div style={{
