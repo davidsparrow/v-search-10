@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { AvatarComponent } from '../AvatarComponent'
 import { useCloudStore } from '../../store/cloudStore'
 import { getTierDisplayName, getTierPrice, AskBenderTier } from '../../types/askbender'
@@ -18,6 +19,7 @@ export function ProfileMenuTemplate({
   customContent 
 }: ProfileMenuTemplateProps) {
   const { user } = useCloudStore()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('links')
 
   if (!isVisible) return null
@@ -241,7 +243,22 @@ export function ProfileMenuTemplate({
                     textTransform: 'uppercase',
                     letterSpacing: '1px'
                   }}
-                  onClick={() => console.log('Terms clicked')}
+                  onClick={() => navigate('/pricing')}
+                >
+                  Pricing
+                </span>
+                <span
+                  style={{
+                    color: '#444',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: '300',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px'
+                  }}
+                  onClick={() => navigate('/terms')}
                 >
                   Terms
                 </span>
@@ -256,29 +273,12 @@ export function ProfileMenuTemplate({
                     textTransform: 'uppercase',
                     letterSpacing: '1px'
                   }}
-                  onClick={() => console.log('Privacy clicked')}
+                  onClick={() => navigate('/privacy')}
                 >
                   Privacy
                 </span>
 
-                {/* User-level specific items */}
-                {userLevel === 'fresh_meat' && (
-                  <span
-                    style={{
-                      color: '#1890ff',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: '300',
-                      cursor: 'pointer',
-                      textDecoration: 'none',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px'
-                    }}
-                    onClick={() => console.log('Upgrade clicked')}
-                  >
-                    Upgrade Account
-                  </span>
-                )}
+                {/* User-level specific items removed */}
 
                 {/* Custom content if provided */}
                 {customContent}
