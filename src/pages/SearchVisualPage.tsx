@@ -22,7 +22,7 @@ import { useCloudStore } from '../store/cloudStore'
 import { MainHeader } from '../components/headers/MainHeader'
 import { SearchMenuTemplate } from '../components/menus/SearchMenuTemplate'
 
-export function SearchResultsPage() {
+export function SearchVisualPage() {
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const navigate = useNavigate()

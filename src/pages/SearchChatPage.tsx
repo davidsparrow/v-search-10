@@ -32,7 +32,7 @@ interface Message {
   timestamp: Date
 }
 
-export function PreSearchPage1() {
+export function SearchChatPage() {
   const navigate = useNavigate()
   const { 
     getThemeConfig, 
@@ -385,7 +385,7 @@ export function PreSearchPage1() {
           console.log('Filters applied:', filters)
           // Handle filter application here
           setIsMenuVisible(false)
-          navigate('/search')
+                              navigate('/search-visual')
         }}
       />
 

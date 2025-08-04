@@ -3,15 +3,14 @@ import { ConfigProvider, theme } from 'antd'
 import { useEffect } from 'react'
 import { HomePage } from './pages/HomePage'
 
-import { SearchResultsPage } from './pages/SearchResultsPage'
+import { SearchVisualPage } from './pages/SearchVisualPage'
 import { StartSearchPage } from './pages/StartSearchPage'
-import { PreSearchPage1 } from './pages/PreSearchPage1'
+import { SearchChatPage } from './pages/SearchChatPage'
 import { AboutPage } from './pages/AboutPage'
 import { SystemSettingsPage } from './pages/SystemSettingsPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 import { PricingPage } from './pages/PricingPage'
-import { PricingPageV2 } from './pages/PricingPageV2'
 import { StarterJourney1 } from './pages/StarterJourney1'
 import { StarterJourney2 } from './pages/StarterJourney2'
 import { StarterJourney3 } from './pages/StarterJourney3'
@@ -139,16 +138,13 @@ function App() {
             <Route path="/" element={<HomePage />} />
 
             <Route path="/start-search" element={<StartSearchPage />} />
-            <Route path="/pre-search-1" element={<PreSearchPage1 />} />
-            <Route path="/search" element={<SearchResultsPage />} />
+            <Route path="/search-chat" element={<SearchChatPage />} />
+            <Route path="/search-visual" element={<SearchVisualPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/admin/system-settings" element={<SystemSettingsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/pricing-v2" element={<PricingPageV2 />} />
-            <Route path="/pricing-2" element={<PricingPageV2 />} />
-            <Route path="/pricing2" element={<PricingPageV2 />} />
             <Route path="/starter-journey-1" element={<StarterJourney1 />} />
             <Route path="/starter-journey-2" element={<StarterJourney2 />} />
             <Route path="/starter-journey-3" element={<StarterJourney3 />} />

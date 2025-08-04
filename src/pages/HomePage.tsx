@@ -89,7 +89,7 @@ export function HomePage() {
       // Hide success message after 3 seconds and navigate
       setTimeout(() => {
         setShowSuccessMessage(false)
-        navigate('/pre-search-1')
+                      navigate('/search-chat')
       }, 3000)
       
     } catch (error) {
