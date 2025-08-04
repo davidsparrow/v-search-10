@@ -8,7 +8,8 @@ import { FaSnowflake } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { auth } from '../lib/supabase'
 import { TypingAnimation } from '../components/common/TypingAnimation'
-import { MenuTemplate } from '../components/MenuTemplate'
+import { ProfileMenuTemplate } from '../components/menus/ProfileMenuTemplate'
+import { MainHeader } from '../components/headers/MainHeader'
 import { AskBenderTier } from '../types/askbender'
 
 const { Header, Content, Footer } = Layout
@@ -126,8 +127,6 @@ export function HomePage() {
   const [resetSuccess, setResetSuccess] = useState(false)
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-
-
   const handleResetModalCancel = () => {
     setIsResetModalVisible(false)
     setResetEmail('')
@@ -178,8 +177,6 @@ export function HomePage() {
     }
   }, [currentTheme])
 
-
-
   // Input styles that match the selected theme
   const inputStyle = {
     height: '40px',
@@ -190,119 +187,18 @@ export function HomePage() {
     fontSize: '14px'
   }
 
-
-
-
-
-
-
-
   const handleOpenMenu = () => {
     setIsMenuVisible(true)
   }
 
   return (
     <Layout style={{ height: '100vh', overflow: 'hidden', background: theme.background }}>
-      {/* Sticky Header */}
-      <Header style={{
-        background: theme.headerBackground,
-        padding: '0 20px',
-        height: '64px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: 'none',
-        zIndex: 100
-      }}>
-        {/* B Logo */}
-        {!logoError ? (
-          <img
-            src="/askbender_b!_green_on_blk.png"
-            alt="AskBender"
-            style={{
-              height: '40px',
-              width: 'auto',
-              cursor: 'pointer',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))'
-            }}
-            onClick={() => navigate('/')}
-            onError={() => setLogoError(true)}
-          />
-        ) : (
-          <div 
-            style={{ 
-              width: '40px', 
-              height: '40px',
-              background: theme.logoAccentColor,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: '20px',
-              cursor: 'pointer'
-            }}
-            onClick={() => navigate('/')}
-          >
-            B
-          </div>
-        )}
-        {/* Theme Icons and Settings */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Theme Icons */}
-          <Space size="small">
-            <Button
-              type="text"
-              icon={<GiBatMask style={{ fontSize: '16px' }} />}
-              className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
-              style={{ 
-                color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
-                fontSize: '16px'
-              }}
-              onClick={() => handleThemeChange('dark')}
-            />
-            <Button
-              type="text"
-              icon={<FaSnowflake style={{ fontSize: '16px' }} />}
-              className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
-              style={{ 
-                color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
-                fontSize: '16px'
-              }}
-              onClick={() => handleThemeChange('white')}
-            />
-            <Button
-              type="text"
-              icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
-              className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
-              style={{ 
-                color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
-                fontSize: '16px'
-              }}
-              onClick={() => handleThemeChange('default')}
-            />
-            <Button
-              type="text"
-              icon={<AiFillBulb style={{ fontSize: '16px' }} />}
-              className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
-              style={{ 
-                color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
-                fontSize: '16px'
-              }}
-              onClick={() => handleThemeChange('compact')}
-            />
-          </Space>
-          {/* Settings Icon */}
-          <Button
-            type="text"
-            icon={<SettingOutlined />}
-            style={{ color: theme.textPrimary, fontSize: '18px' }}
-            onClick={handleOpenMenu}
-          />
-        </div>
-      </Header>
+      {/* MainHeader Component */}
+      <MainHeader 
+        showThemeIcons={true}
+        showSettingsIcon={true}
+        onMenuClick={handleOpenMenu}
+      />
 
       {/* Main Content - Responsive Scroll */}
       <Content className="homepage-content" style={{ height: 'calc(100vh - 64px - 60px)', overflow: 'hidden' }}>
@@ -523,8 +419,6 @@ export function HomePage() {
                   Drop a Log in
                 </Button>
 
-
-
                 {/* Divider */}
                 <Divider style={{ 
                   color: theme.textSecondary, 
@@ -579,61 +473,61 @@ export function HomePage() {
                   Continue with Google
                 </Button>
 
-                  {/* Second separator replaced with "Again with the lost Sticky?" link */}
+                {/* Second separator replaced with "Again with the lost Sticky?" link */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  margin: '12px 0',
+                  gap: '16px'
+                }}>
                   <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    margin: '12px 0',
-                    gap: '16px'
-                  }}>
-                    <div style={{ 
-                      flex: 1, 
-                      height: '1px', 
-                      background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
-                    }} />
-                    <span style={{
+                    flex: 1, 
+                    height: '1px', 
+                    background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
+                  }} />
+                  <span style={{
+                    color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 'normal',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onClick={() => setIsResetModalVisible(true)}
+                  title="Passwords. Glassware. Easy."
+                  >
+                    Again with the lost Sticky?
+                  </span>
+                  <div style={{ 
+                    flex: 1, 
+                    height: '1px', 
+                    background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
+                  }} />
+                </div>
+
+                {/* Bite Me link centered at bottom */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  marginTop: '6px'
+                }}>
+                  <span
+                    style={{
                       color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
                       fontFamily: 'Poppins, sans-serif',
                       fontSize: '12px',
                       fontWeight: 'normal',
                       cursor: 'pointer',
-                      textDecoration: 'underline',
-                      whiteSpace: 'nowrap'
+                      textDecoration: 'underline'
                     }}
-                    onClick={() => setIsResetModalVisible(true)}
-                    title="Passwords. Glassware. Easy."
-                    >
-                      Again with the lost Sticky?
-                    </span>
-                    <div style={{ 
-                      flex: 1, 
-                      height: '1px', 
-                      background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
-                    }} />
-                  </div>
-
-                  {/* Bite Me link centered at bottom */}
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    marginTop: '6px'
-                  }}>
-                    <span
-                      style={{
-                        color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'normal',
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                      }}
-                      onClick={handleBiteMe}
-                      title="Mess around & find out"
-                    >
-                      Bite Me
-                    </span>
-                  </div>
+                    onClick={handleBiteMe}
+                    title="Mess around & find out"
+                  >
+                    Bite Me
+                  </span>
+                </div>
               </div>
             </div>
           </Col>
@@ -691,7 +585,7 @@ export function HomePage() {
       </Footer>
 
       {/* Settings Menu */}
-      <MenuTemplate
+      <ProfileMenuTemplate
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
         pageType="home"

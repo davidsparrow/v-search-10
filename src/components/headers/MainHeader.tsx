@@ -112,8 +112,8 @@ export function MainHeader({
             icon={<FaHamburger />}
             onClick={onMenuClick}
             style={{ 
-              color: theme.textPrimary, 
-              fontSize: '18px' 
+              color: theme.textSecondary, 
+              fontSize: '16px' 
             }}
           />
         )}
