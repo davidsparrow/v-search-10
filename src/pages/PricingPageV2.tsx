@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Button } from 'antd'
 import { useCloudStore } from '../store/cloudStore'
 import { PricingPageTemplate } from '../components/templates/PricingPageTemplate'
+import { ProfileMenuTemplate } from '../components/menus/ProfileMenuTemplate'
 import { GiChicken, GiLoveHowl } from 'react-icons/gi'
 import { IoMdBeer } from 'react-icons/io'
+import { AskBenderTier } from '../types/askbender'
 
 export function PricingPageV2() {
   const { 
@@ -15,9 +17,20 @@ export function PricingPageV2() {
 
   // State for logo error handling
   const [textLogoError, setTextLogoError] = useState(false)
+  
+  // Menu state
+  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  
+  // Tier system state
+  const [userTier] = useState<AskBenderTier>('fresh_meat')
+  
+  const handleOpenMenu = () => {
+    console.log('Menu button clicked, setting isMenuVisible to true')
+    setIsMenuVisible(true)
+  }
 
-  return (
-    <PricingPageTemplate>
+      return (
+      <PricingPageTemplate onMenuClick={handleOpenMenu}>
       {/* Top Black Section Content */}
       <div style={{
         width: '100%',
@@ -378,6 +391,16 @@ export function PricingPageV2() {
         </div>
       </div>
 
+      {/* ProfileMenuTemplate */}
+      {console.log('Rendering ProfileMenuTemplate, isMenuVisible:', isMenuVisible)}
+      <ProfileMenuTemplate
+        isVisible={isMenuVisible}
+        onClose={() => {
+          console.log('Closing menu')
+          setIsMenuVisible(false)
+        }}
+        userLevel={userTier}
+      />
 
     </PricingPageTemplate>
   )
