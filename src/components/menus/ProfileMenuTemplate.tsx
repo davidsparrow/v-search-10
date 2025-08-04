@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { AvatarComponent } from '../AvatarComponent'
 import { useCloudStore } from '../../store/cloudStore'
 import { getTierDisplayName, getTierPrice, AskBenderTier } from '../../types/askbender'
+import { supabase } from '../../lib/supabase'
 
 interface ProfileMenuTemplateProps {
   isVisible: boolean
@@ -21,6 +22,70 @@ export function ProfileMenuTemplate({
   const { user } = useCloudStore()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('links')
+  const [participantData, setParticipantData] = useState<{
+    nickname?: string;
+    email?: string;
+    phone_number?: string;
+  } | null>(null)
+
+  // Fetch participant data when component mounts or user changes
+  useEffect(() => {
+    const fetchParticipantData = async () => {
+      if (!user?.email) return
+
+      try {
+        // First try to find by email
+        let { data, error } = await supabase
+          .from('participants')
+          .select('id, nickname, email, phone_number, created_at')
+          .eq('email', user.email)
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        // If no match by email and user has phone, try by phone
+        if (!data || data.length === 0) {
+          const authUser = await supabase.auth.getUser()
+          if (authUser.data.user?.phone) {
+            const { data: phoneData, error: phoneError } = await supabase
+              .from('participants')
+              .select('id, nickname, email, phone_number, created_at')
+              .eq('phone_number', authUser.data.user.phone)
+              .order('created_at', { ascending: false })
+              .limit(1)
+            
+            if (phoneData && phoneData.length > 0) {
+              data = phoneData
+              error = phoneError
+            }
+          }
+        }
+
+        if (data && data.length > 0) {
+          // Use the newest participant (already ordered by created_at desc)
+          const participant = data[0]
+          setParticipantData({
+            nickname: participant.nickname,
+            email: participant.email,
+            phone_number: participant.phone_number
+          })
+
+          // Log if multiple participants found with same email
+          if (data.length > 1) {
+            console.warn('Multiple participants found with same email/phone:', {
+              email: user.email,
+              participantIds: data.map(p => p.id),
+              usingNewest: participant.id,
+              refId: 'PROFILE_MENU_MULTIPLE_PARTICIPANTS'
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching participant data:', error)
+      }
+    }
+
+    fetchParticipantData()
+  }, [user?.email])
 
   if (!isVisible) return null
 
@@ -86,7 +151,7 @@ export function ProfileMenuTemplate({
               fontFamily: 'Poppins, sans-serif',
               letterSpacing: '1px'
             }}>
-              <span>{user?.email || 'test@example.com'}</span>
+              <span>{participantData?.nickname || 'My Nickname'}</span>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -316,7 +381,7 @@ export function ProfileMenuTemplate({
                 </Button>
               </div>
 
-              {/* Account Name */}
+              {/* Email */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ 
                   display: 'flex', 
@@ -329,7 +394,7 @@ export function ProfileMenuTemplate({
                     fontSize: '12px',
                     fontWeight: 'normal'
                   }}>
-                    Account Name:
+                    Email:
                   </span>
                   <span style={{
                     color: '#222',
@@ -337,7 +402,33 @@ export function ProfileMenuTemplate({
                     fontSize: '12px',
                     fontWeight: 'bold'
                   }}>
-                    {user?.email || 'test@example.com'}
+                    {participantData?.email || user?.email || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Phone Number */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center' 
+                }}>
+                  <span style={{
+                    color: '#888',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 'normal'
+                  }}>
+                    Phone:
+                  </span>
+                  <span style={{
+                    color: '#222',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    {participantData?.phone_number || 'Not set'}
                   </span>
                 </div>
               </div>
