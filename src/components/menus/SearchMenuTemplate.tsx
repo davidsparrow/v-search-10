@@ -946,7 +946,26 @@ export function SearchMenuTemplate({
               </div>
             </div>
 
-            {/* Additional paid filters */}
+            {/* Toggle switches - Allows Milestone Deposits moved to top */}
+            {/* Allows Milestone Deposits Toggle - Moved to top of toggle group */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+              <Switch
+                size="small"
+                checked={allowsMilestoneDeposits}
+                onChange={setAllowsMilestoneDeposits}
+                style={{ marginRight: '8px' }}
+                className="custom-switch"
+              />
+              <span style={{
+                color: allowsMilestoneDeposits ? '#222' : '#888',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '13px',
+                transition: 'color 0.2s'
+              }}>
+                Allows Milestone Deposits
+              </span>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
               <Switch
                 size="small"
@@ -997,26 +1016,25 @@ export function SearchMenuTemplate({
                 fontSize: '13px',
                 transition: 'color 0.2s'
               }}>
-                Requires Deposit at least 30 days before event
+                Provides on-site staff as needed
               </span>
             </div>
 
-            {/* Allows Milestone Deposits Toggle */}
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
               <Switch
                 size="small"
-                checked={allowsMilestoneDeposits}
-                onChange={setAllowsMilestoneDeposits}
+                checked={requiresDeposit}
+                onChange={setRequiresDeposit}
                 style={{ marginRight: '8px' }}
                 className="custom-switch"
               />
               <span style={{
-                color: allowsMilestoneDeposits ? '#222' : '#888',
+                color: requiresDeposit ? '#222' : '#888',
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '13px',
                 transition: 'color 0.2s'
               }}>
-                Allows Milestone Deposits
+                Provides on-site staff as needed
               </span>
             </div>
           </div>
