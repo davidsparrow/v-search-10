@@ -203,21 +203,21 @@ export function SearchChatPage() {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          {logoLoaded && (
-            <img
-              src={sessionLogo}
-              alt="ask bender"
-              className="text-logo-large"
-              style={{ 
-                maxHeight: '120px', // 50% larger than HomePage (80px -> 120px)
-                height: 'auto', 
-                width: 'auto',
-                maxWidth: '100%', // Mobile responsive
-                filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
-                animation: 'billiardFloat 35s linear infinite'
-              }}
-            />
-          )}
+          <img
+            src={sessionLogo}
+            alt="ask bender"
+            className="text-logo-large"
+            style={{ 
+              maxHeight: '120px', // 50% larger than HomePage (80px -> 120px)
+              height: 'auto', 
+              width: 'auto',
+              maxWidth: '100%', // Mobile responsive
+              filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
+              animation: 'billiardFloat 35s linear infinite',
+              opacity: logoLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out'
+            }}
+          />
         </div>
         {/* Chat Messages */}
         <div style={{

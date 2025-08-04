@@ -299,20 +299,21 @@ export function HomePage() {
                 display: 'flex',
                 justifyContent: 'center'
               }}>
-                {logoLoaded && !textLogoError ? (
-                  <img
-                    src={sessionLogo}
-                    alt="ask bender"
-                    style={{
-                      maxWidth: '300px',
-                      width: '100%',
-                      height: 'auto',
-                      animation: 'billiardFloat 35s linear infinite',
-                      filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))'
-                    }}
-                    onError={() => setTextLogoError(true)}
-                  />
-                ) : (
+                <img
+                  src={sessionLogo}
+                  alt="ask bender"
+                  style={{
+                    maxWidth: '300px',
+                    width: '100%',
+                    height: 'auto',
+                    animation: 'billiardFloat 35s linear infinite',
+                    filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
+                    opacity: logoLoaded ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out'
+                  }}
+                  onError={() => setTextLogoError(true)}
+                />
+                {textLogoError && (
                   <div 
                     style={{ 
                       fontSize: '36px',
