@@ -19,9 +19,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BusinessCloudCanvas } from '../components/BusinessCloudCanvas'
 import { useCloudStore } from '../store/cloudStore'
+import { MainHeader } from '../components/headers/MainHeader'
+import { SearchMenuTemplate } from '../components/menus/SearchMenuTemplate'
 
 export function SearchResultsPage() {
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+  const [isMenuVisible, setIsMenuVisible] = useState(false)
   const navigate = useNavigate()
   const {
     searchResults,
@@ -35,36 +38,14 @@ export function SearchResultsPage() {
     resetSearch
   } = useCloudStore()
 
+  const handleOpenMenu = () => {
+    setIsMenuVisible(true)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex flex-col">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold text-white">V-Search</h1>
-            <nav className="flex space-x-6">
-              <button 
-                onClick={() => navigate('/')}
-                className="text-white hover:text-purple-200 transition-colors"
-              >
-                Home
-              </button>
-              <button 
-                onClick={() => navigate('/search')}
-                className="text-white hover:text-purple-200 transition-colors"
-              >
-                Search
-              </button>
-              <button 
-                onClick={() => navigate('/about')}
-                className="text-white hover:text-purple-200 transition-colors"
-              >
-                About
-              </button>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <MainHeader onMenuClick={handleOpenMenu} />
 
       {/* Main Content */}
       <main className="flex-1 flex">
@@ -243,6 +224,16 @@ export function SearchResultsPage() {
           </div>
         </div>
       </main>
+
+      {/* SearchMenuTemplate */}
+      <SearchMenuTemplate
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        onApplyFilters={(filters) => {
+          console.log('Applied filters:', filters)
+          // TODO: Implement filter application logic
+        }}
+      />
     </div>
   )
 } 
