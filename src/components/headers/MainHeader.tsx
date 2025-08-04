@@ -5,6 +5,9 @@ import { GiBatMask } from 'react-icons/gi'
 import { FaSnowflake } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useCloudStore } from '../../store/cloudStore'
+import { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabase'
+import { AvatarComponent } from '../AvatarComponent'
 
 interface MainHeaderProps {
   showThemeIcons?: boolean
@@ -21,14 +24,29 @@ export function MainHeader({
   const { 
     currentTheme, 
     setTheme, 
-    getThemeConfig 
+    getThemeConfig,
+    user
   } = useCloudStore()
 
   const theme = getThemeConfig()
 
+  // Emoji library for emotional faces
+  const emotionalEmojis = ['😊', '😄', '🤔', '😌', '😎', '🤗', '😉', '😋', '😍', '🥰', '😴', '🤩', '😇', '🤠', '😎', '🤓', '😏', '😌', '😋', '😊']
+
+  // State for emoji
+  const [currentEmoji, setCurrentEmoji] = useState('😊')
+
   const handleThemeChange = (themeName: 'default' | 'dark' | 'compact' | 'white') => {
     setTheme(themeName)
   }
+
+
+
+  // Set random emoji on component mount (page load/refresh only)
+  useEffect(() => {
+    const randomEmoji = emotionalEmojis[Math.floor(Math.random() * emotionalEmojis.length)]
+    setCurrentEmoji(randomEmoji)
+  }, []) // Only runs once on mount
 
   return (
     <div style={{
@@ -41,8 +59,9 @@ export function MainHeader({
       boxShadow: 'none',
       zIndex: 100
     }}>
-      {/* B Logo */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      {/* B Logo + Mini Avatar = Emoji */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        {/* B Logo */}
         <img
           src="/askbender_b!_green_on_blk.png"
           alt="AskBender"
@@ -55,6 +74,72 @@ export function MainHeader({
           }}
           onClick={() => navigate('/')}
         />
+        
+        {/* Plus Sign */}
+        <span
+          style={{
+            fontSize: '14px',
+            color: theme.textSecondary,
+            fontWeight: 'bold',
+            margin: '0 2px'
+          }}
+        >
+          +
+        </span>
+        
+        {/* Mini User Avatar */}
+        <div
+          style={{
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease',
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.2)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          onClick={() => navigate('/')}
+        >
+          <AvatarComponent size={24} />
+        </div>
+        
+        {/* Equals Sign */}
+        <span
+          style={{
+            fontSize: '14px',
+            color: theme.textSecondary,
+            fontWeight: 'bold',
+            margin: '0 2px'
+          }}
+        >
+          =
+        </span>
+        
+        {/* Result Emoji */}
+        <div
+          style={{
+            fontSize: '24px',
+            width: '24px',
+            height: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease',
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.2)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          onClick={() => navigate('/')}
+        >
+          {currentEmoji}
+        </div>
       </div>
 
       {/* Theme Icons and Settings */}
