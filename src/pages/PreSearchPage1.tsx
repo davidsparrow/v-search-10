@@ -126,14 +126,14 @@ export function PreSearchPage1() {
       setRecognitionInstance(recognition)
     }
     
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript
       setInputValue(transcript)
       setIsListening(false)
       setRecognitionInstance(null)
     }
     
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error)
       setIsListening(false)
       setRecognitionInstance(null)
