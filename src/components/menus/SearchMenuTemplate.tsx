@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCloudStore } from '../../store/cloudStore'
 import { TierGate } from '../TierGate'
 import { AskBenderTier } from '../../types/askbender'
+import { CityAutocomplete } from '../common/CityAutocomplete'
 
 interface SearchMenuTemplateProps {
   isVisible: boolean
@@ -221,28 +222,28 @@ export function SearchMenuTemplate({
 
         {/* SECOND ITEM: City and State Fields */}
         <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', marginBottom: '2px' }}>
-          <input
-            type="text"
-            value={city}
-            onChange={e => setCity(e.target.value)}
-            placeholder="City"
-            className="apple-search-input"
-            style={{
-              flex: 1,
-              height: '48px',
-              paddingLeft: '36px',
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#222',
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              boxShadow: 'none',
-              transition: 'border 0.2s'
-            }}
-            autoComplete="off"
-          />
+          <div style={{ flex: 1 }}>
+            <CityAutocomplete
+              value={city}
+              onChange={setCity}
+              onStateChange={setState}
+              placeholder="City"
+              style={{
+                height: '48px',
+                paddingLeft: '36px',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                color: '#222',
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: 'none',
+                transition: 'border 0.2s'
+              }}
+              className="apple-search-input"
+            />
+          </div>
           <div style={{ position: 'relative', flex: 1 }}>
             <select
               value={state}

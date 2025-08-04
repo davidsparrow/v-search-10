@@ -120,6 +120,16 @@ body {
   font-weight: 400 !important;
 }
 
+/* Dim placeholder for other themes */
+.dim-placeholder::placeholder,
+.ant-input.dim-placeholder::placeholder,
+.ant-input-textarea.dim-placeholder::placeholder {
+  color: #888888 !important;
+  opacity: 0.7 !important;
+  text-shadow: none !important;
+  font-weight: 400 !important;
+}
+
 @layer base {
   html {
     font-family: system-ui, sans-serif;
