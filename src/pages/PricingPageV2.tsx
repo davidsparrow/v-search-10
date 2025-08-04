@@ -25,7 +25,6 @@ export function PricingPageV2() {
   const [userTier] = useState<AskBenderTier>('fresh_meat')
   
   const handleOpenMenu = () => {
-    console.log('Menu button clicked, setting isMenuVisible to true')
     setIsMenuVisible(true) // Trigger menu visibility
   }
 
@@ -392,11 +391,9 @@ export function PricingPageV2() {
       </div>
 
       {/* ProfileMenuTemplate */}
-      {console.log('Rendering ProfileMenuTemplate, isMenuVisible:', isMenuVisible)}
       <ProfileMenuTemplate
         isVisible={isMenuVisible}
         onClose={() => {
-          console.log('Closing menu')
           setIsMenuVisible(false)
         }}
         userLevel={userTier}
