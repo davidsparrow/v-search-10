@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, Switch } from 'antd'
 import { FaSearch } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
@@ -46,6 +46,13 @@ export function SearchMenuTemplate({
   const stateOptions = [
     'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC','PR'
   ]
+
+  // Set default country to USA when menu opens if country is empty
+  useEffect(() => {
+    if (isVisible && !country) {
+      setCountry('USA')
+    }
+  }, [isVisible, country])
 
   if (!isVisible) return null
 
@@ -234,14 +241,14 @@ export function SearchMenuTemplate({
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: '#222',
+                color: city ? '#222' : '#888',
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
                 boxShadow: 'none',
                 transition: 'border 0.2s'
               }}
-              className="apple-search-input"
+              className={`apple-search-input ${city ? 'city-input-filled' : 'city-input-placeholder'}`}
             />
           </div>
           <div style={{ position: 'relative', flex: 1 }}>
@@ -276,7 +283,10 @@ export function SearchMenuTemplate({
             </select>
             {state ? (
               <button
-                onClick={() => setState('')}
+                onClick={() => {
+                  setState('')
+                  setCity('')
+                }}
                 style={{
                   position: 'absolute',
                   right: '8px',
@@ -1034,7 +1044,7 @@ export function SearchMenuTemplate({
                 fontSize: '13px',
                 transition: 'color 0.2s'
               }}>
-                Provides on-site staff as needed
+                Staff brings own meals/drinks.
               </span>
             </div>
           </div>

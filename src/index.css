@@ -177,6 +177,17 @@ body {
   color: #aaa !important;
   opacity: 1 !important;
   font-weight: 400;
+}
+
+/* City input placeholder styles */
+.city-input-placeholder::placeholder {
+  color: #888 !important;
+  opacity: 1;
+}
+
+.city-input-filled::placeholder {
+  color: #222 !important;
+  opacity: 1;
 } 
 
 .custom-switch.ant-switch {

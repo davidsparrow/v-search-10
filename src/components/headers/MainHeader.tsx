@@ -35,7 +35,7 @@ export function MainHeader({
     // 1. Happy/Positive
     '😊', '😄', '😃', '😁', '😆', '🤗', '😉', '😋', '😍', '🥰', '🤩', '😇', '🤠',
     // 2. Thinking/Curious
-    '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😜', '😝', '😛', '🤤', '😴', '😪', '😵',
+    '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😜', '😝', '😛', '🤤', '😵',
     // 3. Surprised/Shocked
     '😱', '😨', '😅', '😲', '😳', '🤭', '😶', '😐', '😑',
     // 4. Angry/Frustrated
@@ -43,9 +43,9 @@ export function MainHeader({
     // 5. Playful/Silly
     '🤪', '😜', '😝', '😛', '🤤', '🤡', '👻', '👩‍', '👨‍', '👨‍🏫', '👩‍🏫',
     // 6. Love/Affection
-    '🥰', '😍', '😘', '😗', '😙', '😚', '🥲', '😌', '🤗', '🤝', '👋', '💪🏽',
+    '🥰', '😍', '😘', '😗', '😙', '😚', '😌', '🤗', '🤝', '👋', '💪🏽',
     // 7. Confused/Uncertain
-    '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😵', '🤐', '😶', '😐', '😑', '😯', '😦', '😧', '😮', '😴',
+    '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😵', '🤐', '😶', '😐', '😑', '😯', '😦', '😧', '😮',
     // 8. Non-human
     '🎉', '🎊', '🍾', '💰', '💵', '🤑', '💸', '💩', '🚽', '🐣', '🐶'
   ]
@@ -72,6 +72,12 @@ export function MainHeader({
     setCurrentEmoji(randomEmoji)
   }, []) // Only runs once on mount
 
+  // Function to change emoji to a new random one
+  const changeEmoji = () => {
+    const randomEmoji = emotionalEmojis[Math.floor(Math.random() * emotionalEmojis.length)]
+    setCurrentEmoji(randomEmoji)
+  }
+
   return (
     <div style={{
       background: theme.headerBackground,
@@ -94,7 +100,14 @@ export function MainHeader({
             width: 'auto',
             cursor: 'pointer',
             objectFit: 'contain',
+            transition: 'transform 0.2s ease',
             filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.2)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)'
           }}
           onClick={() => navigate('/')}
         />
@@ -165,7 +178,7 @@ export function MainHeader({
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)'
             }}
-            onClick={() => navigate('/')}
+            onClick={changeEmoji}
           >
             {currentEmoji}
           </div>

@@ -353,7 +353,7 @@ export function SearchChatPage() {
                 fontSize: '18px', // 30% larger (14px -> 18px)
                 color: isListening 
                   ? (currentTheme === 'dark' ? '#ff4d4f' : '#000000') // Red when listening in dark theme, black in others
-                  : (currentTheme === 'dark' ? '#1890ff' : '#ffffff'), // Blue when not listening in dark theme, white in others
+                  : (currentTheme === 'dark' ? '#1890ff' : currentTheme === 'white' ? '#1890ff' : '#ffffff'), // Blue when not listening in dark/white theme, white in others
                 animation: isListening ? 'pulse 1.5s infinite' : 'none'
               }}
             />
@@ -391,7 +391,7 @@ export function SearchChatPage() {
             <SendOutlined
               style={{
                 fontSize: '16px', // 30% larger (12px -> 16px)
-                color: currentTheme === 'dark' ? '#1890ff' : '#ffffff'
+                color: currentTheme === 'dark' ? '#1890ff' : currentTheme === 'white' ? '#1890ff' : '#ffffff'
               }}
             />
           </div>
