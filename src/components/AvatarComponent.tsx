@@ -15,11 +15,13 @@ import {
 interface AvatarComponentProps {
   size?: number
   onAvatarChange?: (avatarUrl: string) => void
+  showBackground?: boolean
 }
 
 export function AvatarComponent({ 
   size = 128, 
-  onAvatarChange 
+  onAvatarChange,
+  showBackground = true
 }: AvatarComponentProps) {
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string>('')
   const [isCustomizeModalVisible, setIsCustomizeModalVisible] = useState(false)
@@ -59,6 +61,17 @@ export function AvatarComponent({
       if (onAvatarChange) onAvatarChange(defaultUrl)
     }
   }, [onAvatarChange])
+
+  // Generate avatar URL with or without background
+  const getAvatarUrl = (baseUrl: string) => {
+    if (!showBackground) {
+      // Remove background color from URL for transparent background
+      const url = new URL(baseUrl)
+      url.searchParams.delete('backgroundColor')
+      return url.toString()
+    }
+    return baseUrl
+  }
 
   // Generate new avatar options
   const generateNewOptions = () => {
@@ -161,10 +174,10 @@ export function AvatarComponent({
       <div style={{
         width: `${size}px`,
         height: `${size}px`,
-        borderRadius: '50%',
+        borderRadius: showBackground ? '50%' : '0%',
         overflow: 'hidden',
-        border: isHovered ? '2px solid #1890ff' : '2px solid #ddd',
-        background: '#f0f0f0',
+        border: showBackground ? (isHovered ? '2px solid #1890ff' : '2px solid #ddd') : 'none',
+        background: showBackground ? '#f0f0f0' : 'transparent',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -172,7 +185,7 @@ export function AvatarComponent({
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-        boxShadow: isHovered ? '0 4px 16px rgba(0, 0, 0, 0.2)' : '0 2px 8px rgba(0, 0, 0, 0.1)'
+        boxShadow: showBackground ? (isHovered ? '0 4px 16px rgba(0, 0, 0, 0.2)' : '0 2px 8px rgba(0, 0, 0, 0.1)') : 'none'
       }}
       onClick={handleCustomizeClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -180,7 +193,7 @@ export function AvatarComponent({
       >
         {currentAvatarUrl ? (
           <img
-            src={currentAvatarUrl}
+            src={getAvatarUrl(currentAvatarUrl)}
             alt="User Avatar"
             style={{
               width: '100%',
@@ -192,7 +205,7 @@ export function AvatarComponent({
               const fallbackUrl = generateAvatarUrl({
                 seed: 'fallback',
                 size,
-                backgroundColor: ['b6e3f4'],
+                backgroundColor: showBackground ? ['b6e3f4'] : undefined,
                 baseColor: ['ffdbac']
               })
               setCurrentAvatarUrl(fallbackUrl)

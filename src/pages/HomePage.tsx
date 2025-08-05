@@ -462,7 +462,7 @@ export function HomePage() {
                     fontWeight: 'normal',
                     background: 'transparent',
                     borderColor: 'transparent', // No border
-                    color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#3B82F6'), // Yellow for COMPACT and CLASSIC theme
+                    color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#3B82F6'), // White for COMPACT, White for CLASSIC, Blue for others
                     borderRadius: '88px', // Same as login button
                     display: 'flex',
                     alignItems: 'center',
@@ -507,7 +507,7 @@ export function HomePage() {
                     background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
                   }} />
                   <span style={{
-                    color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
+                    color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#1890ff'),
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '12px',
                     fontWeight: 'normal',
@@ -535,7 +535,7 @@ export function HomePage() {
                 }}>
                   <span
                     style={{
-                      color: currentTheme === 'compact' ? '#ffff00' : (currentTheme === 'default' ? '#ffff00' : '#1890ff'),
+                      color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#1890ff'),
                       fontFamily: 'Poppins, sans-serif',
                       fontSize: '12px',
                       fontWeight: 'normal',

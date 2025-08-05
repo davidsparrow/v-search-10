@@ -36,20 +36,18 @@ export function MainHeader({
     '😊', '😄', '😃', '😁', '😆', '🤗', '😉', '😋', '😍', '🥰', '🤩', '😇', '🤠',
     // 2. Thinking/Curious
     '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😜', '😝', '😛', '🤤', '😴', '😪', '😵',
-    // 3. Sad/Disappointed
-    '😢', '😭', '😿', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '😡', '🤬',
-    // 4. Surprised/Shocked
-    '😱', '😨', '😰', '😥', '😓', '😅', '😰', '😨', '😱', '😲', '😳', '🤭', '😶', '😐', '😑',
-    // 5. Angry/Frustrated
-    '😠', '🤬', '😈', '👿', '💀', '☠️', '😤', '😾', '😼', '😽', '😻', '😺', '😼', '😽',
-    // 6. Playful/Silly
+    // 3. Surprised/Shocked
+    '😱', '😨', '😅', '😲', '😳', '🤭', '😶', '😐', '😑',
+    // 4. Angry/Frustrated
+    '😠', '🤬', '😈', '👿', '😤', '😾', '😼', '😽', '😻', '😺',
+    // 5. Playful/Silly
     '🤪', '😜', '😝', '😛', '🤤', '🤡', '👻', '👩‍', '👨‍', '👨‍🏫', '👩‍🏫',
-    // 7. Love/Affection
+    // 6. Love/Affection
     '🥰', '😍', '😘', '😗', '😙', '😚', '🥲', '😌', '🤗', '🤝', '👋', '💪🏽',
-    // 8. Confused/Uncertain
+    // 7. Confused/Uncertain
     '🤔', '🤨', '🧐', '🤓', '🤯', '🤪', '😵', '🤐', '😶', '😐', '😑', '😯', '😦', '😧', '😮', '😴',
-    // 9. Non-human
-    '🎉', '🎊', '🍾', '💰', '💵', '🤑', '💸', '💩', '🚽', '🐒💨', '🐇💨', '🐣', '🐶'
+    // 8. Non-human
+    '🎉', '🎊', '🍾', '💰', '💵', '🤑', '💸', '💩', '🚽', '🐣', '🐶'
   ]
 
   // State for emoji
@@ -59,7 +57,14 @@ export function MainHeader({
     setTheme(themeName)
   }
 
+  // Helper function to get shadow color based on theme
+  const getShadowColor = () => {
+    return currentTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+  }
 
+  const getShadowColorDark = () => {
+    return currentTheme === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
+  }
 
   // Set random emoji on component mount (page load/refresh only)
   useEffect(() => {
@@ -79,7 +84,7 @@ export function MainHeader({
       zIndex: 100
     }}>
       {/* B Logo + Mini Avatar = Emoji */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-10px' }}>
         {/* B Logo */}
         <img
           src="/askbender_b!_green_on_blk.png"
@@ -89,7 +94,7 @@ export function MainHeader({
             width: 'auto',
             cursor: 'pointer',
             objectFit: 'contain',
-            filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))'
+            filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`
           }}
           onClick={() => navigate('/')}
         />
@@ -106,58 +111,64 @@ export function MainHeader({
           +
         </span>
         
-        {/* Mini User Avatar */}
-        <div
-          style={{
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-          onClick={() => navigate('/')}
-        >
-          <AvatarComponent size={24} />
-        </div>
-        
-        {/* Equals Sign */}
-        <span
-          style={{
-            fontSize: '14px',
-            color: theme.textSecondary,
-            fontWeight: 'bold',
-            margin: '0 2px'
-          }}
-        >
-          =
-        </span>
-        
-        {/* Result Emoji */}
-        <div
-          style={{
-            fontSize: '24px',
-            width: '24px',
-            height: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-          onClick={() => navigate('/')}
-        >
-          {currentEmoji}
+        {/* Avatar Group (Avatar + Equals + Emoji) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-12px' }}>
+          {/* Mini User Avatar */}
+          <div
+            style={{
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease',
+              filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
+              padding: '2px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+            onClick={() => navigate('/')}
+          >
+            <AvatarComponent size={46} showBackground={false} />
+          </div>
+          
+          {/* Equals Sign */}
+          <span
+            style={{
+              fontSize: '14px',
+              color: theme.textSecondary,
+              fontWeight: 'bold',
+              margin: '0 2px',
+              marginLeft: '-8px'
+            }}
+          >
+            =
+          </span>
+          
+          {/* Result Emoji */}
+          <div
+            style={{
+              fontSize: '28px',
+              width: '28px',
+              height: '28px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease',
+              filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
+              marginLeft: '0px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+            onClick={() => navigate('/')}
+          >
+            {currentEmoji}
+          </div>
         </div>
       </div>
 

@@ -29,7 +29,7 @@ export function TypingAnimation() {
     "Three days ago? Virgin Margaritas.",
     "15 days ago?",
     ".........................",
-    "Why you still F'n with me today?.",
+    "Why you still F'n with me today?",
     "I'm not your landlord today.",
     "Yes I heard the argument in March.",
     "No, It was March.",
