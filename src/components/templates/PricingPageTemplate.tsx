@@ -5,14 +5,12 @@ import { MainHeader } from '../headers/MainHeader'
 
 interface PricingPageTemplateProps {
   children: ReactNode
-  showThemeIcons?: boolean
   showSettingsIcon?: boolean
   onMenuClick?: () => void
 }
 
 export function PricingPageTemplate({ 
   children, 
-  showThemeIcons = true, 
   showSettingsIcon = true,
   onMenuClick
 }: PricingPageTemplateProps) {
@@ -27,7 +25,6 @@ export function PricingPageTemplate({
     }}>
       {/* Header */}
       <MainHeader 
-        showThemeIcons={showThemeIcons}
         showSettingsIcon={showSettingsIcon}
         onMenuClick={onMenuClick}
       />

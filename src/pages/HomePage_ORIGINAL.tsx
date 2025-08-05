@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Button, Input, Row, Col, Modal, Typography, Space, Divider } from 'antd'
+import { Button, Input, Row, Col, Modal, Typography, Layout, Space, Divider } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { SettingOutlined } from '@ant-design/icons'
+import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
+import { GiBatMask } from 'react-icons/gi'
+import { FaSnowflake } from 'react-icons/fa'
 import { useCloudStore } from '../store/cloudStore'
 import { auth } from '../lib/supabase'
 import { TypingAnimation } from '../components/common/TypingAnimation'
@@ -10,6 +13,7 @@ import { MainHeader } from '../components/headers/MainHeader'
 import { AskBenderTier } from '../types/askbender'
 import { getSessionLogo, preloadSessionLogo, getFallbackLogo } from '../lib/logoManager'
 
+const { Header, Content, Footer } = Layout
 const { } = Typography
 
 // Phone number formatting function
@@ -104,7 +108,7 @@ export function HomePage() {
       // Hide success message after 3 seconds and navigate
       setTimeout(() => {
         setShowSuccessMessage(false)
-        navigate('/search-chat')
+                      navigate('/search-chat')
       }, 3000)
       
     } catch (error) {
@@ -207,27 +211,17 @@ export function HomePage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh',
-      background: theme.background,
-      overflow: 'auto'
-    }}>
-      {/* Header */}
+    <Layout style={{ height: '100vh', overflow: 'hidden', background: theme.background }}>
+      {/* MainHeader Component */}
       <MainHeader 
+        showThemeIcons={true}
         showSettingsIcon={true}
         onMenuClick={handleOpenMenu}
       />
 
-      {/* Main Content */}
-      <div style={{
-        width: '100%',
-        minHeight: 'calc(100vh - 64px - 60px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px 20px' // Reduced from 40px to 20px to move content up by ~100px
-      }}>
-        <Row style={{ height: '100%', width: '100%' }} gutter={8}>
+      {/* Main Content - Responsive Scroll */}
+      <Content className="homepage-content" style={{ height: 'calc(100vh - 64px - 60px)', overflow: 'hidden' }}>
+        <Row style={{ height: '100%' }} gutter={8}>
           {/* Visual Side - Left (Desktop) / Top (Mobile) */}
           <Col xs={24} md={14} className="homepage-image" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ 
@@ -305,22 +299,20 @@ export function HomePage() {
                 display: 'flex',
                 justifyContent: 'center'
               }}>
-                {sessionLogo && (
-                  <img
-                    src={sessionLogo}
-                    alt="ask bender"
-                    style={{
-                      maxWidth: '300px',
-                      width: '100%',
-                      height: 'auto',
-                      animation: 'billiardFloat 35s linear infinite',
-                      filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
-                      opacity: logoLoaded ? 1 : 0,
-                      transition: 'opacity 0.3s ease-in-out'
-                    }}
-                    onError={() => setTextLogoError(true)}
-                  />
-                )}
+                <img
+                  src={sessionLogo}
+                  alt="ask bender"
+                  style={{
+                    maxWidth: '300px',
+                    width: '100%',
+                    height: 'auto',
+                    animation: 'billiardFloat 35s linear infinite',
+                    filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))',
+                    opacity: logoLoaded ? 1 : 0,
+                    transition: 'opacity 0.3s ease-in-out'
+                  }}
+                  onError={() => setTextLogoError(true)}
+                />
                 {textLogoError && (
                   <div 
                     style={{ 
@@ -560,47 +552,57 @@ export function HomePage() {
             </div>
           </Col>
         </Row>
-      </div>
+      </Content>
 
-      {/* Copyright Footer - Using PricingPageTemplate style */}
-      <div style={{
-        width: '100%',
-        background: '#000000',
-        padding: '20px',
-        textAlign: 'center',
-        borderTop: '1px solid #333333'
+      {/* Footer */}
+      <Footer style={{ 
+        background: 'transparent',
+        padding: 0,
+        height: '27px',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
       }}>
-        <p style={{
-          color: '#666666',
-          fontSize: '10px',
-          fontFamily: 'Poppins, sans-serif',
-          margin: '0',
-          lineHeight: '17px'
+        <div style={{ 
+          width: '100%',
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%'
         }}>
-          © 2025 bendersaas.ai&nbsp;&nbsp;&nbsp;&nbsp;
-          <span 
-            style={{ 
-              color: '#666666',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-            onClick={() => navigate('/privacy')}
-          >
-            privacy
-          </span>
-          &nbsp;&nbsp;
-          <span 
-            style={{ 
-              color: '#666666',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-            onClick={() => navigate('/terms')}
-          >
-            terms
-          </span>
-        </p>
-      </div>
+          <div style={{ 
+            fontSize: '10px',
+            color: theme.textSecondary,
+            lineHeight: '17px',
+            paddingBottom: '10px'
+          }}>
+            © 2025 bendersaas.ai&nbsp;&nbsp;&nbsp;&nbsp;
+            <span 
+              style={{ 
+                color: theme.textSecondary,
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+              onClick={() => navigate('/privacy')}
+            >
+              privacy
+            </span>
+            &nbsp;&nbsp;
+            <span 
+              style={{ 
+                color: theme.textSecondary,
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+              onClick={() => navigate('/terms')}
+            >
+              terms
+            </span>
+          </div>
+        </div>
+      </Footer>
 
       {/* Settings Menu */}
       <ProfileMenuTemplate
@@ -648,6 +650,6 @@ export function HomePage() {
           </>
         )}
       </Modal>
-    </div>
+    </Layout>
   )
 } 

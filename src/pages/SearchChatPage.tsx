@@ -181,7 +181,6 @@ export function SearchChatPage() {
     <Layout style={{ height: '100vh', overflow: 'hidden', background: theme.background }}>
       {/* MainHeader Component */}
       <MainHeader
-        showThemeIcons={true}
         showSettingsIcon={true}
         onMenuClick={handleOpenMenu}
       />

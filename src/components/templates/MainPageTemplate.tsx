@@ -8,7 +8,6 @@ const { Content } = Layout
 
 interface MainPageTemplateProps {
   children: ReactNode
-  showThemeIcons?: boolean
   showSettingsIcon?: boolean
   showFooter?: boolean
   onMenuClick?: () => void
@@ -17,7 +16,6 @@ interface MainPageTemplateProps {
 
 export function MainPageTemplate({ 
   children, 
-  showThemeIcons = true, 
   showSettingsIcon = true,
   showFooter = true,
   onMenuClick,
@@ -34,7 +32,6 @@ export function MainPageTemplate({
     }}>
       {/* Header */}
       <MainHeader 
-        showThemeIcons={showThemeIcons}
         showSettingsIcon={showSettingsIcon}
         onMenuClick={onMenuClick}
       />

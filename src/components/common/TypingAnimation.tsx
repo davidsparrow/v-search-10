@@ -26,7 +26,7 @@ export function TypingAnimation() {
     "Of course non-alcoholic tomorrow.",
     "Just like 2 days ago.",
     "Yes, it alternates. It's whiskey today.",
-    "Three days ago? Virgin Margaritas.",
+    "Virgin Margaritas were 3 pleasant days ago.",
     "15 days ago?",
     ".........................",
     "Why you still F'n with me today?",

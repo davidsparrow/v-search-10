@@ -2,7 +2,7 @@
 
 A **canvas-based business cloud visualization** that transforms how event planners find local service providers through an innovative image-based interface.
 
-## 🚀 MVP Features here
+## 🚀 MVP Features
 
 ### Core Visualization
 - **Canvas-based business cloud** with 15 sample businesses

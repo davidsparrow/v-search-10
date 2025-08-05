@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Button } from 'antd'
+import { Button, Space } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { AvatarComponent } from '../AvatarComponent'
 import { useCloudStore } from '../../store/cloudStore'
 import { getTierDisplayName, getTierPrice, AskBenderTier } from '../../types/askbender'
 import { supabase } from '../../lib/supabase'
+import { AiFillExperiment, AiFillBulb } from 'react-icons/ai'
+import { GiBatMask } from 'react-icons/gi'
+import { FaSnowflake } from 'react-icons/fa'
 
 interface ProfileMenuTemplateProps {
   isVisible: boolean
@@ -19,7 +22,7 @@ export function ProfileMenuTemplate({
   userLevel = 'fresh_meat',
   customContent 
 }: ProfileMenuTemplateProps) {
-  const { user } = useCloudStore()
+  const { user, currentTheme, setTheme, getThemeConfig } = useCloudStore()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('links')
   const [participantData, setParticipantData] = useState<{
@@ -27,6 +30,12 @@ export function ProfileMenuTemplate({
     email?: string;
     phone_number?: string;
   } | null>(null)
+
+  const theme = getThemeConfig()
+
+  const handleThemeChange = (themeName: 'default' | 'dark' | 'compact' | 'white') => {
+    setTheme(themeName)
+  }
 
   // Fetch participant data when component mounts or user changes
   useEffect(() => {
@@ -136,6 +145,85 @@ export function ProfileMenuTemplate({
             alignItems: 'flex-start', 
             gap: '16px' 
           }}>
+            {/* Theme Icons */}
+            <Space size="small">
+              <Button
+                type="text"
+                icon={<GiBatMask style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
+                style={{ 
+                  color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px',
+                  background: '#000000',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+                onClick={() => handleThemeChange('dark')}
+              />
+              <Button
+                type="text"
+                icon={<FaSnowflake style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
+                style={{ 
+                  color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px',
+                  background: '#000000',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+                onClick={() => handleThemeChange('white')}
+              />
+              <Button
+                type="text"
+                icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
+                style={{ 
+                  color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px',
+                  background: '#000000',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+                onClick={() => handleThemeChange('default')}
+              />
+              <Button
+                type="text"
+                icon={<AiFillBulb style={{ fontSize: '16px' }} />}
+                className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
+                style={{ 
+                  color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
+                  fontSize: '16px',
+                  background: '#000000',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+                onClick={() => handleThemeChange('compact')}
+              />
+            </Space>
             {/* User Avatar */}
             <AvatarComponent 
               size={128}
