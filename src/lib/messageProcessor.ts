@@ -11,6 +11,8 @@
 import { calculateFinalTimeout, getReplyMode, isRecurringFlow } from './timeoutUtils';
 import { processAIFlowRequest, AIFlowRequest } from './aiFlowRouter';
 import { EnhancedSpintaxEngine, SpintaxContext } from './spintaxEngine';
+import { smsService, SMSResponse } from './smsService';
+import { emailService, EmailContent, EmailResponse } from './emailService';
 
 // Type definitions for message processing
 export interface Message {
@@ -104,6 +106,10 @@ export interface ProcessedMessage {
   processingTime: number;
   characterCount: number;
   deliveryMethod: string;
+  deliveryResults?: {
+    smsResult?: SMSResponse;
+    emailResult?: EmailResponse;
+  };
 }
 
 export interface MessageResponse {
@@ -117,6 +123,81 @@ export interface MessageResponse {
     processingTime: number;
     characterCount: number;
   };
+  deliveryResults?: {
+    smsResult?: SMSResponse;
+    emailResult?: EmailResponse;
+  };
+}
+
+/**
+ * Enhanced delivery method determination with character limits
+ */
+export function determineDeliveryMethod(
+  messageContent: string,
+  participant: Participant,
+  group: Group
+): 'sms' | 'email' | 'both' {
+  const smsCharLimit = participant.sms_character_limit || 160; // Default SMS limit
+  const participantPrefersEmail = participant.email && participant.preferred_communication_method === 'email';
+  const messageLength = messageContent.length;
+  
+  // If message is too long for SMS, use email
+  if (messageLength > smsCharLimit) {
+    return 'email';
+  }
+  
+  // If participant prefers email, use email
+  if (participantPrefersEmail) {
+    return 'email';
+  }
+  
+  // If participant has email and message is long, use both
+  if (participant.email && messageLength > 100) {
+    return 'both';
+  }
+  
+  // Default to SMS
+  return 'sms';
+}
+
+/**
+ * Send message via appropriate channels
+ */
+export async function sendMessageViaChannels(
+  message: Message,
+  response: MessageResponse,
+  participant: Participant,
+  group: Group
+): Promise<{
+  smsResult?: SMSResponse;
+  emailResult?: EmailResponse;
+}> {
+  const deliveryMethod = determineDeliveryMethod(response.content, participant, group);
+  const results: { smsResult?: SMSResponse; emailResult?: EmailResponse } = {};
+  
+  if (deliveryMethod === 'sms' || deliveryMethod === 'both') {
+    if (participant.phone_number) {
+      results.smsResult = await smsService.sendSMS(
+        participant.phone_number,
+        response.content
+      );
+    }
+  }
+  
+  if (deliveryMethod === 'email' || deliveryMethod === 'both') {
+    if (participant.email) {
+      const emailContent: EmailContent = {
+        to: participant.email,
+        subject: `Message from ${group.name}`,
+        body: response.content,
+        htmlBody: response.content // Could be enhanced with HTML formatting
+      };
+      
+      results.emailResult = await emailService.sendEmail(emailContent);
+    }
+  }
+  
+  return results;
 }
 
 /**
@@ -163,7 +244,15 @@ export async function processIncomingMessage(context: MessageProcessingContext):
     const responseResult = await generateResponse(context, replyMode.isProfessional ? 'professional' : 'casual');
     
     // 4. Determine delivery method
-    const deliveryMethod = determineDeliveryMethod(context.participant, context.group);
+    const deliveryMethod = determineDeliveryMethod(responseResult.content, context.participant, context.group);
+    
+    // 5. Send via appropriate channels
+    const channelResults = await sendMessageViaChannels(
+      context.message,
+      { content: responseResult.content, timeout: finalTimeout, mode: replyMode.isProfessional ? 'professional' : 'casual', deliveryMethod, metadata: { aiUsed: responseResult.aiUsed, spintaxUsed: responseResult.spintaxUsed, processingTime: 0, characterCount: responseResult.content.length } },
+      context.participant,
+      context.group
+    );
     
     const processingTime = Date.now() - startTime;
     
@@ -176,7 +265,8 @@ export async function processIncomingMessage(context: MessageProcessingContext):
       spintaxUsed: responseResult.spintaxUsed,
       processingTime,
       characterCount: responseResult.content.length,
-      deliveryMethod
+      deliveryMethod,
+      deliveryResults: channelResults
     };
     
   } catch (error) {
@@ -359,27 +449,7 @@ export function determineTemplateName(message: Message, participant: Participant
   }
 }
 
-/**
- * Determines the delivery method for the message
- * 
- * @param participant - The participant
- * @param group - The group
- * @returns Delivery method string
- */
-export function determineDeliveryMethod(participant: Participant, group: Group): string {
-  // Check participant's preferred method
-  if (participant.preferred_communication_method) {
-    return participant.preferred_communication_method;
-  }
-  
-  // Check group's fallback settings
-  if (group.z_personality_config?.preferred_fallback_method) {
-    return group.z_personality_config.preferred_fallback_method;
-  }
-  
-  // Default to SMS
-  return 'sms';
-}
+
 
 /**
  * Validates a message processing context
@@ -441,7 +511,8 @@ export function createMessageResponse(processedMessage: ProcessedMessage): Messa
       spintaxUsed: processedMessage.spintaxUsed,
       processingTime: processedMessage.processingTime,
       characterCount: processedMessage.characterCount
-    }
+    },
+    deliveryResults: processedMessage.deliveryResults
   };
 }
 
@@ -488,6 +559,11 @@ export function getProcessingStats(processedMessages: ProcessedMessage[]) {
   const avgProcessingTime = processedMessages.reduce((sum, m) => sum + m.processingTime, 0) / totalMessages;
   const avgCharacterCount = processedMessages.reduce((sum, m) => sum + m.characterCount, 0) / totalMessages;
   
+  // Delivery statistics
+  const smsDelivered = processedMessages.filter(m => m.deliveryResults?.smsResult?.success).length;
+  const emailDelivered = processedMessages.filter(m => m.deliveryResults?.emailResult?.success).length;
+  const dualDelivered = processedMessages.filter(m => m.deliveryResults?.smsResult?.success && m.deliveryResults?.emailResult?.success).length;
+  
   return {
     totalMessages,
     aiUsed,
@@ -495,7 +571,12 @@ export function getProcessingStats(processedMessages: ProcessedMessage[]) {
     avgProcessingTime: Math.round(avgProcessingTime),
     avgCharacterCount: Math.round(avgCharacterCount),
     aiUsageRate: totalMessages > 0 ? (aiUsed / totalMessages) * 100 : 0,
-    spintaxUsageRate: totalMessages > 0 ? (spintaxUsed / totalMessages) * 100 : 0
+    spintaxUsageRate: totalMessages > 0 ? (spintaxUsed / totalMessages) * 100 : 0,
+    smsDelivered,
+    emailDelivered,
+    dualDelivered,
+    smsDeliveryRate: totalMessages > 0 ? (smsDelivered / totalMessages) * 100 : 0,
+    emailDeliveryRate: totalMessages > 0 ? (emailDelivered / totalMessages) * 100 : 0
   };
 }
 

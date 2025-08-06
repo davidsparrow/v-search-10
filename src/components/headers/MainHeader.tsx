@@ -178,6 +178,19 @@ export function MainHeader({
 
       {/* Settings */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Profile Link */}
+        <Button
+          type="text"
+          onClick={() => navigate('/user-profile')}
+          style={{ 
+            color: theme.textSecondary, 
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          Profile
+        </Button>
+        
         {/* Hamburger Menu Icon */}
         {showSettingsIcon && (
           <Button
