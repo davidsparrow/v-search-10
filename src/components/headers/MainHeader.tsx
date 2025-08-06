@@ -80,7 +80,7 @@ export function MainHeader({
       zIndex: 100
     }}>
       {/* B Logo + Mini Avatar = Emoji */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-5px' }}>
         {/* B Logo */}
         <img
           src="/askbender_b!_green_on_blk.png"
@@ -160,7 +160,8 @@ export function MainHeader({
               cursor: 'pointer',
               transition: 'transform 0.2s ease',
               filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
-              marginLeft: '4px'
+              marginLeft: '4px',
+              marginTop: '4px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.2)'
@@ -185,7 +186,7 @@ export function MainHeader({
             onClick={onMenuClick}
             style={{ 
               color: theme.textSecondary, 
-              fontSize: '16px' 
+              fontSize: '24px' 
             }}
           />
         )}
