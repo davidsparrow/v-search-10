@@ -10,6 +10,9 @@ ALTER TABLE participants ADD COLUMN IF NOT EXISTS created_by UUID;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS modified_by UUID;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS terms_accepted TEXT;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS terms_accepted_ip INET;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS terms_accepted_location TEXT;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS terms_accepted_user_agent TEXT;
 
 -- Add comments for documentation
 COMMENT ON COLUMN participants.created_at IS 'Standard creation timestamp for audit trail';
@@ -18,6 +21,9 @@ COMMENT ON COLUMN participants.created_by IS 'UUID of user/system that created t
 COMMENT ON COLUMN participants.modified_by IS 'UUID of user/system that last modified this participant';
 COMMENT ON COLUMN participants.terms_accepted IS 'User initials indicating terms acceptance for first-time user detection';
 COMMENT ON COLUMN participants.terms_accepted_at IS 'Timestamp when terms were accepted for compliance tracking';
+COMMENT ON COLUMN participants.terms_accepted_ip IS 'IP address when terms were accepted for compliance and security';
+COMMENT ON COLUMN participants.terms_accepted_location IS 'Geographic location (country/city) when terms were accepted';
+COMMENT ON COLUMN participants.terms_accepted_user_agent IS 'Browser/device information when terms were accepted';
 
 -- Create trigger function to auto-update updated_at
 CREATE OR REPLACE FUNCTION update_participants_updated_at()
@@ -53,6 +59,7 @@ WHERE updated_at IS NULL;
 -- Create index for efficient terms acceptance queries
 CREATE INDEX IF NOT EXISTS idx_participants_terms_accepted ON participants(terms_accepted);
 CREATE INDEX IF NOT EXISTS idx_participants_terms_accepted_at ON participants(terms_accepted_at);
+CREATE INDEX IF NOT EXISTS idx_participants_terms_accepted_ip ON participants(terms_accepted_ip);
 
 -- Create index for audit trail queries
 CREATE INDEX IF NOT EXISTS idx_participants_created_at ON participants(created_at DESC);

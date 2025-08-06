@@ -6,6 +6,7 @@
 -- Drop indexes first
 DROP INDEX IF EXISTS idx_participants_terms_accepted;
 DROP INDEX IF EXISTS idx_participants_terms_accepted_at;
+DROP INDEX IF EXISTS idx_participants_terms_accepted_ip;
 DROP INDEX IF EXISTS idx_participants_created_at;
 DROP INDEX IF EXISTS idx_participants_updated_at;
 
@@ -21,4 +22,7 @@ ALTER TABLE participants DROP COLUMN IF EXISTS updated_at;
 ALTER TABLE participants DROP COLUMN IF EXISTS created_by;
 ALTER TABLE participants DROP COLUMN IF EXISTS modified_by;
 ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted;
-ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted_at; 
+ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted_at;
+ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted_ip;
+ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted_location;
+ALTER TABLE participants DROP COLUMN IF EXISTS terms_accepted_user_agent; 
