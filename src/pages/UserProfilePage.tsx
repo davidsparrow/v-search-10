@@ -61,6 +61,8 @@ export const UserProfilePage: React.FC = () => {
         .from('participants')
         .select('*')
         .eq('eventria_user_id', user.id)
+        .order('joined_at', { ascending: false })
+        .limit(1)
         .single();
 
       if (error) {

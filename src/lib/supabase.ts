@@ -7,18 +7,52 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Participant management functions
 export const participantService = {
-  // Check if participant already exists
-  checkExistingParticipant: async (userId: string) => {
+  // Check if participant already exists by user ID or email
+  checkExistingParticipant: async (userId: string, email?: string) => {
     try {
-      const { data, error } = await supabase
+      // First check by eventria_user_id
+      const { data: userData, error: userError } = await supabase
         .from('participants')
-        .select('id')
+        .select('id, email, eventria_user_id')
         .eq('eventria_user_id', userId)
-        .single()
+        .limit(1)
       
-      return { exists: !!data, error }
+      if (userData && userData.length > 0) {
+        console.log('Found existing participant by user ID:', userData[0])
+        return { exists: true, data: userData[0], error: null }
+      }
+      
+      // If no match by user ID and we have email, check by email
+      if (email) {
+        const { data: emailData, error: emailError } = await supabase
+          .from('participants')
+          .select('id, email, eventria_user_id')
+          .eq('email', email)
+          .limit(1)
+        
+        if (emailData && emailData.length > 0) {
+          console.log('Found existing participant by email:', emailData[0])
+          // Update the existing participant with the new eventria_user_id
+          const { data: updateData, error: updateError } = await supabase
+            .from('participants')
+            .update({ eventria_user_id: userId })
+            .eq('id', emailData[0].id)
+            .select()
+          
+          if (updateError) {
+            console.error('Error updating participant with new user ID:', updateError)
+          } else {
+            console.log('Updated participant with new user ID:', updateData)
+          }
+          
+          return { exists: true, data: emailData[0], error: null }
+        }
+      }
+      
+      return { exists: false, data: null, error: null }
     } catch (err) {
-      return { exists: false, error: err }
+      console.error('Error checking existing participant:', err)
+      return { exists: false, data: null, error: err }
     }
   },
 
@@ -34,6 +68,11 @@ export const participantService = {
           phone_number: phoneNumber || 'placeholder',
           real_score: 0,
           display_score: 0,
+          social_cred_rating: 0.0,
+          professional_mode_always: false,
+          pref_timeout: 300,
+          preferred_communication_method: 'sms',
+          sms_character_limit: 160,
           joined_at: new Date().toISOString()
         }])
         .select()
@@ -55,15 +94,23 @@ export const participantService = {
   handleParticipantCreation: async (user: any) => {
     if (!user) return { success: false, error: 'No user data' }
     
-    const { exists } = await participantService.checkExistingParticipant(user.id)
+    console.log('Checking for existing participant for user:', user.id, user.email)
+    const { exists, data: existingParticipant, error } = await participantService.checkExistingParticipant(user.id, user.email)
     
-    if (!exists) {
-      // Create participant with basic info from auth
-      const result = await participantService.createParticipant(user)
-      return result
+    if (error) {
+      console.error('Error checking existing participant:', error)
+      return { success: false, error }
     }
     
-    return { success: true, exists: true }
+    if (exists) {
+      console.log('Participant already exists, skipping creation:', existingParticipant)
+      return { success: true, exists: true, data: existingParticipant }
+    }
+    
+    console.log('No existing participant found, creating new one...')
+    // Create participant with basic info from auth
+    const result = await participantService.createParticipant(user)
+    return result
   }
 }
 
