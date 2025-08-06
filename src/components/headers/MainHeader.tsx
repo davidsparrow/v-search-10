@@ -122,7 +122,7 @@ export function MainHeader({
               cursor: 'pointer',
               transition: 'transform 0.2s ease',
               filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
-              padding: '2px'
+              padding: '2px 6px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.2)'

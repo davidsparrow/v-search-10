@@ -307,17 +307,8 @@ export function AvatarComponent({
 
             {/* Avatar options */}
             <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ marginBottom: '12px' }}>
                 <h4 style={{ margin: 0 }}>Choose an Avatar</h4>
-                <Button
-                  type="text"
-                  icon={<ReloadOutlined />}
-                  onClick={generateNewOptions}
-                  loading={isLoading}
-                  size="small"
-                >
-                  New Options
-                </Button>
               </div>
               <Row gutter={[8, 8]}>
                 {avatarOptions.map((avatar) => (
@@ -348,6 +339,17 @@ export function AvatarComponent({
                 ))}
               </Row>
             </div>
+
+            {/* New Options button */}
+            <Button
+              type="dashed"
+              icon={<ReloadOutlined />}
+              onClick={generateNewOptions}
+              loading={isLoading}
+              style={{ width: '100%', marginBottom: '8px' }}
+            >
+              New Options
+            </Button>
 
             {/* Random avatar button */}
             <Button
