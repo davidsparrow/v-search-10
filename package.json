@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/avataaars": "^9.2.3",
     "@dicebear/bottts": "^9.2.3",
+    "@dicebear/lorelei": "^9.2.3",
+    "@dicebear/miniavs": "^9.2.3",
+    "@dicebear/pixel-art": "^9.2.3",
     "@supabase/supabase-js": "^2.52.1",
     "antd": "^5.26.6",
     "react": "^19.1.0",

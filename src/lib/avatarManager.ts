@@ -5,7 +5,7 @@ export interface AvatarOptions {
   baseColor?: string[]
   topColor?: string[]
   size?: number
-  collection?: 'croodles' | 'bottts'
+  collection?: 'croodles' | 'bottts' | 'pixelArt' | 'lorelei' | 'miniavs' | 'avataaars'
 }
 
 // Avatar collection configuration
@@ -21,6 +21,30 @@ export const AVATAR_COLLECTIONS = {
     icon: '🤖',
     apiUrl: 'https://api.dicebear.com/9.x/bottts/svg',
     description: 'Robot characters'
+  },
+  pixelArt: {
+    name: 'Pixel Art',
+    icon: '👾',
+    apiUrl: 'https://api.dicebear.com/9.x/pixel-art/svg',
+    description: 'Retro pixel characters'
+  },
+  lorelei: {
+    name: 'Lorelei',
+    icon: '✨',
+    apiUrl: 'https://api.dicebear.com/9.x/lorelei/svg',
+    description: 'Modern clean style'
+  },
+  miniavs: {
+    name: 'Miniavs',
+    icon: '👤',
+    apiUrl: 'https://api.dicebear.com/9.x/miniavs/svg',
+    description: 'Simple minimal avatars'
+  },
+  avataaars: {
+    name: 'Avataaars',
+    icon: '😊',
+    apiUrl: 'https://api.dicebear.com/9.x/avataaars/svg',
+    description: 'Classic human avatars'
   }
 } as const
 
@@ -167,6 +191,14 @@ export function extractColorsFromUrl(avatarUrl: string): {
     let collection: AvatarCollection = 'croodles'
     if (url.pathname.includes('bottts')) {
       collection = 'bottts'
+    } else if (url.pathname.includes('pixel-art')) {
+      collection = 'pixelArt'
+    } else if (url.pathname.includes('lorelei')) {
+      collection = 'lorelei'
+    } else if (url.pathname.includes('miniavs')) {
+      collection = 'miniavs'
+    } else if (url.pathname.includes('avataaars')) {
+      collection = 'avataaars'
     }
     
     return {

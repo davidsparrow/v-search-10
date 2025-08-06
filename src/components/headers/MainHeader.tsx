@@ -132,7 +132,7 @@ export function MainHeader({
             }}
             onClick={() => navigate('/')}
           >
-            <AvatarComponent size={46} showBackground={false} />
+            <AvatarComponent size={41} showBackground={false} />
           </div>
           
           {/* Equals Sign */}
@@ -151,16 +151,16 @@ export function MainHeader({
           {/* Result Emoji */}
           <div
             style={{
-              fontSize: '28px',
-              width: '28px',
-              height: '28px',
+              fontSize: '32px',
+              width: '32px',
+              height: '32px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'transform 0.2s ease',
               filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
-              marginLeft: '0px'
+              marginLeft: '4px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.2)'
