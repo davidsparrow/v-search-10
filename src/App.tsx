@@ -11,12 +11,14 @@ import { SystemSettingsPage } from './pages/SystemSettingsPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 import { PricingPage } from './pages/PricingPage'
+import { StarterJourney0 } from './pages/StarterJourney0'
 import { StarterJourney1 } from './pages/StarterJourney1'
 import { StarterJourney2 } from './pages/StarterJourney2'
 import { StarterJourney3 } from './pages/StarterJourney3'
 
 import { useCloudStore } from './store/cloudStore'
 import { supabase, participantService } from './lib/supabase'
+import { firstTimeUserService } from './lib/firstTimeUserService'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { setupGlobalErrorHandling } from './lib/errorLogging'
@@ -90,6 +92,9 @@ function App() {
                       )
                     ])
                     console.log('🔍 AUTH: Participant creation result:', result)
+                    
+                    // Handle first-time user routing
+                    await firstTimeUserService.handleUserRouting(session.user)
                   } catch (error) {
                     console.error('🔍 AUTH: Participant creation failed or timed out:', error)
                     // Don't let participant creation failure break the auth flow
@@ -145,6 +150,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/starter-journey-0" element={<StarterJourney0 />} />
             <Route path="/starter-journey-1" element={<StarterJourney1 />} />
             <Route path="/starter-journey-2" element={<StarterJourney2 />} />
             <Route path="/starter-journey-3" element={<StarterJourney3 />} />

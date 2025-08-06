@@ -104,7 +104,7 @@ export const auth = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/start-search`
+        redirectTo: `${window.location.origin}/starter-journey-0`
       }
     })
     return { data, error }
