@@ -2,9 +2,12 @@
 
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { useCloudStore } from '../store/cloudStore'
 
 export function StarterJourney0() {
   const navigate = useNavigate()
+  const { user } = useCloudStore()
   const [timeRemaining, setTimeRemaining] = useState(60) // 60 seconds timeout
   const [showTimeoutMessage, setShowTimeoutMessage] = useState(false)
   const [currentTab, setCurrentTab] = useState(1) // 1, 2, or 3
@@ -35,6 +38,86 @@ export function StarterJourney0() {
   const [showTab2Failure, setShowTab2Failure] = useState(false)
   const [showTab3Failure, setShowTab3Failure] = useState(false)
   const [showTab3Warning, setShowTab3Warning] = useState(false)
+  const [isSavingTerms, setIsSavingTerms] = useState(false)
+
+  // Function to get user's IP address
+  const getUserIP = async () => {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json')
+      const data = await response.json()
+      return data.ip
+    } catch (error) {
+      console.error('Error getting IP address:', error)
+      return null
+    }
+  }
+
+  // Function to get user's location from IP
+  const getUserLocation = async (ip: string) => {
+    try {
+      const response = await fetch(`https://ipapi.co/${ip}/json/`)
+      const data = await response.json()
+      return `${data.country_name || 'Unknown'}, ${data.city || 'Unknown'}`
+    } catch (error) {
+      console.error('Error getting location:', error)
+      return 'Unknown'
+    }
+  }
+
+  // Function to save terms acceptance to database
+  const saveTermsAcceptance = async () => {
+    if (!user || !initials.trim()) {
+      console.error('No user or initials provided')
+      return false
+    }
+
+    try {
+      setIsSavingTerms(true)
+      
+      // Get user's IP address
+      const ipAddress = await getUserIP()
+      
+      // Get user's location
+      const location = ipAddress ? await getUserLocation(ipAddress) : 'Unknown'
+      
+      // Get user agent
+      const userAgent = navigator.userAgent
+
+      console.log('Saving terms acceptance:', {
+        userId: user.id,
+        initials: initials.trim(),
+        ipAddress,
+        location,
+        userAgent
+      })
+
+      // Update participant with terms acceptance data
+      const { error } = await supabase
+        .from('participants')
+        .update({
+          terms_accepted: initials.trim(),
+          terms_accepted_at: new Date().toISOString(),
+          terms_accepted_ip: ipAddress,
+          terms_accepted_location: location,
+          terms_accepted_user_agent: userAgent,
+          modified_by: user.id
+        })
+        .eq('eventria_user_id', user.id)
+
+      if (error) {
+        console.error('Error saving terms acceptance:', error)
+        return false
+      }
+
+      console.log('Terms acceptance saved successfully')
+      return true
+    } catch (error) {
+      console.error('Error saving terms acceptance:', error)
+      return false
+    } finally {
+      setIsSavingTerms(false)
+    }
+  }
 
   // Dynamic titles based on current tab
   const getTabTitle = (tabNumber: number) => {
@@ -1004,17 +1087,25 @@ export function StarterJourney0() {
     }
   }
 
-  // Monitor form completion for tab 1
+  // Monitor form completion for tab 1 and save terms acceptance
   useEffect(() => {
     if (currentTab === 1 && isCheckboxChecked && initials.trim() !== '') {
-      // Both checkbox and initials are filled - progress to tab 2
-      setTimeout(() => {
-        setCurrentTab(2)
-        setTimeRemaining(60) // Reset timer for new tab
-        setShowTimeoutMessage(false)
-      }, 500) // Small delay for UX
+      // Save terms acceptance to database
+      saveTermsAcceptance().then((success) => {
+        if (success) {
+          // Progress to tab 2 after successful save
+          setTimeout(() => {
+            setCurrentTab(2)
+            setTimeRemaining(60) // Reset timer for new tab
+            setShowTimeoutMessage(false)
+          }, 500) // Small delay for UX
+        } else {
+          // If save failed, show error or retry
+          console.error('Failed to save terms acceptance')
+        }
+      })
     }
-  }, [currentTab, isCheckboxChecked, initials])
+  }, [currentTab, isCheckboxChecked, initials, user])
 
   // Monitor form completion for tab 2 - REMOVED: No progression on checkbox check
   // Tab 2 only progresses when timer runs out and user clicks a button in the failure popup
