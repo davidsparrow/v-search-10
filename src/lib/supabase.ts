@@ -100,6 +100,10 @@ export const participantService = {
           pref_timeout: 300,
           preferred_communication_method: 'sms',
           sms_character_limit: 160,
+          created_by: userData.id, // Track who created this participant
+          modified_by: userData.id, // Track who last modified
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           joined_at: new Date().toISOString()
         }])
         .select()
