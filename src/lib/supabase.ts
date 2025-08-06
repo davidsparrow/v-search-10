@@ -7,13 +7,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Participant management functions
 export const participantService = {
-  // Check if participant already exists by user ID or email
-  checkExistingParticipant: async (userId: string, email?: string) => {
+  // Check if participant already exists by user ID, email, or phone number
+  checkExistingParticipant: async (userId: string, email?: string, phoneNumber?: string) => {
     try {
       // First check by eventria_user_id
       const { data: userData, error: userError } = await supabase
         .from('participants')
-        .select('id, email, eventria_user_id')
+        .select('id, email, eventria_user_id, phone_number')
         .eq('eventria_user_id', userId)
         .limit(1)
       
@@ -26,7 +26,7 @@ export const participantService = {
       if (email) {
         const { data: emailData, error: emailError } = await supabase
           .from('participants')
-          .select('id, email, eventria_user_id')
+          .select('id, email, eventria_user_id, phone_number')
           .eq('email', email)
           .limit(1)
         
@@ -46,6 +46,33 @@ export const participantService = {
           }
           
           return { exists: true, data: emailData[0], error: null }
+        }
+      }
+      
+      // If no match by email and we have phone number, check by phone number
+      if (phoneNumber && phoneNumber !== 'placeholder') {
+        const { data: phoneData, error: phoneError } = await supabase
+          .from('participants')
+          .select('id, email, eventria_user_id, phone_number')
+          .eq('phone_number', phoneNumber)
+          .limit(1)
+        
+        if (phoneData && phoneData.length > 0) {
+          console.log('Found existing participant by phone number:', phoneData[0])
+          // Update the existing participant with the new eventria_user_id
+          const { data: updateData, error: updateError } = await supabase
+            .from('participants')
+            .update({ eventria_user_id: userId })
+            .eq('id', phoneData[0].id)
+            .select()
+          
+          if (updateError) {
+            console.error('Error updating participant with new user ID:', updateError)
+          } else {
+            console.log('Updated participant with new user ID:', updateData)
+          }
+          
+          return { exists: true, data: phoneData[0], error: null }
         }
       }
       
@@ -94,8 +121,8 @@ export const participantService = {
   handleParticipantCreation: async (user: any) => {
     if (!user) return { success: false, error: 'No user data' }
     
-    console.log('Checking for existing participant for user:', user.id, user.email)
-    const { exists, data: existingParticipant, error } = await participantService.checkExistingParticipant(user.id, user.email)
+    console.log('Checking for existing participant for user:', user.id, user.email, user.phone)
+    const { exists, data: existingParticipant, error } = await participantService.checkExistingParticipant(user.id, user.email, user.phone)
     
     if (error) {
       console.error('Error checking existing participant:', error)
