@@ -54,6 +54,8 @@ export const UserProfilePage: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
+      console.log('Loading profile for user:', user.id);
+
       // Get participant profile
       const { data: participant, error } = await supabase
         .from('participants')
@@ -62,8 +64,56 @@ export const UserProfilePage: React.FC = () => {
         .single();
 
       if (error) {
+        console.error('Error fetching participant:', error);
+        
+        // If participant doesn't exist, try to create one
+        if (error.code === 'PGRST116') {
+          console.log('Participant not found, creating new one...');
+          
+          const { data: newParticipant, error: createError } = await supabase
+            .from('participants')
+            .insert({
+              eventria_user_id: user.id,
+              phone_number: user.phone || 'unknown',
+              email: user.email,
+              professional_mode_always: false,
+              pref_timeout: 300,
+              preferred_communication_method: 'sms',
+              sms_character_limit: 160,
+              real_score: 0,
+              display_score: 0,
+              social_cred_rating: 0.0
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating participant:', createError);
+            throw new Error('Failed to create user profile');
+          }
+
+          console.log('Created new participant:', newParticipant);
+          
+          // Set defaults for new participant
+          const profileWithDefaults: UserProfile = {
+            ...newParticipant,
+            professional_mode_always: newParticipant.professional_mode_always ?? false,
+            pref_timeout: newParticipant.pref_timeout ?? 300,
+            preferred_communication_method: newParticipant.preferred_communication_method ?? 'sms',
+            sms_character_limit: newParticipant.sms_character_limit ?? 160,
+            real_score: newParticipant.real_score ?? 0,
+            display_score: newParticipant.display_score ?? 0,
+            social_cred_rating: newParticipant.social_cred_rating ?? 0
+          };
+
+          setProfile(profileWithDefaults);
+          return;
+        }
+        
         throw error;
       }
+
+      console.log('Found existing participant:', participant);
 
       // Set defaults if values are null
       const profileWithDefaults: UserProfile = {
