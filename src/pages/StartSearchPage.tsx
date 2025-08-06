@@ -48,11 +48,24 @@ export function StartSearchPage() {
 
     // Process the incoming message for critical message detection
     try {
-      const processedMessage = await processIncomingMessage(
-        inputValue,
-        'test-user-id', // TODO: Replace with actual user ID
-        'test-session-id' // TODO: Replace with actual session ID
-      )
+      const processedMessage = await processIncomingMessage({
+        message: {
+          id: Date.now().toString(),
+          content: inputValue,
+          direction: 'inbound',
+          timestamp: new Date().toISOString(),
+          participant_id: 'test-user-id'
+        },
+        participant: {
+          id: 'test-user-id',
+          phone_number: '555-1234',
+          group_id: 'test-group'
+        },
+        group: {
+          id: 'test-group',
+          name: 'Test Group'
+        }
+      })
 
       // Check if this is a critical message that should interrupt the session
       if (shouldInterruptSession(processedMessage)) {
@@ -60,7 +73,7 @@ export function StartSearchPage() {
         const criticalResponse: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: getCriticalMessageResponse(processedMessage.criticalKeyword),
+          content: getCriticalMessageResponse(),
           timestamp: new Date(),
           isCritical: true
         }

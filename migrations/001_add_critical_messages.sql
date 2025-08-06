@@ -1,4 +1,4 @@
--- Migration: Add Critical Message Support for askbender-mvp2
+-- Migration: Add Critical Message Support for eventria-mvp
 -- Date: 2024-01-XX
 -- Description: Adds critical message fields to Messages table, extends UserSessions, and creates essential tables
 

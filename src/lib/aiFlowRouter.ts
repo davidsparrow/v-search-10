@@ -1,10 +1,10 @@
 /**
- * AI Flow Router for AskBender Message Processing
+ * AI Flow Router for Eventria Message Processing
  * 
  * This module handles routing to different AI flows based on user intent
  * and manages AI message building with safety constraints and guardrails.
  * 
- * @author AskBender Team
+ * @author Eventria Team
  * @version 1.0.0
  */
 

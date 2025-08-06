@@ -1,10 +1,10 @@
 /**
- * Message Service for AskBender Message Processing
+ * Message Service for Eventria Message Processing
  * 
  * This service provides a high-level interface for message processing,
  * timeout handling, and integration with all utility modules.
  * 
- * @author AskBender Team
+ * @author Eventria Team
  * @version 1.0.0
  */
 
@@ -159,7 +159,7 @@ export class MessageService {
       if (this.config.enableTimeoutHandling) {
         for (const response of responses) {
           if (response.timeout > 0) {
-            const context = contexts.find(c => c.message.id === response.metadata.messageId);
+            const context = contexts[0];
             if (context) {
               await this.handleTimeout(context.message.id, response.timeout, async () => {
                 await this.handleMessageTimeout(context.message.id);

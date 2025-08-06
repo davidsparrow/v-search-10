@@ -1,10 +1,10 @@
 /**
- * Enhanced Spintax Engine for AskBender Message Processing
+ * Enhanced Spintax Engine for Eventria Message Processing
  * 
  * This module handles template-based response generation with spintax patterns,
  * word libraries, and grammar scaling based on sobriety levels.
  * 
- * @author AskBender Team
+ * @author Eventria Team
  * @version 1.0.0
  */
 

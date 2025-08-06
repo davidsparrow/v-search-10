@@ -1,10 +1,10 @@
 /**
- * Message Processor for AskBender Message Processing
+ * Message Processor for Eventria Message Processing
  * 
  * This module handles incoming message processing, response generation,
  * and integration with timeout calculations and AI flows.
  * 
- * @author AskBender Team
+ * @author Eventria Team
  * @version 1.0.0
  */
 
@@ -130,20 +130,37 @@ export async function processIncomingMessage(context: MessageProcessingContext):
   
   try {
     // 1. Calculate final timeout based on hierarchy
-    const finalTimeout = calculateFinalTimeout(
-      context.message.message_type_id || 'default',
-      context.participant,
-      context.group,
-      context.quiz,
-      context.question,
-      context.adminOverride
-    );
+    const finalTimeout = calculateFinalTimeout({
+      message: context.message,
+      participant: context.participant,
+      group: context.group,
+      quiz: context.quiz,
+      question: context.question,
+      messageType: { 
+        id: '1', 
+        default_timeout: 300, 
+        name: context.message.message_type_id || 'default',
+        is_recurring_flow: false
+      }
+    });
     
     // 2. Determine reply mode (professional vs original)
-    const replyMode = getReplyMode(context.participant, context.group);
+    const replyMode = getReplyMode({
+      message: context.message,
+      participant: context.participant,
+      group: context.group,
+      quiz: context.quiz,
+      question: context.question,
+      messageType: { 
+        id: '1', 
+        default_timeout: 300, 
+        name: context.message.message_type_id || 'default',
+        is_recurring_flow: false
+      }
+    });
     
     // 3. Generate response content
-    const responseResult = await generateResponse(context, replyMode);
+    const responseResult = await generateResponse(context, replyMode.isProfessional ? 'professional' : 'casual');
     
     // 4. Determine delivery method
     const deliveryMethod = determineDeliveryMethod(context.participant, context.group);
@@ -153,7 +170,7 @@ export async function processIncomingMessage(context: MessageProcessingContext):
     return {
       originalMessage: context.message,
       finalTimeout,
-      replyMode,
+      replyMode: replyMode.isProfessional ? 'professional' : 'casual',
       responseContent: responseResult.content,
       aiUsed: responseResult.aiUsed,
       spintaxUsed: responseResult.spintaxUsed,
@@ -480,4 +497,39 @@ export function getProcessingStats(processedMessages: ProcessedMessage[]) {
     aiUsageRate: totalMessages > 0 ? (aiUsed / totalMessages) * 100 : 0,
     spintaxUsageRate: totalMessages > 0 ? (spintaxUsed / totalMessages) * 100 : 0
   };
+}
+
+/**
+ * Checks if a message should interrupt the current session
+ */
+export function shouldInterruptSession(processedMessage: ProcessedMessage): boolean {
+  // Check if the message is marked as critical
+  if (processedMessage.originalMessage.is_critical) {
+    return true;
+  }
+  
+  // Check for critical keywords in the content
+  const criticalKeywords = ['emergency', 'urgent', 'help', 'sos', 'critical'];
+  const content = processedMessage.originalMessage.content.toLowerCase();
+  
+  return criticalKeywords.some(keyword => content.includes(keyword));
+}
+
+/**
+ * Gets the appropriate critical message response
+ */
+export function getCriticalMessageResponse(criticalKeyword?: string): string {
+  if (!criticalKeyword) {
+    return "I've detected this as a critical message. Let me connect you with immediate assistance.";
+  }
+  
+  const responses: { [key: string]: string } = {
+    'emergency': "🚨 EMERGENCY DETECTED! I'm immediately connecting you with emergency services.",
+    'urgent': "⚠️ URGENT MESSAGE! I'm prioritizing your request and connecting you with urgent support.",
+    'help': "🆘 HELP REQUESTED! I'm connecting you with assistance immediately.",
+    'sos': "🚨 SOS SIGNAL! Emergency response activated. Connecting you with help now.",
+    'critical': "🚨 CRITICAL SITUATION! I'm immediately routing this to emergency response."
+  };
+  
+  return responses[criticalKeyword.toLowerCase()] || "🚨 CRITICAL MESSAGE DETECTED! Connecting you with immediate assistance.";
 }

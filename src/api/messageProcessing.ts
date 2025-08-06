@@ -5,13 +5,14 @@
  * AI flow routing, and timeout calculations for both internal
  * and external consumption.
  * 
- * @author AskBender Team
+ * @author Eventria Team
  * @version 1.0.0
  */
 
 import { MessageService, createMessageService } from '../services/messageService';
 import { calculateFinalTimeout, getReplyMode, isRecurringFlow } from '../lib/timeoutUtils';
-import { processAIFlowRequest, AIFlowRequest } from '../lib/aiFlowRouter';
+import { processAIFlowRequest } from '../lib/aiFlowRouter';
+import type { AIFlowRequest as AIFlowRequestType } from '../lib/aiFlowRouter';
 import { EnhancedSpintaxEngine } from '../lib/spintaxEngine';
 
 // Type definitions for API requests and responses
@@ -102,18 +103,22 @@ export interface MessageProcessingResponse {
 export interface TimeoutCalculationRequest {
   messageType: string;
   participant: {
+    id: string;
     pref_timeout?: number;
     professional_mode_always?: boolean;
   };
   group: {
+    id: string;
     default_reply_expiration_seconds?: number;
     professional_mode_enabled?: boolean;
     z_mood?: string;
   };
   quiz?: {
+    id: string;
     default_reply_expiration_seconds?: number;
   };
   question?: {
+    id: string;
     reply_expiration_seconds?: number;
   };
   adminOverride?: number;
@@ -138,7 +143,7 @@ export interface TimeoutCalculationResponse {
   timestamp: string;
 }
 
-export interface AIFlowRequest {
+export interface AIFlowRequest extends AIFlowRequestType {
   userIntent: string;
   context: string;
   participantId: string;
@@ -261,7 +266,10 @@ export async function processMessageEndpoint(
     
     // Process the message
     const response = await messageService.processMessage({
-      message: request.message,
+      message: {
+        ...request.message,
+        timestamp: new Date().toISOString()
+      },
       participant: request.participant,
       group: request.group,
       quiz: request.quiz,
@@ -307,20 +315,51 @@ export async function calculateTimeoutEndpoint(
     }
     
     // Calculate final timeout
-    const finalTimeout = calculateFinalTimeout(
-      request.messageType,
-      request.participant,
-      request.group,
-      request.quiz,
-      request.question,
-      request.adminOverride
-    );
+    const finalTimeout = calculateFinalTimeout({
+      message: {
+        id: 'temp-id',
+        message_type_id: request.messageType,
+        participant_id: request.participant.id,
+        timeout_override: request.adminOverride
+      },
+      participant: request.participant,
+      group: request.group,
+      quiz: request.quiz,
+      question: request.question,
+      messageType: { 
+        id: '1', 
+        default_timeout: 300, 
+        name: request.messageType || 'default',
+        is_recurring_flow: false
+      }
+    });
     
     // Determine reply mode
-    const replyMode = getReplyMode(request.participant, request.group);
+    const replyMode = getReplyMode({
+      message: {
+        id: 'temp-id',
+        message_type_id: request.messageType,
+        participant_id: request.participant.id
+      },
+      participant: request.participant,
+      group: request.group,
+      quiz: request.quiz,
+      question: request.question,
+      messageType: { 
+        id: '1', 
+        default_timeout: 300, 
+        name: request.messageType || 'default',
+        is_recurring_flow: false
+      }
+    });
     
     // Check if this is a recurring flow
-    const isRecurringFlowResult = isRecurringFlow(request.messageType);
+    const isRecurringFlowResult = isRecurringFlow({ 
+      id: '1', 
+      default_timeout: 300, 
+      name: request.messageType || 'default',
+      is_recurring_flow: false
+    });
     
     return {
       success: true,
@@ -335,7 +374,7 @@ export async function calculateTimeoutEndpoint(
           adminOverride: request.adminOverride
         },
         isRecurringFlow: isRecurringFlowResult,
-        replyMode
+        replyMode: replyMode.isProfessional ? 'professional' : 'casual'
       },
       timestamp
     };
@@ -434,7 +473,10 @@ export async function processBatchEndpoint(
     
     // Convert requests to processing contexts
     const contexts = request.messages.map(req => ({
-      message: req.message,
+      message: {
+        ...req.message,
+        timestamp: new Date().toISOString()
+      },
       participant: req.participant,
       group: req.group,
       quiz: req.quiz,
@@ -604,14 +646,27 @@ export async function healthCheckEndpoint(): Promise<{
     const spintaxEngine = new EnhancedSpintaxEngine();
     
     // Test timeout calculation
-    const testTimeout = calculateFinalTimeout(
-      'test',
-      { pref_timeout: 300 },
-      { default_reply_expiration_seconds: 120 },
-      undefined,
-      undefined,
-      undefined
-    );
+    const testTimeout = calculateFinalTimeout({
+      message: {
+        id: 'test-message',
+        message_type_id: 'test',
+        participant_id: 'test-participant'
+      },
+      participant: { 
+        id: 'test-participant',
+        pref_timeout: 300 
+      },
+      group: { 
+        id: 'test-group',
+        default_reply_expiration_seconds: 120 
+      },
+      messageType: { 
+        id: '1', 
+        default_timeout: 300, 
+        name: 'test',
+        is_recurring_flow: false
+      }
+    });
     
     // Test AI flow routing
     const testAIRequest: AIFlowRequest = {
