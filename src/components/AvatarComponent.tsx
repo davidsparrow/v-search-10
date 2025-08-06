@@ -9,7 +9,9 @@ import {
   getUserAvatarUrl,
   avatarCustomizationOptions,
   extractColorsFromUrl,
-  AvatarOptions
+  AvatarOptions,
+  AVATAR_COLLECTIONS,
+  AvatarCollection
 } from '../lib/avatarManager'
 
 interface AvatarComponentProps {
@@ -35,6 +37,7 @@ export function AvatarComponent({
   const [currentBackgroundColor, setCurrentBackgroundColor] = useState<string>('b6e3f4')
   const [currentBaseColor, setCurrentBaseColor] = useState<string>('ffdbac')
   const [currentTopColor, setCurrentTopColor] = useState<string>('0905b5')
+  const [currentCollection, setCurrentCollection] = useState<AvatarCollection>('croodles')
 
   // Load current avatar on component mount
   useEffect(() => {
@@ -47,6 +50,7 @@ export function AvatarComponent({
       setCurrentBackgroundColor(colors.backgroundColor)
       setCurrentBaseColor(colors.baseColor)
       setCurrentTopColor(colors.topColor)
+      setCurrentCollection(colors.collection)
       if (onAvatarChange) onAvatarChange(saved)
     } else {
       // Generate a default avatar
@@ -58,6 +62,7 @@ export function AvatarComponent({
       setCurrentBackgroundColor(colors.backgroundColor)
       setCurrentBaseColor(colors.baseColor)
       setCurrentTopColor(colors.topColor)
+      setCurrentCollection(colors.collection)
       if (onAvatarChange) onAvatarChange(defaultUrl)
     }
   }, [onAvatarChange])
@@ -77,7 +82,7 @@ export function AvatarComponent({
   const generateNewOptions = () => {
     setIsLoading(true)
     setTimeout(() => {
-      const options = generateAvatarOptions(6)
+      const options = generateAvatarOptions(6, currentCollection)
       setAvatarOptions(options)
       setIsLoading(false)
     }, 100)
@@ -86,14 +91,15 @@ export function AvatarComponent({
   // Open customize modal
   const handleCustomizeClick = () => {
     generateNewOptions()
-    // Extract current colors from the avatar URL
-    if (currentAvatarUrl) {
-      const colors = extractColorsFromUrl(currentAvatarUrl)
-      setCurrentSeed(colors.seed)
-      setCurrentBackgroundColor(colors.backgroundColor)
-      setCurrentBaseColor(colors.baseColor)
-      setCurrentTopColor(colors.topColor)
-    }
+          // Extract current colors from the avatar URL
+      if (currentAvatarUrl) {
+        const colors = extractColorsFromUrl(currentAvatarUrl)
+        setCurrentSeed(colors.seed)
+        setCurrentBackgroundColor(colors.backgroundColor)
+        setCurrentBaseColor(colors.baseColor)
+        setCurrentTopColor(colors.topColor)
+        setCurrentCollection(colors.collection)
+      }
     setIsCustomizeModalVisible(true)
   }
 
@@ -109,6 +115,7 @@ export function AvatarComponent({
       setCurrentBackgroundColor(colors.backgroundColor)
       setCurrentBaseColor(colors.baseColor)
       setCurrentTopColor(colors.topColor)
+      setCurrentCollection(colors.collection)
       if (onAvatarChange) onAvatarChange(avatar.url)
     }
   }
@@ -121,7 +128,8 @@ export function AvatarComponent({
       backgroundColor: [currentBackgroundColor],
       baseColor: [currentBaseColor],
       topColor: [currentTopColor],
-      size
+      size,
+      collection: currentCollection
     }
     
     // Update the specific color that changed
@@ -154,17 +162,19 @@ export function AvatarComponent({
     const randomUrl = generateAvatarUrl({
       seed: randomSeed,
       size,
+      collection: currentCollection,
       backgroundColor: [avatarCustomizationOptions.backgroundColor[Math.floor(Math.random() * avatarCustomizationOptions.backgroundColor.length)].value],
       baseColor: [avatarCustomizationOptions.baseColor[Math.floor(Math.random() * avatarCustomizationOptions.baseColor.length)].value],
       topColor: [avatarCustomizationOptions.topColor[Math.floor(Math.random() * avatarCustomizationOptions.topColor.length)].value]
     })
     setCurrentAvatarUrl(randomUrl)
-    // Extract colors from random avatar
-    const colors = extractColorsFromUrl(randomUrl)
-    setCurrentSeed(colors.seed)
-    setCurrentBackgroundColor(colors.backgroundColor)
-    setCurrentBaseColor(colors.baseColor)
-    setCurrentTopColor(colors.topColor)
+          // Extract colors from random avatar
+      const colors = extractColorsFromUrl(randomUrl)
+      setCurrentSeed(colors.seed)
+      setCurrentBackgroundColor(colors.backgroundColor)
+      setCurrentBaseColor(colors.baseColor)
+      setCurrentTopColor(colors.topColor)
+      setCurrentCollection(colors.collection)
     if (onAvatarChange) onAvatarChange(randomUrl)
   }
 
@@ -238,6 +248,38 @@ export function AvatarComponent({
         <div style={{ display: 'flex', gap: '24px' }}>
           {/* Left side - Avatar preview and options */}
           <div style={{ flex: 1 }}>
+            {/* Collection Selector */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                Avatar Collection
+              </label>
+              <Select
+                value={currentCollection}
+                onChange={(value: AvatarCollection) => {
+                  setCurrentCollection(value)
+                  // Regenerate options for the new collection
+                  setTimeout(() => {
+                    const options = generateAvatarOptions(6, value)
+                    setAvatarOptions(options)
+                  }, 100)
+                }}
+                style={{ width: '100%' }}
+                size="small"
+              >
+                {Object.entries(AVATAR_COLLECTIONS).map(([key, config]) => (
+                  <Select.Option key={key} value={key}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '16px' }}>{config.icon}</span>
+                      <span>{config.name}</span>
+                      <span style={{ fontSize: '10px', color: '#999', marginLeft: 'auto' }}>
+                        {config.description}
+                      </span>
+                    </div>
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+
             {/* Current avatar preview */}
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <div style={{

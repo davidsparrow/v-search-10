@@ -5,7 +5,26 @@ export interface AvatarOptions {
   baseColor?: string[]
   topColor?: string[]
   size?: number
+  collection?: 'croodles' | 'bottts'
 }
+
+// Avatar collection configuration
+export const AVATAR_COLLECTIONS = {
+  croodles: {
+    name: 'Croodles',
+    icon: '🎨',
+    apiUrl: 'https://api.dicebear.com/9.x/croodles/svg',
+    description: 'Doodle-style characters'
+  },
+  bottts: {
+    name: 'Bottts',
+    icon: '🤖',
+    apiUrl: 'https://api.dicebear.com/9.x/bottts/svg',
+    description: 'Robot characters'
+  }
+} as const
+
+export type AvatarCollection = keyof typeof AVATAR_COLLECTIONS
 
 // Generate a random seed for avatar generation
 export function generateRandomSeed(): string {
@@ -14,12 +33,13 @@ export function generateRandomSeed(): string {
 
 // Generate avatar URL using DiceBear API
 export function generateAvatarUrl(options: AvatarOptions = {}): string {
-  const baseUrl = 'https://api.dicebear.com/9.x/croodles/svg'
+  const collection = options.collection || 'croodles'
+  const baseUrl = AVATAR_COLLECTIONS[collection].apiUrl
   const params = new URLSearchParams()
   
-  // Add all options to URL parameters
+  // Add all options to URL parameters (except collection)
   Object.entries(options).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
+    if (key !== 'collection' && value !== undefined && value !== null) {
       if (Array.isArray(value)) {
         params.append(key, value.join(','))
       } else {
@@ -37,7 +57,7 @@ export function generateAvatarUrl(options: AvatarOptions = {}): string {
 }
 
 // Generate multiple random avatars for selection
-export function generateAvatarOptions(count: number = 6): Array<{id: string, name: string, url: string}> {
+export function generateAvatarOptions(count: number = 6, collection: AvatarCollection = 'croodles'): Array<{id: string, name: string, url: string}> {
   const avatars = []
   
   const backgroundColors = ['b6e3f4', 'c0aede', 'ffdfbf', 'ffd5dc', 'd1d4f9', 'ffdab9']
@@ -49,6 +69,7 @@ export function generateAvatarOptions(count: number = 6): Array<{id: string, nam
     const options: AvatarOptions = {
       seed,
       size: 128,
+      collection,
       backgroundColor: [backgroundColors[i % backgroundColors.length]],
       baseColor: [baseColors[i % baseColors.length]],
       topColor: [topColors[i % topColors.length]]
@@ -115,7 +136,7 @@ export function loadUserAvatar(): string | null {
 }
 
 // Get user's current avatar URL
-export function getUserAvatarUrl(): string {
+export function getUserAvatarUrl(collection: AvatarCollection = 'croodles'): string {
   const saved = loadUserAvatar()
   if (saved) {
     return saved
@@ -124,6 +145,7 @@ export function getUserAvatarUrl(): string {
   return generateAvatarUrl({
     seed: 'default-user',
     size: 128,
+    collection,
     backgroundColor: ['b6e3f4'],
     baseColor: ['ffdbac']
   })
@@ -135,16 +157,24 @@ export function extractColorsFromUrl(avatarUrl: string): {
   backgroundColor: string
   baseColor: string
   topColor: string
+  collection: AvatarCollection
 } {
   try {
     const url = new URL(avatarUrl)
     const params = new URLSearchParams(url.search)
     
+    // Determine collection from URL
+    let collection: AvatarCollection = 'croodles'
+    if (url.pathname.includes('bottts')) {
+      collection = 'bottts'
+    }
+    
     return {
       seed: params.get('seed') || generateRandomSeed(),
       backgroundColor: params.get('backgroundColor') || 'b6e3f4',
       baseColor: params.get('baseColor') || 'ffdbac',
-      topColor: params.get('topColor') || '0905b5'
+      topColor: params.get('topColor') || '0905b5',
+      collection
     }
   } catch (error) {
     console.error('Failed to extract colors from URL:', error)
@@ -152,7 +182,8 @@ export function extractColorsFromUrl(avatarUrl: string): {
       seed: generateRandomSeed(),
       backgroundColor: 'b6e3f4',
       baseColor: 'ffdbac',
-      topColor: '0905b5'
+      topColor: '0905b5',
+      collection: 'croodles'
     }
   }
 } 
