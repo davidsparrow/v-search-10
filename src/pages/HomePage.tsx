@@ -46,8 +46,9 @@ export function HomePage() {
   const theme = getThemeConfig()
   
   // State for modal and menu
-  const [isMenuVisible, setIsMenuVisible] = useState(false)
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false)
+  const [openToSignup, setOpenToSignup] = useState(false)
+  const [isMenuVisible, setIsMenuVisible] = useState(false)
   const [logoError, setLogoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
@@ -138,6 +139,16 @@ export function HomePage() {
 
   const handleOpenLoginModal = () => {
     setIsLoginModalVisible(true)
+  }
+
+  const handleOpenSignupModal = () => {
+    setOpenToSignup(true)
+    setIsLoginModalVisible(true)
+  }
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalVisible(false)
+    setOpenToSignup(false)
   }
 
   // Input style for theme consistency
@@ -306,18 +317,18 @@ export function HomePage() {
               }}
               className={currentTheme === 'compact' ? 'compact-theme' : ''}
               >
-                {/* Drop a Login Button */}
+                {/* Start Freeloading Button */}
                 <Button
                   type="primary"
                   size="large"
-                  onClick={handleOpenLoginModal}
+                  onClick={handleOpenSignupModal}
                   style={{
                     width: '100%',
                     height: '48px',
                     fontSize: '16px',
                     fontWeight: '500',
-                    background: '#DC2626', // Red
-                    borderColor: '#DC2626',
+                    background: '#1890ff', // Blue
+                    borderColor: '#1890ff',
                     color: 'white',
                     borderRadius: '88px',
                     transition: 'all 0.2s ease',
@@ -325,23 +336,23 @@ export function HomePage() {
                     fontFamily: 'Poppins, sans-serif'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#B91C1C' // 30% darker red
-                    e.currentTarget.style.borderColor = '#B91C1C'
+                    e.currentTarget.style.background = '#1890ff' // 30% darker blue
+                    e.currentTarget.style.borderColor = '#1890ff'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#DC2626'
-                    e.currentTarget.style.borderColor = '#DC2626'
+                    e.currentTarget.style.background = '#1890ff'
+                    e.currentTarget.style.borderColor = '#1890ff'
                   }}
                   onMouseDown={(e) => {
-                    e.currentTarget.style.background = '#991B1B' // 50% darker red
-                    e.currentTarget.style.borderColor = '#991B1B'
+                    e.currentTarget.style.background = '#1890ff' // 50% darker blue
+                    e.currentTarget.style.borderColor = '#1890ff'
                   }}
                   onMouseUp={(e) => {
-                    e.currentTarget.style.background = '#B91C1C' // Back to hover state
-                    e.currentTarget.style.borderColor = '#B91C1C'
+                    e.currentTarget.style.background = '#1890ff' // Back to hover state
+                    e.currentTarget.style.borderColor = '#1890ff'
                   }}
                 >
-                  Drop a Login
+                  Start Freeloading
                 </Button>
 
                 {/* Bite Me link centered at bottom */}
@@ -421,8 +432,9 @@ export function HomePage() {
       {/* Login Modal */}
       <LoginModal
         isVisible={isLoginModalVisible}
-        onClose={() => setIsLoginModalVisible(false)}
+        onClose={handleCloseLoginModal}
         defaultTab="1"
+        openToSignup={openToSignup}
       />
 
       {/* Password Reset Modal */}

@@ -5,6 +5,7 @@ import { useCloudStore } from '../../store/cloudStore'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { AvatarComponent } from '../AvatarComponent'
+import { LoginModal } from '../LoginModal'
 
 interface MainHeaderProps {
   showSettingsIcon?: boolean
@@ -25,6 +26,7 @@ export function MainHeader({
   } = useCloudStore()
 
   const theme = getThemeConfig()
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false)
 
   // Emoji library for emotional faces
   const emotionalEmojis = [
@@ -79,7 +81,8 @@ export function MainHeader({
       } else {
         setUser(null)
         setIsAuthenticated(false)
-        navigate('/')
+        // Force a page refresh to ensure all components update
+        window.location.reload()
       }
     } catch (error) {
       console.error('Logout error:', error)
@@ -87,60 +90,30 @@ export function MainHeader({
   }
 
   return (
-    <div style={{
-      background: theme.headerBackground,
-      padding: '0 20px',
-      height: '64px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      boxShadow: 'none',
-      zIndex: 100
-    }}>
-      {/* B Logo + Mini Avatar = Emoji */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-5px' }}>
-        {/* B Logo */}
-        <img
-          src="/askbender_b!_green_on_blk.png"
-          alt="AskBender"
-          style={{
-            height: '40px',
-            width: 'auto',
-            cursor: 'pointer',
-            objectFit: 'contain',
-            transition: 'transform 0.2s ease',
-            filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-          onClick={() => navigate('/')}
-        />
-        
-        {/* Plus Sign */}
-        <span
-          style={{
-            fontSize: '14px',
-            color: theme.textSecondary,
-            fontWeight: 'bold',
-            margin: '0 2px'
-          }}
-        >
-          +
-        </span>
-        
-        {/* Avatar Group (Avatar + Equals + Emoji) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-12px' }}>
-          {/* Mini User Avatar */}
-          <div
+    <>
+      <div style={{
+        background: theme.headerBackground,
+        padding: '0 20px',
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: 'none',
+        zIndex: 100
+      }}>
+        {/* B Logo + Mini Avatar = Emoji */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-5px' }}>
+          {/* B Logo */}
+          <img
+            src="/askbender_b!_green_on_blk.png"
+            alt="AskBender"
             style={{
+              height: '40px',
+              width: 'auto',
               cursor: 'pointer',
+              objectFit: 'contain',
               transition: 'transform 0.2s ease',
-              filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
-              padding: '2px 6px'
+              filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.2)'
@@ -149,93 +122,142 @@ export function MainHeader({
               e.currentTarget.style.transform = 'scale(1)'
             }}
             onClick={() => navigate('/')}
-          >
-            <AvatarComponent size={41} showBackground={false} />
-          </div>
+          />
           
-          {/* Equals Sign */}
+          {/* Plus Sign */}
           <span
             style={{
               fontSize: '14px',
               color: theme.textSecondary,
               fontWeight: 'bold',
-              margin: '0 2px',
-              marginLeft: '-8px'
+              margin: '0 2px'
             }}
           >
-            =
+            +
           </span>
           
-          {/* Result Emoji */}
-          <div
-            style={{
-              fontSize: '32px',
-              width: '32px',
+          {/* Avatar Group (Avatar + Equals + Emoji) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '-12px' }}>
+            {/* Mini User Avatar */}
+            <div
+              style={{
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease',
+                filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
+                padding: '2px 6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+              onClick={() => navigate('/')}
+            >
+              <AvatarComponent size={41} showBackground={false} />
+            </div>
+            
+            {/* Equals Sign */}
+            <span
+              style={{
+                fontSize: '14px',
+                color: theme.textSecondary,
+                fontWeight: 'bold',
+                margin: '0 2px',
+                marginLeft: '-8px'
+              }}
+            >
+              =
+            </span>
+            
+            {/* Result Emoji */}
+            <div
+              style={{
+                fontSize: '32px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease',
+                filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
+                marginLeft: '4px',
+                marginTop: '4px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+              onClick={changeEmoji}
+            >
+              {currentEmoji}
+            </div>
+          </div>
+        </div>
+
+        {/* Settings */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Login/Logout Button - always show with different text */}
+          <Button
+            type="text"
+            onClick={user ? handleLogout : () => setIsLoginModalVisible(true)}
+            style={{ 
+              color: 'white', 
+              fontSize: '12px',
+              fontWeight: '500',
+              border: '1px solid white',
+              borderRadius: '20px',
+              background: 'transparent',
+              padding: '4px 16px',
               height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'transform 0.2s ease',
-              filter: `drop-shadow(0 2px 4px ${getShadowColor()}) drop-shadow(0 4px 8px ${getShadowColorDark()})`,
-              marginLeft: '4px',
-              marginTop: '4px'
+              transition: 'all 0.2s ease',
+              fontFamily: 'Poppins, sans-serif'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.2)'
+              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)'
+              e.currentTarget.style.transform = 'scale(1.02)'
             }}
             onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.borderColor = 'white'
               e.currentTarget.style.transform = 'scale(1)'
             }}
-            onClick={changeEmoji}
+            onMouseDown={(e) => {
+              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.5)'
+              e.currentTarget.style.transform = 'scale(0.98)'
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
           >
-            {currentEmoji}
-          </div>
+            {user ? 'fish your logout' : 'drop a login'}
+          </Button>
+          
+          {/* Hamburger Menu Icon */}
+          {showSettingsIcon && (
+            <Button
+              type="text"
+              icon={<FaHamburger />}
+              onClick={onMenuClick}
+              style={{ 
+                color: theme.textSecondary, 
+                fontSize: '24px' 
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Settings */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Logout/Profile Button */}
-        {user ? (
-          <Button
-            type="text"
-            onClick={handleLogout}
-            style={{ 
-              color: theme.textSecondary, 
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            Logout
-          </Button>
-        ) : (
-          <Button
-            type="text"
-            onClick={() => navigate('/user-profile')}
-            style={{ 
-              color: theme.textSecondary, 
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            Profile
-          </Button>
-        )}
-        
-        {/* Hamburger Menu Icon */}
-        {showSettingsIcon && (
-          <Button
-            type="text"
-            icon={<FaHamburger />}
-            onClick={onMenuClick}
-            style={{ 
-              color: theme.textSecondary, 
-              fontSize: '24px' 
-            }}
-          />
-        )}
-      </div>
-    </div>
+      {/* Login Modal */}
+      <LoginModal 
+        isVisible={isLoginModalVisible}
+        onClose={() => setIsLoginModalVisible(false)}
+      />
+    </>
   )
 } 

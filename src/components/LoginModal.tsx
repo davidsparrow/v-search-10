@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Input, Space, Tabs } from 'antd'
 import { useCloudStore } from '../store/cloudStore'
 import { supabase } from '../lib/supabase'
@@ -10,13 +10,15 @@ interface LoginModalProps {
   isVisible: boolean
   onClose: () => void
   defaultTab?: string
+  openToSignup?: boolean
 }
 
-export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalProps) {
+export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup = false }: LoginModalProps) {
   const { setUser, setIsAuthenticated } = useCloudStore()
   const navigate = useNavigate()
   
   const [activeTab, setActiveTab] = useState(defaultTab)
+  const [showSignupTab, setShowSignupTab] = useState(openToSignup)
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
@@ -28,6 +30,14 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalP
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Effect to handle opening to signup tab
+  useEffect(() => {
+    if (openToSignup) {
+      setShowSignupTab(true)
+      setActiveTab('2')
+    }
+  }, [openToSignup])
 
   const handleLogin = async () => {
     setIsLoading(true)
@@ -113,6 +123,11 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalP
     console.log('Forgot password clicked')
   }
 
+  const handleFreshMeatClick = () => {
+    setShowSignupTab(true)
+    setActiveTab('2')
+  }
+
   if (!isVisible) return null
 
   return (
@@ -160,7 +175,7 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalP
               color: '#222',
               fontFamily: 'Poppins, sans-serif'
             }}>
-              Welcome Back
+              Welcome to bendersaas.ai!
             </h2>
             <Button
               type="text"
@@ -299,7 +314,7 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalP
                       cursor: 'pointer',
                       fontFamily: 'Poppins, sans-serif'
                     }}
-                    onClick={() => setActiveTab('2')}
+                    onClick={handleFreshMeatClick}
                   >
                     Fresh Meat? Start Here
                   </span>
@@ -319,130 +334,132 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1' }: LoginModalP
               </div>
             </TabPane>
 
-            <TabPane tab="Sign Up" key="2">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Email Field */}
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#333',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={signupForm.email}
-                    onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
-                    style={{
-                      height: '40px',
-                      borderRadius: '6px',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  />
-                </div>
-
-                {/* Password Field */}
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#333',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Password
-                  </label>
-                  <Input.Password
-                    placeholder="Create a password"
-                    value={signupForm.password}
-                    onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
-                    style={{
-                      height: '40px',
-                      borderRadius: '6px',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  />
-                </div>
-
-                {/* Confirm Password Field */}
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#333',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Confirm Password
-                  </label>
-                  <Input.Password
-                    placeholder="Confirm your password"
-                    value={signupForm.confirmPassword}
-                    onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
-                    style={{
-                      height: '40px',
-                      borderRadius: '6px',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  />
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                  <div style={{
-                    color: '#ff4d4f',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    {error}
-                  </div>
-                )}
-
-                {/* Sign Up Button */}
-                <Button
-                  type="primary"
-                  onClick={handleSignup}
-                  loading={isLoading}
-                  disabled={!signupForm.email || !signupForm.password || !signupForm.confirmPassword}
-                  style={{
-                    height: '44px',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    fontFamily: 'Poppins, sans-serif',
-                    background: '#52c41a',
-                    border: 'none'
-                  }}
-                >
-                  Start Free
-                </Button>
-
-                {/* Back to Login Link */}
-                <div style={{
-                  textAlign: 'center',
-                  marginTop: '16px'
-                }}>
-                  <span
-                    style={{
-                      color: '#1890ff',
+            {showSignupTab && (
+              <TabPane tab="Sign Up" key="2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Email Field */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '8px',
                       fontSize: '14px',
-                      cursor: 'pointer',
+                      fontWeight: '500',
+                      color: '#333',
                       fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Email
+                    </label>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={signupForm.email}
+                      onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
+                      style={{
+                        height: '40px',
+                        borderRadius: '6px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    />
+                  </div>
+
+                  {/* Password Field */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#333',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Password
+                    </label>
+                    <Input.Password
+                      placeholder="Create a password"
+                      value={signupForm.password}
+                      onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
+                      style={{
+                        height: '40px',
+                        borderRadius: '6px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    />
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#333',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Confirm Password
+                    </label>
+                    <Input.Password
+                      placeholder="Confirm your password"
+                      value={signupForm.confirmPassword}
+                      onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+                      style={{
+                        height: '40px',
+                        borderRadius: '6px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    />
+                  </div>
+
+                  {/* Error Message */}
+                  {error && (
+                    <div style={{
+                      color: '#ff4d4f',
+                      fontSize: '14px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Sign Up Button */}
+                  <Button
+                    type="primary"
+                    onClick={handleSignup}
+                    loading={isLoading}
+                    disabled={!signupForm.email || !signupForm.password || !signupForm.confirmPassword}
+                    style={{
+                      height: '44px',
+                      borderRadius: '6px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      fontFamily: 'Poppins, sans-serif',
+                      background: '#52c41a',
+                      border: 'none'
                     }}
-                    onClick={() => setActiveTab('1')}
                   >
-                    Already have an account? Login
-                  </span>
+                    Start Free
+                  </Button>
+
+                  {/* Back to Login Link */}
+                  <div style={{
+                    textAlign: 'center',
+                    marginTop: '16px'
+                  }}>
+                    <span
+                      style={{
+                        color: '#1890ff',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                      onClick={() => setActiveTab('1')}
+                    >
+                      Already have an account? Login
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </TabPane>
+              </TabPane>
+            )}
           </Tabs>
         </div>
       </div>

@@ -2,6 +2,21 @@ import { useState, useEffect } from 'react'
 
 export function TypingAnimation() {
   const phrases = [
+    "What type of Event you f'n with today?",
+    "One of those? You're boned today.",
+    "Of course I can help you! But I probably won't today.",
+    "Because we're not friends yet today.",
+    "Bruh. AI has short-ass memory. Yesterday?",
+    "Take a number and wait over in the corner today.",
+    "Now, see that pointy hat? Wear that s* right now.",
+    "Perfect. Stay like that for a few millenia.",
+    "I'll get to you someday.",
+    ".................................................",
+    "Hello? Oh, the walnut's still here today?",
+    "Where's your hat today?",
+    "Feeling smarter today?",
+    "Stay in your lane today.",
+    "Hat back on today.",
     "What do you want to F with today?",
     "Where do you want F with it today?",
     "Wait. Why there today?",
