@@ -30,6 +30,7 @@ export function ProfileMenuTemplate({
     email?: string;
     phone_number?: string;
   } | null>(null)
+  const [hoveredTheme, setHoveredTheme] = useState<string | null>(null)
 
   const theme = getThemeConfig()
 
@@ -147,82 +148,173 @@ export function ProfileMenuTemplate({
           }}>
             {/* Theme Icons */}
             <Space size="small">
-              <Button
-                type="text"
-                icon={<GiBatMask style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
-                style={{ 
-                  color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px',
-                  background: '#000000',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onClick={() => handleThemeChange('dark')}
-              />
-              <Button
-                type="text"
-                icon={<FaSnowflake style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
-                style={{ 
-                  color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px',
-                  background: '#000000',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onClick={() => handleThemeChange('white')}
-              />
-              <Button
-                type="text"
-                icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
-                style={{ 
-                  color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px',
-                  background: '#000000',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onClick={() => handleThemeChange('default')}
-              />
-              <Button
-                type="text"
-                icon={<AiFillBulb style={{ fontSize: '16px' }} />}
-                className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
-                style={{ 
-                  color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
-                  fontSize: '16px',
-                  background: '#000000',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onClick={() => handleThemeChange('compact')}
-              />
+              <div style={{ position: 'relative' }}>
+                <Button
+                  type="text"
+                  icon={<GiBatMask style={{ fontSize: '16px' }} />}
+                  className={currentTheme === 'dark' ? 'icon-two-tone-dark' : ''}
+                  style={{ 
+                    color: currentTheme === 'dark' ? theme.logoAccentColor : theme.textSecondary,
+                    fontSize: '16px',
+                    background: '#000000',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onClick={() => handleThemeChange('dark')}
+                  onMouseEnter={() => setHoveredTheme('dark')}
+                  onMouseLeave={() => setHoveredTheme(null)}
+                />
+                {hoveredTheme === 'dark' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#000',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 1001,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    DarkBender - can you handle the stares?
+                  </div>
+                )}
+              </div>
+              
+              <div style={{ position: 'relative' }}>
+                <Button
+                  type="text"
+                  icon={<FaSnowflake style={{ fontSize: '16px' }} />}
+                  className={currentTheme === 'white' ? 'icon-two-tone-white' : ''}
+                  style={{ 
+                    color: currentTheme === 'white' ? theme.logoAccentColor : theme.textSecondary,
+                    fontSize: '16px',
+                    background: '#000000',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onClick={() => handleThemeChange('white')}
+                  onMouseEnter={() => setHoveredTheme('white')}
+                  onMouseLeave={() => setHoveredTheme(null)}
+                />
+                {hoveredTheme === 'white' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#000',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 1001,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    I'm a Snowflake - you said it, but I agree.
+                  </div>
+                )}
+              </div>
+              
+              <div style={{ position: 'relative' }}>
+                <Button
+                  type="text"
+                  icon={<AiFillExperiment style={{ fontSize: '16px' }} />}
+                  className={currentTheme === 'default' ? 'icon-two-tone-default' : ''}
+                  style={{ 
+                    color: currentTheme === 'default' ? theme.logoAccentColor : theme.textSecondary,
+                    fontSize: '16px',
+                    background: '#000000',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onClick={() => handleThemeChange('default')}
+                  onMouseEnter={() => setHoveredTheme('default')}
+                  onMouseLeave={() => setHoveredTheme(null)}
+                />
+                {hoveredTheme === 'default' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#000',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 1001,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Does anythng ryhme with Purple? Nipple! But no.
+                  </div>
+                )}
+              </div>
+              
+              <div style={{ position: 'relative' }}>
+                <Button
+                  type="text"
+                  icon={<AiFillBulb style={{ fontSize: '16px' }} />}
+                  className={currentTheme === 'compact' ? 'icon-two-tone-compact' : ''}
+                  style={{ 
+                    color: currentTheme === 'compact' ? theme.logoAccentColor : theme.textSecondary,
+                    fontSize: '16px',
+                    background: '#000000',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onClick={() => handleThemeChange('compact')}
+                  onMouseEnter={() => setHoveredTheme('compact')}
+                  onMouseLeave={() => setHoveredTheme(null)}
+                />
+                {hoveredTheme === 'compact' && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#000',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 1001,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Think Pink - and let your freak kites fly.
+                  </div>
+                )}
+              </div>
             </Space>
             {/* User Avatar */}
             <AvatarComponent 

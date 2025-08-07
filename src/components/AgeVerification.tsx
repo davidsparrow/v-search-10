@@ -67,7 +67,8 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
             style={{
               height: '60px',
               width: 'auto',
-              objectFit: 'contain'
+              objectFit: 'contain',
+              filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8)) drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.6))'
             }}
           />
         </div>
