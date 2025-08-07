@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { ConfigProvider, theme } from 'antd'
 import { useEffect } from 'react'
 import { HomePage } from './pages/HomePage'
+import { AdminRoute } from './components/AdminRoute'
 
 import { SearchVisualPage } from './pages/SearchVisualPage'
 import { StartSearchPage } from './pages/StartSearchPage'
@@ -147,7 +148,7 @@ function App() {
             <Route path="/search-chat" element={<SearchChatPage />} />
             <Route path="/search-visual" element={<SearchVisualPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/admin/system-settings" element={<SystemSettingsPage />} />
+            <Route path="/admin/system-settings" element={<AdminRoute><SystemSettingsPage /></AdminRoute>} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
