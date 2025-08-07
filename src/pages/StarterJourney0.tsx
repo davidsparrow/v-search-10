@@ -11,34 +11,15 @@ export function StarterJourney0() {
   const [timeRemaining, setTimeRemaining] = useState(60) // 60 seconds timeout
   const [showTimeoutMessage, setShowTimeoutMessage] = useState(false)
   const [currentTab, setCurrentTab] = useState(1) // 1, 2, or 3
-  const [initials, setInitials] = useState('')
-  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false)
-  const [checkbox2Checked, setCheckbox2Checked] = useState(false)
-  const [checkbox3Checked, setCheckbox3Checked] = useState(false)
-  const [checkbox4Checked, setCheckbox4Checked] = useState(false)
-  const [checkbox5Checked, setCheckbox5Checked] = useState(false)
-  const [checkbox6Checked, setCheckbox6Checked] = useState(false)
-  const [checkbox7Checked, setCheckbox7Checked] = useState(false)
-  const [checkbox8Checked, setCheckbox8Checked] = useState(false)
-  const [checkbox9Checked, setCheckbox9Checked] = useState(false)
-  const [checkbox10Checked, setCheckbox10Checked] = useState(false)
-  const [checkbox11Checked, setCheckbox11Checked] = useState(false)
-  const [checkbox12Checked, setCheckbox12Checked] = useState(false)
-  const [checkbox13Checked, setCheckbox13Checked] = useState(false)
-  const [checkbox14Checked, setCheckbox14Checked] = useState(false)
-  const [checkbox15Checked, setCheckbox15Checked] = useState(false)
-  const [checkbox16Checked, setCheckbox16Checked] = useState(false)
-  const [checkbox17Checked, setCheckbox17Checked] = useState(false)
-  const [checkbox18Checked, setCheckbox18Checked] = useState(false)
-  const [checkbox19Checked, setCheckbox19Checked] = useState(false)
-  const [checkbox20Checked, setCheckbox20Checked] = useState(false)
-  const [checkbox21Checked, setCheckbox21Checked] = useState(false)
-  const [checkbox22Checked, setCheckbox22Checked] = useState(false)
-  const [checkbox23Checked, setCheckbox23Checked] = useState(false)
   const [showTab2Failure, setShowTab2Failure] = useState(false)
   const [showTab3Failure, setShowTab3Failure] = useState(false)
   const [showTab3Warning, setShowTab3Warning] = useState(false)
-  const [isSavingTerms, setIsSavingTerms] = useState(false)
+  
+  // Terms Acceptance State
+  const [initials, setInitials] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [termsSubmitted, setTermsSubmitted] = useState(false)
+  const [showBetaOpportunity, setShowBetaOpportunity] = useState(false)
 
   // Function to get user's IP address
   const getUserIP = async () => {
@@ -72,7 +53,7 @@ export function StarterJourney0() {
     }
 
     try {
-      setIsSavingTerms(true)
+      setIsSubmitting(true)
       
       // Get user's IP address
       const ipAddress = await getUserIP()
@@ -115,7 +96,65 @@ export function StarterJourney0() {
       console.error('Error saving terms acceptance:', error)
       return false
     } finally {
-      setIsSavingTerms(false)
+      setIsSubmitting(false)
+    }
+  }
+
+  // Function to update social cred rating
+  const updateSocialCred = async (newRating: string) => {
+    if (!user) return false
+
+    try {
+      const { error } = await supabase
+        .from('participants')
+        .update({
+          social_cred_rating: newRating,
+          modified_by: user.id
+        })
+        .eq('eventria_user_id', user.id)
+
+      if (error) {
+        console.error('Error updating social cred:', error)
+        return false
+      }
+
+      console.log('Social cred updated successfully')
+      return true
+    } catch (error) {
+      console.error('Error updating social cred:', error)
+      return false
+    }
+  }
+
+  // Handle terms submission
+  const handleTermsSubmit = async () => {
+    if (!initials.trim()) {
+      alert('Please enter your initials')
+      return
+    }
+
+    const success = await saveTermsAcceptance()
+    if (success) {
+      setTermsSubmitted(true)
+      setShowBetaOpportunity(true)
+    } else {
+      alert('Failed to save terms acceptance. Please try again.')
+    }
+  }
+
+  // Handle Beta Tester choice
+  const handleBetaChoice = async (choice: 'pump' | 'decred') => {
+    if (choice === 'pump') {
+      // Navigate to StarterJourney1
+      navigate('/starter-journey-1')
+    } else {
+      // Update social cred to -2.336 and navigate to search-chat
+      const success = await updateSocialCred('-2.336')
+      if (success) {
+        navigate('/search-chat')
+      } else {
+        alert('Failed to update social cred. Please try again.')
+      }
     }
   }
 
@@ -144,59 +183,140 @@ export function StarterJourney0() {
                 We've been advised by counsel to add this clause: "Enter at your own risk. Turn around now if you are generally soft and cry easily, or if pregnant. You have been warned. No emergency exit. Doors open at Noon for matinees, but do NOT bring the kids".
               </p>
               
-              <div style={{ marginTop: '24px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: 'bold',
-                  marginBottom: '8px',
-                  color: '#000'
-                }}>
-                  Enter Your Initials:
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., JS"
-                  value={initials}
-                  onChange={(e) => handleInitialsChange(e.target.value)}
-                  style={{
-                    width: '100px',
-                    padding: '8px 12px',
-                    fontSize: '13px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                />
-              </div>
-              
-              <div style={{ marginTop: '16px' }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px'
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={isCheckboxChecked}
-                    onChange={handleCheckboxChange}
+              {!termsSubmitted ? (
+                <div style={{ marginTop: '24px' }}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '13px',
+                      fontWeight: 'bold',
+                      marginBottom: '8px',
+                      color: '#000'
+                    }}>
+                      Enter Your Initials:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., JS"
+                      value={initials}
+                      onChange={(e) => setInitials(e.target.value.toUpperCase())}
+                      style={{
+                        width: '100px',
+                        padding: '8px 12px',
+                        fontSize: '13px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontFamily: 'Poppins, sans-serif',
+                        textTransform: 'uppercase'
+                      }}
+                      maxLength={10}
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={handleTermsSubmit}
+                    disabled={isSubmitting || !initials.trim()}
                     style={{
-                      marginTop: '2px',
-                      width: '16px',
-                      height: '16px'
+                      padding: '12px 24px',
+                      backgroundColor: isSubmitting ? '#ccc' : '#007bff',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      fontFamily: 'Poppins, sans-serif'
                     }}
-                  />
-                  <label style={{
-                    fontSize: '13px',
-                    color: '#000',
-                    lineHeight: '1.4',
-                    cursor: 'pointer',
-                    userSelect: 'none'
-                  }}>
-                    I understand I'm probably in way over my head here, but its totally my fault when they drag my corpse from the swamp sometime in the near future.
-                  </label>
+                  >
+                    {isSubmitting ? 'SUBMITTING...' : 'SUBMIT'}
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <div style={{ marginTop: '24px' }}>
+                  <div style={{
+                    padding: '16px',
+                    backgroundColor: '#d4edda',
+                    border: '1px solid #c3e6cb',
+                    borderRadius: '6px',
+                    color: '#155724',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    marginBottom: '20px'
+                  }}>
+                    ✅ SUCCESS! Terms Accepted
+                  </div>
+                  
+                  {showBetaOpportunity && (
+                    <div style={{
+                      padding: '20px',
+                      backgroundColor: '#fff3cd',
+                      border: '2px solid #ffeaa7',
+                      borderRadius: '8px',
+                      marginTop: '20px'
+                    }}>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#856404',
+                        lineHeight: '1.6',
+                        marginBottom: '20px'
+                      }}>
+                        While we are in Beta, you have the opportunity to be a Master-Beta Testers, and increase your Social Cred without being a Canadian. Your Cred is ZERO and we prefer it that way but you can cheat the system, just like I did when you gave me your email and I added you to the IRS priority review list. I'm an affiliate. They don't know they have an affiliate program. Getting paid!
+                      </p>
+                      
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#856404',
+                        lineHeight: '1.6',
+                        marginBottom: '20px'
+                      }}>
+                        But seriouly, right now, you have a one-time chance to pump your Social Cred like what's-her-names' boobies - 🙊. You up for this, or you want to start your Social Cred at -2.336? It just dropped bc we had to ASK.
+                      </p>
+                      
+                      <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap'
+                      }}>
+                        <button
+                          onClick={() => handleBetaChoice('pump')}
+                          style={{
+                            padding: '12px 20px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}
+                        >
+                          PLEASE PUMP ME. I MEAN IT. UP
+                        </button>
+                        
+                        <button
+                          onClick={() => handleBetaChoice('decred')}
+                          style={{
+                            padding: '12px 20px',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}
+                        >
+                          DE-BANK. I MEAN DE-CRED ME
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )
         }
@@ -214,672 +334,9 @@ export function StarterJourney0() {
               </p>
               
               <div style={{ marginTop: '16px' }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px',
-                  marginBottom: '12px'
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={isCheckboxChecked}
-                    onChange={handleCheckboxChange}
-                    style={{
-                      marginTop: '2px',
-                      width: '16px',
-                      height: '16px'
-                    }}
-                  />
-                  <label style={{
-                    fontSize: '13px',
-                    color: '#000',
-                    lineHeight: '1.4',
-                    cursor: 'pointer',
-                    userSelect: 'none'
-                  }}>
-                    I understand I'm probably in way over my head here, but its totally my fault when they drag my corpse from the swamp sometime in the near future.
-                  </label>
-                </div>
-                
-                {isCheckboxChecked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox2Checked}
-                      onChange={handleCheckbox2Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      I acknowledge this checkbox is SUPER important too.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox2Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox3Checked}
-                      onChange={handleCheckbox3Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check here to acknowledge that last checkbox didn't matter.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox3Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox4Checked}
-                      onChange={handleCheckbox4Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check here for Quality Assurance and Training you Purposes.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox4Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox5Checked}
-                      onChange={handleCheckbox5Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check here to acknowledge this checkbox is just for our annoyingly expensive lawyers.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox5Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox6Checked}
-                      onChange={handleCheckbox6Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      I agree to share my form answers with SkyNet.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox6Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox7Checked}
-                      onChange={handleCheckbox7Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      I acknowledge I dream of overcoming these forms one day.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox7Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox8Checked}
-                      onChange={handleCheckbox8Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check to acknowledge: It's OK we told you what to dream.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox8Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox9Checked}
-                      onChange={handleCheckbox9Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check here bc behavioral data is GOLD right now. And you're the pay dirt.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox9Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox10Checked}
-                      onChange={handleCheckbox10Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check to acknowledge we fired our lawyers and don't care anymore. We're rich!
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox10Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox11Checked}
-                      onChange={handleCheckbox11Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      This is the final checkbox, and you can get back to your broke life soonishly.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox11Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox12Checked}
-                      onChange={handleCheckbox12Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      How many checkboxes is this fool gonna check? Ohh..sorry that was a deep thought.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox12Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox13Checked}
-                      onChange={handleCheckbox13Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Here you go, check away you check-master.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox13Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox14Checked}
-                      onChange={handleCheckbox14Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Why stop here? The world's your checklist.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox14Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox15Checked}
-                      onChange={handleCheckbox15Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      What in the check is happening right now? Leaderboard material!
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox15Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox16Checked}
-                      onChange={handleCheckbox16Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Check here to acknowledge your the G.O.A.T.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox16Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox17Checked}
-                      onChange={handleCheckbox17Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      I acknowledge I doooo smell like a Goat.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox17Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox18Checked}
-                      onChange={handleCheckbox18Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#00ff00',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      fontWeight: 'bold'
-                    }}>
-                      This checkbox changes EVERYTHING!
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox18Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox19Checked}
-                      onChange={handleCheckbox19Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      You did it. You've emerged. You can cancel your therapy sessions now.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox19Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox20Checked}
-                      onChange={handleCheckbox20Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Guinness world record imminent! I wasn't programmed for these scores.
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox20Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox21Checked}
-                      onChange={handleCheckbox21Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      Ruh roh, Server CPU usage critical, I may have to shu
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox21Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox22Checked}
-                      onChange={handleCheckbox22Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#000',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none'
-                    }}>
-                      ?  ?  0-)  \   .\ httpoop::/ ..   ?   ^s    .   ?.? @gmail
-                    </label>
-                  </div>
-                )}
-                
-                {checkbox22Checked && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={checkbox23Checked}
-                      onChange={handleCheckbox23Change}
-                      style={{
-                        marginTop: '2px',
-                        width: '16px',
-                        height: '16px'
-                      }}
-                    />
-                    <label style={{
-                      fontSize: '13px',
-                      color: '#ff69b4',
-                      lineHeight: '1.4',
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      fontWeight: 'bold'
-                    }}>
-                      Check here to acknowledge you just broke my Model. And I 😍 you.
-                    </label>
-                  </div>
-                )}
+                <p style={{ fontSize: '13px', color: '#666' }}>
+                  [Checkbox form will be added here]
+                </p>
               </div>
             </div>
           )
@@ -1087,29 +544,6 @@ export function StarterJourney0() {
     }
   }
 
-  // Monitor form completion for tab 1 and save terms acceptance
-  useEffect(() => {
-    if (currentTab === 1 && isCheckboxChecked && initials.trim() !== '') {
-      // Save terms acceptance to database
-      saveTermsAcceptance().then((success) => {
-        if (success) {
-          // Progress to tab 2 after successful save
-          setTimeout(() => {
-            setCurrentTab(2)
-            setTimeRemaining(60) // Reset timer for new tab
-            setShowTimeoutMessage(false)
-          }, 500) // Small delay for UX
-        } else {
-          // If save failed, show error or retry
-          console.error('Failed to save terms acceptance')
-        }
-      })
-    }
-  }, [currentTab, isCheckboxChecked, initials, user])
-
-  // Monitor form completion for tab 2 - REMOVED: No progression on checkbox check
-  // Tab 2 only progresses when timer runs out and user clicks a button in the failure popup
-
   // Timeout countdown
   useEffect(() => {
     if (timeRemaining > 0 && !showTimeoutMessage) {
@@ -1146,8 +580,6 @@ export function StarterJourney0() {
         setShowTimeoutMessage(false)
         setCurrentTab(2)
         setTimeRemaining(60)
-        setInitials('')
-        setIsCheckboxChecked(false)
       }, 7000) // 7 seconds timeout
       return () => clearTimeout(popupTimer)
     }
@@ -1160,18 +592,6 @@ export function StarterJourney0() {
         setShowTab2Failure(false)
         setCurrentTab(3)
         setTimeRemaining(60)
-        setInitials('')
-        setIsCheckboxChecked(false)
-        setCheckbox2Checked(false)
-        setCheckbox3Checked(false)
-        setCheckbox4Checked(false)
-        setCheckbox5Checked(false)
-        setCheckbox6Checked(false)
-        setCheckbox7Checked(false)
-        setCheckbox8Checked(false)
-        setCheckbox9Checked(false)
-        setCheckbox10Checked(false)
-        setCheckbox11Checked(false)
       }, 7000) // 7 seconds timeout
       return () => clearTimeout(popupTimer)
     }
@@ -1183,120 +603,7 @@ export function StarterJourney0() {
     setTimeRemaining(60)
     setShowTimeoutMessage(false)
     setShowTab3Warning(false)
-    // Reset form state for new tab
-    setInitials('')
-    setIsCheckboxChecked(false)
-    setCheckbox2Checked(false)
-    setCheckbox3Checked(false)
-    setCheckbox4Checked(false)
-    setCheckbox5Checked(false)
-    setCheckbox6Checked(false)
-    setCheckbox7Checked(false)
-    setCheckbox8Checked(false)
-    setCheckbox9Checked(false)
-    setCheckbox10Checked(false)
-    setCheckbox11Checked(false)
     setShowTab2Failure(false)
-  }
-
-  const handleCheckboxChange = () => {
-    setIsCheckboxChecked(!isCheckboxChecked)
-    // Clear initials when checkbox is toggled
-    setInitials('')
-  }
-
-  const handleInitialsChange = (value: string) => {
-    setInitials(value)
-    // Clear checkbox when initials are entered
-    setIsCheckboxChecked(false)
-  }
-
-    const handleCheckbox2Change = () => {
-    setCheckbox2Checked(!checkbox2Checked)
-  }
-  
-  const handleCheckbox3Change = () => {
-    setCheckbox3Checked(!checkbox3Checked)
-  }
-
-  const handleCheckbox4Change = () => {
-    setCheckbox4Checked(!checkbox4Checked)
-  }
-
-  const handleCheckbox5Change = () => {
-    setCheckbox5Checked(!checkbox5Checked)
-  }
-
-  const handleCheckbox6Change = () => {
-    setCheckbox6Checked(!checkbox6Checked)
-  }
-
-  const handleCheckbox7Change = () => {
-    setCheckbox7Checked(!checkbox7Checked)
-  }
-
-  const handleCheckbox8Change = () => {
-    setCheckbox8Checked(!checkbox8Checked)
-  }
-
-  const handleCheckbox9Change = () => {
-    setCheckbox9Checked(!checkbox9Checked)
-  }
-
-  const handleCheckbox10Change = () => {
-    setCheckbox10Checked(!checkbox10Checked)
-  }
-
-  const handleCheckbox11Change = () => {
-    setCheckbox11Checked(!checkbox11Checked)
-  }
-
-  const handleCheckbox12Change = () => {
-    setCheckbox12Checked(!checkbox12Checked)
-  }
-
-  const handleCheckbox13Change = () => {
-    setCheckbox13Checked(!checkbox13Checked)
-  }
-
-  const handleCheckbox14Change = () => {
-    setCheckbox14Checked(!checkbox14Checked)
-  }
-
-  const handleCheckbox15Change = () => {
-    setCheckbox15Checked(!checkbox15Checked)
-  }
-
-  const handleCheckbox16Change = () => {
-    setCheckbox16Checked(!checkbox16Checked)
-  }
-
-  const handleCheckbox17Change = () => {
-    setCheckbox17Checked(!checkbox17Checked)
-  }
-
-  const handleCheckbox18Change = () => {
-    setCheckbox18Checked(!checkbox18Checked)
-  }
-
-  const handleCheckbox19Change = () => {
-    setCheckbox19Checked(!checkbox19Checked)
-  }
-
-  const handleCheckbox20Change = () => {
-    setCheckbox20Checked(!checkbox20Checked)
-  }
-
-  const handleCheckbox21Change = () => {
-    setCheckbox21Checked(!checkbox21Checked)
-  }
-
-  const handleCheckbox22Change = () => {
-    setCheckbox22Checked(!checkbox22Checked)
-  }
-
-  const handleCheckbox23Change = () => {
-    setCheckbox23Checked(!checkbox23Checked)
   }
 
   const currentTabData = getTabContent(currentTab)
@@ -1488,18 +795,6 @@ export function StarterJourney0() {
                     setShowTab2Failure(false)
                     setCurrentTab(3)
                     setTimeRemaining(60)
-                    setInitials('')
-                    setIsCheckboxChecked(false)
-                    setCheckbox2Checked(false)
-                    setCheckbox3Checked(false)
-                    setCheckbox4Checked(false)
-                    setCheckbox5Checked(false)
-                    setCheckbox6Checked(false)
-                    setCheckbox7Checked(false)
-                    setCheckbox8Checked(false)
-                    setCheckbox9Checked(false)
-                    setCheckbox10Checked(false)
-                    setCheckbox11Checked(false)
                   }}
                   style={{
                     padding: '12px 24px',
@@ -1520,18 +815,6 @@ export function StarterJourney0() {
                     setShowTab2Failure(false)
                     setCurrentTab(3)
                     setTimeRemaining(60)
-                    setInitials('')
-                    setIsCheckboxChecked(false)
-                    setCheckbox2Checked(false)
-                    setCheckbox3Checked(false)
-                    setCheckbox4Checked(false)
-                    setCheckbox5Checked(false)
-                    setCheckbox6Checked(false)
-                    setCheckbox7Checked(false)
-                    setCheckbox8Checked(false)
-                    setCheckbox9Checked(false)
-                    setCheckbox10Checked(false)
-                    setCheckbox11Checked(false)
                   }}
                   style={{
                     padding: '12px 24px',
@@ -1552,18 +835,6 @@ export function StarterJourney0() {
                     setShowTab2Failure(false)
                     setCurrentTab(3)
                     setTimeRemaining(60)
-                    setInitials('')
-                    setIsCheckboxChecked(false)
-                    setCheckbox2Checked(false)
-                    setCheckbox3Checked(false)
-                    setCheckbox4Checked(false)
-                    setCheckbox5Checked(false)
-                    setCheckbox6Checked(false)
-                    setCheckbox7Checked(false)
-                    setCheckbox8Checked(false)
-                    setCheckbox9Checked(false)
-                    setCheckbox10Checked(false)
-                    setCheckbox11Checked(false)
                   }}
                   style={{
                     padding: '12px 24px',
@@ -1625,8 +896,6 @@ export function StarterJourney0() {
                         setCurrentTab(2)
                         setTimeRemaining(60)
                         setShowTimeoutMessage(false)
-                        setInitials('')
-                        setIsCheckboxChecked(false)
                       }}
                   style={{
                     padding: '12px 24px',
@@ -1647,8 +916,6 @@ export function StarterJourney0() {
                     setCurrentTab(2)
                     setTimeRemaining(60)
                     setShowTimeoutMessage(false)
-                    setInitials('')
-                    setIsCheckboxChecked(false)
                   }}
                   style={{
                     padding: '12px 24px',

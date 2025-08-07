@@ -1,8 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
 import { ConfigProvider, theme } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { HomePage } from './pages/HomePage'
 import { AdminRoute } from './components/AdminRoute'
+import { AgeVerification } from './components/AgeVerification'
 
 import { SearchVisualPage } from './pages/SearchVisualPage'
 import { StartSearchPage } from './pages/StartSearchPage'
@@ -27,6 +28,7 @@ import { setupGlobalErrorHandling } from './lib/errorLogging'
 
 function App() {
   const { currentTheme, setUser, setIsAuthenticated, setIsLoading } = useCloudStore()
+  const [ageVerified, setAgeVerified] = useState(false)
 
   // ENTERPRISE REPLACEMENT: Replace with enterprise error monitoring setup
   // Current: Basic global error handling
@@ -135,6 +137,19 @@ function App() {
           algorithm: theme.defaultAlgorithm,
         }
     }
+  }
+
+  // Show age verification before rendering the app
+  if (!ageVerified) {
+    return (
+      <ConfigProvider theme={getThemeConfig()}>
+        <ErrorBoundary>
+          <div className="App">
+            <AgeVerification onVerified={() => setAgeVerified(true)} />
+          </div>
+        </ErrorBoundary>
+      </ConfigProvider>
+    )
   }
 
   return (
