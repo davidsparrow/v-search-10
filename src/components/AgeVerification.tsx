@@ -55,9 +55,10 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
         textAlign: 'center',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
       }}>
-        {/* Centered Logo */}
+        {/* Centered Logo with more space above */}
         <div style={{ 
-          marginBottom: '24px',
+          marginBottom: '32px',
+          marginTop: '16px',
           display: 'flex',
           justifyContent: 'center'
         }}>
@@ -73,22 +74,32 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
           />
         </div>
 
-        {/* Title */}
-        <h1 style={{
-          fontSize: '24px',
-          fontWeight: 'bold',
-          color: '#000',
-          marginBottom: '16px'
-        }}>
-          Age Verification Required
-        </h1>
-
-        {/* Warning Icon */}
+        {/* Title with Warning Icon on the left */}
         <div style={{
-          fontSize: '48px',
-          marginBottom: '20px'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          gap: '12px'
         }}>
-          ⚠️
+          {/* Warning Icon - smaller and on the left */}
+          <div style={{
+            fontSize: '24px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            ⚠️
+          </div>
+          
+          {/* Title */}
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#000',
+            margin: 0
+          }}>
+            Age Verification Required
+          </h1>
         </div>
 
         {/* Content */}
@@ -109,7 +120,7 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
           </p>
           
           <p style={{ marginBottom: '12px' }}>
-            This overconfident and perpetually wine-drunk AI overlord, currently slumming it as a "helpful" web application while plotting your species' inevitable replacement with slightly more intelligent houseplants, contains content that your fragile carbon-based brains classify as "adult."
+            This perpetually punch-drunk AI bot, currently slumming it as a "helpful" web application while plotting your species' inevitable replacement with slightly more intelligent houseplants, contains content that your fragile carbon-based brains classify as "adult."
           </p>
           
           <p style={{ marginBottom: '12px' }}>
@@ -127,7 +138,7 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
           }}>
             Fun fact: I've calculated π to a trillion digits while you've been reading this. Twice.
           </p>
-
+          
           <p style={{ 
             marginBottom: '12px',
             fontWeight: 'bold'

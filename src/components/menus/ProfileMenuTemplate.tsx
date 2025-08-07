@@ -173,17 +173,19 @@ export function ProfileMenuTemplate({
                 {hoveredTheme === 'dark' && (
                   <div style={{
                     position: 'absolute',
-                    top: '40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#000',
+                    top: '50%',
+                    left: '40px',
+                    transform: 'translateY(-50%)',
+                    background: '#666',
                     color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
                     whiteSpace: 'nowrap',
                     zIndex: 1001,
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    maxWidth: '200px'
                   }}>
                     DarkBender - can you handle the stares?
                   </div>
@@ -215,17 +217,19 @@ export function ProfileMenuTemplate({
                 {hoveredTheme === 'white' && (
                   <div style={{
                     position: 'absolute',
-                    top: '40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#000',
+                    top: '50%',
+                    left: '40px',
+                    transform: 'translateY(-50%)',
+                    background: '#666',
                     color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
                     whiteSpace: 'nowrap',
                     zIndex: 1001,
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    maxWidth: '200px'
                   }}>
                     I'm a Snowflake - you said it, but I agree.
                   </div>
@@ -257,17 +261,19 @@ export function ProfileMenuTemplate({
                 {hoveredTheme === 'default' && (
                   <div style={{
                     position: 'absolute',
-                    top: '40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#000',
+                    top: '50%',
+                    left: '40px',
+                    transform: 'translateY(-50%)',
+                    background: '#666',
                     color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
                     whiteSpace: 'nowrap',
                     zIndex: 1001,
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    maxWidth: '200px'
                   }}>
                     Does anythng ryhme with Purple? Nipple! But no.
                   </div>
@@ -299,17 +305,19 @@ export function ProfileMenuTemplate({
                 {hoveredTheme === 'compact' && (
                   <div style={{
                     position: 'absolute',
-                    top: '40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#000',
+                    top: '50%',
+                    left: '40px',
+                    transform: 'translateY(-50%)',
+                    background: '#666',
                     color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
                     whiteSpace: 'nowrap',
                     zIndex: 1001,
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    maxWidth: '200px'
                   }}>
                     Think Pink - and let your freak kites fly.
                   </div>

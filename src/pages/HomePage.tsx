@@ -3,10 +3,11 @@ import { Button, Input, Row, Col, Modal, Typography, Space, Divider } from 'antd
 import { useNavigate } from 'react-router-dom'
 import { SettingOutlined } from '@ant-design/icons'
 import { useCloudStore } from '../store/cloudStore'
-import { auth } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { TypingAnimation } from '../components/common/TypingAnimation'
 import { ProfileMenuTemplate } from '../components/menus/ProfileMenuTemplate'
 import { MainHeader } from '../components/headers/MainHeader'
+import { LoginModal } from '../components/LoginModal'
 import { AskBenderTier } from '../types/askbender'
 import { getSessionLogo, preloadSessionLogo, getFallbackLogo } from '../lib/logoManager'
 
@@ -46,16 +47,19 @@ export function HomePage() {
   
   // State for modal and menu
   const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false)
   const [logoError, setLogoError] = useState(false)
   const [textLogoError, setTextLogoError] = useState(false)
   const [instaImageError, setInstaImageError] = useState(false)
   const [sessionLogo, setSessionLogo] = useState<string>('')
   const [logoLoaded, setLogoLoaded] = useState(false)
 
-  // Form state
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  // Reset modal state
+  const [isResetModalVisible, setIsResetModalVisible] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetError, setResetError] = useState('')
+  const [resetSuccess, setResetSuccess] = useState(false)
 
   // Tier system state
   const [userTier] = useState<AskBenderTier>('fresh_meat')
@@ -83,97 +87,42 @@ export function HomePage() {
     preloadLogo()
   }, [])
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      console.log('Please enter email and password')
-      return
-    }
-    
-    setIsLoading(true)
-    try {
-      // For now, simulate successful login for testing
-      console.log('Login attempt with:', { email, password })
-      
-      // Show success message
-      setShowSuccessMessage(true)
-      
-      // Clear form
-      setEmail('')
-      setPassword('')
-      
-      // Hide success message after 3 seconds and navigate
-      setTimeout(() => {
-        setShowSuccessMessage(false)
-        navigate('/search-chat')
-      }, 3000)
-      
-    } catch (error) {
-      console.error('Login error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleGoogleAuth = async () => {
-    setIsLoading(true)
-    try {
-      const { error } = await auth.signInWithGoogle()
-      if (error) {
-        console.error('Google auth error:', error.message)
-        // TODO: Show error message to user
-      }
-      // Google auth will redirect automatically
-    } catch (error) {
-      console.error('Google auth error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleBiteMe = () => {
-    window.open('https://bite.bendersaas.ai', '_blank')
+    // TODO: Implement Bite-Me modal with new content
+    console.log('Bite Me clicked - modal coming soon')
   }
-
-  // Password reset modal state
-  const [isResetModalVisible, setIsResetModalVisible] = useState(false)
-  const [resetEmail, setResetEmail] = useState('')
-  const [resetLoading, setResetLoading] = useState(false)
-  const [resetError, setResetError] = useState('')
-  const [resetSuccess, setResetSuccess] = useState(false)
-  const resetTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleResetModalCancel = () => {
     setIsResetModalVisible(false)
     setResetEmail('')
     setResetError('')
     setResetSuccess(false)
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
   }
 
   const handleResetPassword = async () => {
     if (!resetEmail) {
-      setResetError('Please enter your email address.')
+      setResetError('Please enter your email')
       return
     }
-    
+
     setResetLoading(true)
     setResetError('')
-    setResetSuccess(false)
-    
+
     try {
-      const { error } = await auth.resetPasswordForEmail(resetEmail)
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+
       if (error) {
         setResetError(error.message)
       } else {
         setResetSuccess(true)
-        // Auto-close after 5 seconds
         setTimeout(() => {
-          setIsResetModalVisible(false)
-          setResetSuccess(false)
-        }, 5000)
+          handleResetModalCancel()
+        }, 3000)
       }
-    } catch (err: any) {
-      setResetError(err.message || 'Something went wrong.')
+    } catch (error) {
+      setResetError('Failed to send reset email')
     } finally {
       setResetLoading(false)
     }
@@ -183,27 +132,22 @@ export function HomePage() {
     setTheme(theme)
   }
 
-  // Apply white-theme class to body for placeholder styling
-  useEffect(() => {
-    if (currentTheme === 'white') {
-      document.body.classList.add('white-theme')
-    } else {
-      document.body.classList.remove('white-theme')
-    }
-  }, [currentTheme])
+  const handleOpenMenu = () => {
+    setIsMenuVisible(true)
+  }
 
-  // Input styles that match the selected theme
+  const handleOpenLoginModal = () => {
+    setIsLoginModalVisible(true)
+  }
+
+  // Input style for theme consistency
   const inputStyle = {
     height: '40px',
-    borderRadius: '8px',
+    borderRadius: '88px',
     border: `1px solid ${theme.cardBorder}`,
     background: theme.cardBackground,
     color: currentTheme === 'white' ? '#000000' : theme.textPrimary, // Black text for white theme
     fontSize: '14px'
-  }
-
-  const handleOpenMenu = () => {
-    setIsMenuVisible(true)
   }
 
   return (
@@ -352,80 +296,33 @@ export function HomePage() {
                 </p>
               </div>
 
-              {/* Authentication Form */}
+              {/* Simplified Login Section */}
               <div style={{ 
                 width: '80%', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'center',
-                gap: '8px' // Reduced from 12px to 8px for tighter spacing
+                gap: '16px'
               }}
               className={currentTheme === 'compact' ? 'compact-theme' : ''}
               >
-                {/* Email/Phone Input */}
-                <Input
-                  placeholder="Phone, Email or User Name"
-                  value={email}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    // Only format if it looks like a phone number
-                    if (isPhoneNumber(value)) {
-                      setEmail(formatPhoneNumber(value))
-                    } else {
-                      setEmail(value)
-                    }
-                  }}
-                  style={inputStyle}
-                />
-
-                {/* Password Input */}
-                <Input.Password
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={inputStyle}
-                />
-
-                {/* Success Message */}
-                {showSuccessMessage && (
-                  <div style={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    background: 'rgba(34, 197, 94, 0.9)',
-                    color: 'white',
-                    padding: '16px 24px',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    zIndex: 9999,
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-                  }}>
-                    ✅ Success! Redirecting to chat...
-                  </div>
-                )}
-
-                {/* Login Button */}
+                {/* Drop a Login Button */}
                 <Button
                   type="primary"
-                  size="middle"
-                  onClick={handleLogin}
-                  loading={isLoading}
-                  disabled={isLoading}
+                  size="large"
+                  onClick={handleOpenLoginModal}
                   style={{
                     width: '100%',
-                    height: '40px',
-                    fontSize: '14px',
-                    fontWeight: 'normal',
+                    height: '48px',
+                    fontSize: '16px',
+                    fontWeight: '500',
                     background: '#DC2626', // Red
                     borderColor: '#DC2626',
                     color: 'white',
                     borderRadius: '88px',
                     transition: 'all 0.2s ease',
                     cursor: 'pointer',
-                    marginTop: '8px', // Reduced from 12px to 8px
-                    marginBottom: '4px' // Added small bottom margin
+                    fontFamily: 'Poppins, sans-serif'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = '#B91C1C' // 30% darker red
@@ -444,108 +341,20 @@ export function HomePage() {
                     e.currentTarget.style.borderColor = '#B91C1C'
                   }}
                 >
-                  Drop a Log in
+                  Drop a Login
                 </Button>
-
-                {/* Divider */}
-                <Divider style={{ 
-                  color: theme.textSecondary, 
-                  fontSize: '12px',
-                  margin: '4px 0', // Reduced from 8px to 4px
-                  borderColor: theme.cardBorder
-                }}>
-                  or
-                </Divider>
-
-                {/* Google Auth Button */}
-                <Button
-                  size="middle"
-                  onClick={handleGoogleAuth}
-                  loading={isLoading}
-                  disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    fontSize: '14px',
-                    fontWeight: 'normal',
-                    background: 'transparent',
-                    borderColor: 'transparent', // No border
-                    color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#3B82F6'), // White for COMPACT, White for CLASSIC, Blue for others
-                    borderRadius: '88px', // Same as login button
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer',
-                    marginBottom: '4px' // Added small bottom margin
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-                    e.currentTarget.style.borderColor = 'transparent' // No border on hover
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent'
-                    e.currentTarget.style.borderColor = 'transparent' // No border
-                  }}
-                >
-                  <img 
-                    src="/google-g-icon-transparent.png" 
-                    alt="Google"
-                    style={{ 
-                      width: '16px', 
-                      height: '16px',
-                      objectFit: 'contain'
-                    }}
-                  />
-                  Continue with Google
-                </Button>
-
-                {/* Second separator replaced with "Again with the lost Sticky?" link */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  margin: '12px 0',
-                  gap: '16px'
-                }}>
-                  <div style={{ 
-                    flex: 1, 
-                    height: '1px', 
-                    background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
-                  }} />
-                  <span style={{
-                    color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#1890ff'),
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: 'normal',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onClick={() => setIsResetModalVisible(true)}
-                  title="Passwords. Glassware. Easy."
-                  >
-                    Again with the lost Sticky?
-                  </span>
-                  <div style={{ 
-                    flex: 1, 
-                    height: '1px', 
-                    background: currentTheme === 'compact' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)' 
-                  }} />
-                </div>
 
                 {/* Bite Me link centered at bottom */}
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'center', 
-                  marginTop: '6px'
+                  marginTop: '16px'
                 }}>
                   <span
                     style={{
                       color: currentTheme === 'compact' ? '#ffffff' : (currentTheme === 'default' ? '#ffffff' : '#1890ff'),
                       fontFamily: 'Poppins, sans-serif',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: 'normal',
                       cursor: 'pointer',
                       textDecoration: 'underline'
@@ -607,6 +416,13 @@ export function HomePage() {
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
         userLevel={userTier}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isVisible={isLoginModalVisible}
+        onClose={() => setIsLoginModalVisible(false)}
+        defaultTab="1"
       />
 
       {/* Password Reset Modal */}

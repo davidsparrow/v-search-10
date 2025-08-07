@@ -19,7 +19,9 @@ export function MainHeader({
   const { 
     currentTheme,
     getThemeConfig,
-    user
+    user,
+    setIsAuthenticated,
+    setUser
   } = useCloudStore()
 
   const theme = getThemeConfig()
@@ -66,6 +68,22 @@ export function MainHeader({
   const changeEmoji = () => {
     const randomEmoji = emotionalEmojis[Math.floor(Math.random() * emotionalEmojis.length)]
     setCurrentEmoji(randomEmoji)
+  }
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Logout error:', error)
+      } else {
+        setUser(null)
+        setIsAuthenticated(false)
+        navigate('/')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   return (
@@ -178,18 +196,32 @@ export function MainHeader({
 
       {/* Settings */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Profile Link */}
-        <Button
-          type="text"
-          onClick={() => navigate('/user-profile')}
-          style={{ 
-            color: theme.textSecondary, 
-            fontSize: '14px',
-            fontWeight: '500'
-          }}
-        >
-          Profile
-        </Button>
+        {/* Logout/Profile Button */}
+        {user ? (
+          <Button
+            type="text"
+            onClick={handleLogout}
+            style={{ 
+              color: theme.textSecondary, 
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            Logout
+          </Button>
+        ) : (
+          <Button
+            type="text"
+            onClick={() => navigate('/user-profile')}
+            style={{ 
+              color: theme.textSecondary, 
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            Profile
+          </Button>
+        )}
         
         {/* Hamburger Menu Icon */}
         {showSettingsIcon && (
