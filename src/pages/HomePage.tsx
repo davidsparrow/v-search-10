@@ -317,44 +317,6 @@ export function HomePage() {
               }}
               className={currentTheme === 'compact' ? 'compact-theme' : ''}
               >
-                {/* Start Freeloading Button */}
-                <Button
-                  type="primary"
-                  size="large"
-                  onClick={handleOpenSignupModal}
-                  style={{
-                    width: '100%',
-                    height: '48px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    background: '#1890ff', // Blue
-                    borderColor: '#1890ff',
-                    color: 'white',
-                    borderRadius: '88px',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#1890ff' // 30% darker blue
-                    e.currentTarget.style.borderColor = '#1890ff'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#1890ff'
-                    e.currentTarget.style.borderColor = '#1890ff'
-                  }}
-                  onMouseDown={(e) => {
-                    e.currentTarget.style.background = '#1890ff' // 50% darker blue
-                    e.currentTarget.style.borderColor = '#1890ff'
-                  }}
-                  onMouseUp={(e) => {
-                    e.currentTarget.style.background = '#1890ff' // Back to hover state
-                    e.currentTarget.style.borderColor = '#1890ff'
-                  }}
-                >
-                  Start Freeloading
-                </Button>
-
                 {/* Bite Me link centered at bottom */}
                 <div style={{ 
                   display: 'flex', 

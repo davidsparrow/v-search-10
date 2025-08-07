@@ -27,6 +27,7 @@ export function MainHeader({
 
   const theme = getThemeConfig()
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false)
+  const [openToSignup, setOpenToSignup] = useState(false)
 
   // Emoji library for emotional faces
   const emotionalEmojis = [
@@ -200,6 +201,49 @@ export function MainHeader({
 
         {/* Settings */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Start Freeloading Button */}
+          <Button
+            type="primary"
+            onClick={() => {
+              setOpenToSignup(true)
+              setIsLoginModalVisible(true)
+            }}
+            style={{ 
+              color: 'white', 
+              fontSize: '12px',
+              fontWeight: '500',
+              border: '1px solid #52c41a',
+              borderRadius: '20px',
+              background: '#52c41a',
+              padding: '4px 16px',
+              height: '32px',
+              transition: 'all 0.2s ease',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#73d13d'
+              e.currentTarget.style.borderColor = '#73d13d'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#52c41a'
+              e.currentTarget.style.borderColor = '#52c41a'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.background = '#389e0d'
+              e.currentTarget.style.borderColor = '#389e0d'
+              e.currentTarget.style.transform = 'scale(0.98)'
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.background = '#73d13d'
+              e.currentTarget.style.borderColor = '#73d13d'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+          >
+            Start Freeloading
+          </Button>
+
           {/* Login/Logout Button - always show with different text */}
           <Button
             type="text"
@@ -256,7 +300,11 @@ export function MainHeader({
       {/* Login Modal */}
       <LoginModal 
         isVisible={isLoginModalVisible}
-        onClose={() => setIsLoginModalVisible(false)}
+        onClose={() => {
+          setIsLoginModalVisible(false)
+          setOpenToSignup(false)
+        }}
+        openToSignup={openToSignup}
       />
     </>
   )

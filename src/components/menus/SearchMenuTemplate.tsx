@@ -80,7 +80,7 @@ export function SearchMenuTemplate({
           right: 0,
           width: '350px',
           height: '100vh',
-          background: 'white',
+          background: '#FFF5E6',
           zIndex: 1000,
           animation: 'slideInRight 0.4s ease-out',
           padding: '24px',
@@ -216,12 +216,13 @@ export function SearchMenuTemplate({
               fontFamily: 'Poppins, sans-serif',
               fontSize: '14px',
               fontWeight: 400,
-              color: '#222',
-              background: 'transparent',
-              border: 'none',
+              color: '#000',
+              background: 'white',
+              border: '1px solid #d9d9d9',
               outline: 'none',
               boxShadow: 'none',
-              transition: 'border 0.2s'
+              transition: 'border 0.2s',
+              borderRadius: '88px'
             }}
             autoComplete="off"
           />
@@ -241,12 +242,13 @@ export function SearchMenuTemplate({
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: city ? '#222' : '#888',
-                background: 'transparent',
-                border: 'none',
+                color: city ? '#000' : '#666',
+                background: 'white',
+                border: '1px solid #d9d9d9',
                 outline: 'none',
                 boxShadow: 'none',
-                transition: 'border 0.2s'
+                transition: 'border 0.2s',
+                borderRadius: '88px'
               }}
               className={`apple-search-input ${city ? 'city-input-filled' : 'city-input-placeholder'}`}
             />
@@ -264,16 +266,17 @@ export function SearchMenuTemplate({
                 fontFamily: 'Poppins, sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
-                color: state ? '#222' : '#888',
-                background: 'transparent',
-                border: 'none',
+                color: state ? '#000' : '#666',
+                background: 'white',
+                border: '1px solid #d9d9d9',
                 outline: 'none',
                 boxShadow: 'none',
                 appearance: 'none',
                 transition: 'border 0.2s',
                 cursor: 'pointer',
                 textAlign: 'left',
-                textAlignLast: 'left'
+                textAlignLast: 'left',
+                borderRadius: '88px'
               }}
             >
               <option value="" disabled hidden>State</option>
@@ -339,16 +342,17 @@ export function SearchMenuTemplate({
               fontFamily: 'Poppins, sans-serif',
               fontSize: '14px',
               fontWeight: 400,
-              color: country ? '#222' : '#888',
-              background: 'transparent',
-              border: 'none',
+              color: country ? '#000' : '#666',
+              background: 'white',
+              border: '1px solid #d9d9d9',
               outline: 'none',
               boxShadow: 'none',
               appearance: 'none',
               transition: 'border 0.2s',
               cursor: 'pointer',
               textAlign: 'left',
-              textAlignLast: 'left'
+              textAlignLast: 'left',
+              borderRadius: '88px'
             }}
           >
             <option value="" disabled hidden>Country</option>
@@ -489,16 +493,17 @@ export function SearchMenuTemplate({
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: genre ? '#222' : '#888',
-                    background: 'transparent',
-                    border: 'none',
+                    color: genre ? '#000' : '#666',
+                    background: 'white',
+                    border: '1px solid #d9d9d9',
                     outline: 'none',
                     boxShadow: 'none',
                     appearance: 'none',
                     transition: 'border 0.2s',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    textAlignLast: 'left'
+                    textAlignLast: 'left',
+                    borderRadius: '88px'
                   }}
                 >
                   <option value="" disabled hidden></option>
@@ -574,16 +579,17 @@ export function SearchMenuTemplate({
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: driveMiles ? '#222' : '#888',
-                    background: 'transparent',
-                    border: 'none',
+                    color: driveMiles ? '#000' : '#666',
+                    background: 'white',
+                    border: '1px solid #d9d9d9',
                     outline: 'none',
                     boxShadow: 'none',
                     appearance: 'none',
                     transition: 'border 0.2s',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    textAlignLast: 'left'
+                    textAlignLast: 'left',
+                    borderRadius: '88px'
                   }}
                 >
                   <option value="" disabled hidden></option>
@@ -679,16 +685,17 @@ export function SearchMenuTemplate({
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: cancellationFee ? '#222' : '#888',
-                    background: 'transparent',
-                    border: 'none',
+                    color: cancellationFee ? '#000' : '#666',
+                    background: 'white',
+                    border: '1px solid #d9d9d9',
                     outline: 'none',
                     boxShadow: 'none',
                     appearance: 'none',
                     transition: 'border 0.2s',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    textAlignLast: 'left'
+                    textAlignLast: 'left',
+                    borderRadius: '88px'
                   }}
                 >
                   <option value="" disabled hidden></option>
@@ -782,16 +789,17 @@ export function SearchMenuTemplate({
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: minInitialDeposit ? '#222' : '#888',
-                    background: 'transparent',
-                    border: 'none',
+                    color: minInitialDeposit ? '#000' : '#666',
+                    background: 'white',
+                    border: '1px solid #d9d9d9',
                     outline: 'none',
                     boxShadow: 'none',
                     appearance: 'none',
                     transition: 'border 0.2s',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    textAlignLast: 'left'
+                    textAlignLast: 'left',
+                    borderRadius: '88px'
                   }}
                 >
                   <option value="" disabled hidden></option>
@@ -885,16 +893,17 @@ export function SearchMenuTemplate({
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: minTotalDeposit ? '#222' : '#888',
-                    background: 'transparent',
-                    border: 'none',
+                    color: minTotalDeposit ? '#000' : '#666',
+                    background: 'white',
+                    border: '1px solid #d9d9d9',
                     outline: 'none',
                     boxShadow: 'none',
                     appearance: 'none',
                     transition: 'border 0.2s',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    textAlignLast: 'left'
+                    textAlignLast: 'left',
+                    borderRadius: '88px'
                   }}
                 >
                   <option value="" disabled hidden></option>

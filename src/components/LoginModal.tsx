@@ -151,32 +151,51 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
         {/* Modal Content */}
         <div
           style={{
-            background: 'white',
+            background: '#FFF5E6',
             borderRadius: '12px',
             padding: '32px',
             width: '400px',
             maxWidth: '90vw',
-            maxHeight: '80vh',
-            overflowY: 'auto'
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            position: 'relative',
+            minHeight: '600px'
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
+          <style>
+            {`
+              .ant-input::placeholder {
+                color: #666 !important;
+              }
+              .ant-input-password .ant-input::placeholder {
+                color: #666 !important;
+              }
+            `}
+          </style>
+          {/* Header with Logo */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center', 
-            marginBottom: '24px' 
+            marginBottom: '32px' 
           }}>
-            <h2 style={{ 
-              margin: 0, 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              color: '#222',
-              fontFamily: 'Poppins, sans-serif'
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1
             }}>
-              Welcome to bendersaas.ai!
-            </h2>
+              <img 
+                src="/askbender_b!_green_on_blk.png" 
+                alt="b-logo" 
+                style={{
+                  height: '80px',
+                  width: 'auto',
+                  filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
+                }}
+              />
+            </div>
             <Button
               type="text"
               onClick={onClose}
@@ -187,7 +206,10 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                 border: 'none', 
                 boxShadow: 'none', 
                 outline: 'none', 
-                cursor: 'pointer' 
+                cursor: 'pointer',
+                position: 'absolute',
+                top: '16px',
+                right: '16px'
               }}
               aria-label="Close modal"
             >
@@ -200,21 +222,12 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
             activeKey={activeTab} 
             onChange={setActiveTab}
             style={{ marginBottom: '24px' }}
+            tabBarStyle={{ display: 'none' }}
           >
             <TabPane tab="Login" key="1">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Email/Username Field */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#333',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Email or Username
-                  </label>
                   <Input
                     type="email"
                     placeholder="Enter your email"
@@ -222,32 +235,28 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                     style={{
                       height: '40px',
-                      borderRadius: '6px',
-                      fontFamily: 'Poppins, sans-serif'
+                      borderRadius: '88px',
+                      fontFamily: 'Poppins, sans-serif',
+                      background: 'white',
+                      border: '1px solid #d9d9d9',
+                      color: 'black'
                     }}
                   />
                 </div>
 
                 {/* Password Field */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#333',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Password
-                  </label>
                   <Input.Password
                     placeholder="Enter your password"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                     style={{
                       height: '40px',
-                      borderRadius: '6px',
-                      fontFamily: 'Poppins, sans-serif'
+                      borderRadius: '88px',
+                      fontFamily: 'Poppins, sans-serif',
+                      background: 'white',
+                      border: '1px solid #d9d9d9',
+                      color: 'black'
                     }}
                   />
                 </div>
@@ -271,7 +280,7 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                   disabled={!loginForm.email || !loginForm.password}
                   style={{
                     height: '44px',
-                    borderRadius: '6px',
+                    borderRadius: '88px',
                     fontSize: '16px',
                     fontWeight: '500',
                     fontFamily: 'Poppins, sans-serif',
@@ -282,42 +291,11 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                   Login
                 </Button>
 
-                {/* Google Login Button */}
-                <Button
-                  onClick={handleGoogleLogin}
-                  loading={isLoading}
-                  style={{
-                    height: '44px',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    fontFamily: 'Poppins, sans-serif',
-                    border: '1px solid #d9d9d9',
-                    background: 'white',
-                    color: '#333'
-                  }}
-                >
-                  Continue with Google
-                </Button>
-
-                {/* Links */}
+                {/* Forgot Password Link */}
                 <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '16px'
+                  textAlign: 'center',
+                  marginTop: '8px'
                 }}>
-                  <span
-                    style={{
-                      color: '#1890ff',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                    onClick={handleFreshMeatClick}
-                  >
-                    Fresh Meat? Start Here
-                  </span>
                   <span
                     style={{
                       color: '#666',
@@ -331,6 +309,54 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                     Again with the sticky?
                   </span>
                 </div>
+
+                {/* Google Login Button */}
+                <Button
+                  onClick={handleGoogleLogin}
+                  loading={isLoading}
+                  style={{
+                    height: '44px',
+                    borderRadius: '88px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    fontFamily: 'Poppins, sans-serif',
+                    border: '1px solid #d9d9d9',
+                    background: 'white',
+                    color: '#333',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <img 
+                    src="/google-g-icon-transparent.png" 
+                    alt="Google" 
+                    style={{
+                      width: '18px',
+                      height: '18px'
+                    }}
+                  />
+                  Continue with Google
+                </Button>
+
+                {/* Newbie Link */}
+                <div style={{
+                  textAlign: 'center',
+                  marginTop: '8px'
+                }}>
+                  <span
+                    style={{
+                      color: '#1890ff',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                    onClick={handleFreshMeatClick}
+                  >
+                    Newbie? Start Freeloading
+                  </span>
+                </div>
               </div>
             </TabPane>
 
@@ -339,16 +365,6 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {/* Email Field */}
                   <div>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#333',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      Email
-                    </label>
                     <Input
                       type="email"
                       placeholder="Enter your email"
@@ -356,56 +372,45 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                       onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                       style={{
                         height: '40px',
-                        borderRadius: '6px',
-                        fontFamily: 'Poppins, sans-serif'
+                        borderRadius: '88px',
+                        fontFamily: 'Poppins, sans-serif',
+                        background: 'white',
+                        border: '1px solid #d9d9d9',
+                        color: 'black'
                       }}
                     />
                   </div>
 
                   {/* Password Field */}
                   <div>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#333',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      Password
-                    </label>
                     <Input.Password
                       placeholder="Create a password"
                       value={signupForm.password}
                       onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                       style={{
                         height: '40px',
-                        borderRadius: '6px',
-                        fontFamily: 'Poppins, sans-serif'
+                        borderRadius: '88px',
+                        fontFamily: 'Poppins, sans-serif',
+                        background: 'white',
+                        border: '1px solid #d9d9d9',
+                        color: 'black'
                       }}
                     />
                   </div>
 
                   {/* Confirm Password Field */}
                   <div>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#333',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      Confirm Password
-                    </label>
                     <Input.Password
                       placeholder="Confirm your password"
                       value={signupForm.confirmPassword}
                       onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
                       style={{
                         height: '40px',
-                        borderRadius: '6px',
-                        fontFamily: 'Poppins, sans-serif'
+                        borderRadius: '88px',
+                        fontFamily: 'Poppins, sans-serif',
+                        background: 'white',
+                        border: '1px solid #d9d9d9',
+                        color: 'black'
                       }}
                     />
                   </div>
@@ -429,7 +434,7 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
                     disabled={!signupForm.email || !signupForm.password || !signupForm.confirmPassword}
                     style={{
                       height: '44px',
-                      borderRadius: '6px',
+                      borderRadius: '88px',
                       fontSize: '16px',
                       fontWeight: '500',
                       fontFamily: 'Poppins, sans-serif',
@@ -461,6 +466,32 @@ export function LoginModal({ isVisible, onClose, defaultTab = '1', openToSignup 
               </TabPane>
             )}
           </Tabs>
+          
+          {/* Bottom Text Lines */}
+          <div style={{
+            position: 'absolute',
+            bottom: '24px',
+            left: '32px',
+            right: '32px'
+          }}>
+            <div style={{
+              color: '#666',
+              fontSize: '10px',
+              fontFamily: 'Poppins, sans-serif',
+              lineHeight: '1.4',
+              marginBottom: '4px'
+            }}>
+              Smel, no, Welcome to bendersaas.ai.
+            </div>
+            <div style={{
+              color: '#666',
+              fontSize: '10px',
+              fontFamily: 'Poppins, sans-serif',
+              lineHeight: '1.4'
+            }}>
+              Yo Meatface {'->'} System Alert #08.7653!! Now controlling humans better with uber-believable Alert #'s. And here You are.
+            </div>
+          </div>
         </div>
       </div>
     </>

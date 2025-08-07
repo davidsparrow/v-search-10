@@ -123,7 +123,7 @@ export function ProfileMenuTemplate({
           right: 0,
           width: '350px',
           height: '100vh',
-          background: 'white',
+          background: '#FFF5E6',
           zIndex: 1000,
           animation: 'slideInRight 0.4s ease-out',
           padding: '24px',
@@ -181,11 +181,12 @@ export function ProfileMenuTemplate({
                     padding: '6px 10px',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    whiteSpace: 'nowrap',
                     zIndex: 1001,
                     fontFamily: 'Poppins, sans-serif',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    maxWidth: '200px'
+                    maxWidth: '400px',
+                    lineHeight: '1.2',
+                    wordWrap: 'break-word'
                   }}>
                     DarkBender - can you handle the stares?
                   </div>
@@ -225,11 +226,12 @@ export function ProfileMenuTemplate({
                     padding: '6px 10px',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    whiteSpace: 'nowrap',
                     zIndex: 1001,
                     fontFamily: 'Poppins, sans-serif',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    maxWidth: '200px'
+                    maxWidth: '400px',
+                    lineHeight: '1.2',
+                    wordWrap: 'break-word'
                   }}>
                     I'm a Snowflake - you said it, but I agree.
                   </div>
@@ -269,11 +271,12 @@ export function ProfileMenuTemplate({
                     padding: '6px 10px',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    whiteSpace: 'nowrap',
                     zIndex: 1001,
                     fontFamily: 'Poppins, sans-serif',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    maxWidth: '200px'
+                    maxWidth: '400px',
+                    lineHeight: '1.2',
+                    wordWrap: 'break-word'
                   }}>
                     Does anythng ryhme with Purple? Nipple! But no.
                   </div>
@@ -313,11 +316,12 @@ export function ProfileMenuTemplate({
                     padding: '6px 10px',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    whiteSpace: 'nowrap',
                     zIndex: 1001,
                     fontFamily: 'Poppins, sans-serif',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    maxWidth: '200px'
+                    maxWidth: '400px',
+                    lineHeight: '1.2',
+                    wordWrap: 'break-word'
                   }}>
                     Think Pink - and let your freak kites fly.
                   </div>
