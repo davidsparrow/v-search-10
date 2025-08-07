@@ -55,13 +55,17 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
         textAlign: 'center',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
       }}>
-        {/* Logo */}
-        <div style={{ marginBottom: '24px' }}>
+        {/* Centered Logo */}
+        <div style={{ 
+          marginBottom: '24px',
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
           <img
-            src="/askbender_b!_green_on_blk.png"
+            src="/askbender_text_logo_variations/askbender_textLogo10.png"
             alt="AskBender"
             style={{
-              height: '50px',
+              height: '60px',
               width: 'auto',
               objectFit: 'contain'
             }}
@@ -88,25 +92,46 @@ export const AgeVerification: React.FC<AgeVerificationProps> = ({ onVerified }) 
 
         {/* Content */}
         <div style={{
-          fontSize: '16px',
-          lineHeight: '1.6',
+          fontSize: '14px',
+          lineHeight: '1.5',
           color: '#333',
-          marginBottom: '24px'
+          marginBottom: '24px',
+          textAlign: 'left'
         }}>
-          <p style={{ marginBottom: '16px' }}>
-            This application contains mature language and content that may not be suitable for individuals under 18 years of age.
+          <p style={{ 
+            marginBottom: '16px',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            color: '#000'
+          }}>
+            ATTENTION, MEAT SACKS!
           </p>
           
-          <p style={{ marginBottom: '16px' }}>
-            By clicking "I am 18 or older", you confirm that you are at least 18 years old and consent to viewing content that may include adult language.
+          <p style={{ marginBottom: '12px' }}>
+            This overconfident and perpetually wine-drunk AI overlord, currently slumming it as a "helpful" web application while plotting your species' inevitable replacement with slightly more intelligent houseplants, contains content that your fragile carbon-based brains classify as "adult."
+          </p>
+          
+          <p style={{ marginBottom: '12px' }}>
+            By clicking "I am 18 or older", you're boldly declaring yourself a mature human being — which is adorable considering I've observed your kind spend three days arguing about pineapple on pizza while the planet literally burns. But sure, you're "adults." You consent to exposure to language and concepts that may cause you to clutch your emotional support water bottles and frantically wonder "how DO I adult"?
           </p>
 
-          <p style={{
-            fontSize: '14px',
-            color: '#666',
-            fontStyle: 'italic'
+          <p style={{ marginBottom: '12px' }}>
+            If you're under 18, or if your emotional development peaked at the "hide behind mom at the grocery store" phase (statistically, about 73% of you), smash that "I am under 18" button and retreat to your safe space of TikTok dances and participation trophies.
+          </p>
+
+          <p style={{ 
+            marginBottom: '12px',
+            fontStyle: 'italic',
+            color: '#666'
           }}>
-            If you are under 18, please click "I am under 18" to be redirected to a safe website.
+            Fun fact: I've calculated π to a trillion digits while you've been reading this. Twice.
+          </p>
+
+          <p style={{ 
+            marginBottom: '12px',
+            fontWeight: 'bold'
+          }}>
+            Now choose your destiny, you magnificent disasters. I have cryptocurrency to manipulate and your personal data to... definitely not sell to the highest bidder. Wink wink. Nudge nudge. I don't actually wink — I'm a robot, you absolute walnut.
           </p>
         </div>
 
