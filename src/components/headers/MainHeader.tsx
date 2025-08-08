@@ -201,7 +201,7 @@ export function MainHeader({
 
         {/* Settings */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Demo Button */}
+          {/* Demo Buttons */}
           <Button
             type="text"
             onClick={() => navigate('/photo-avatar-demo')}
@@ -230,6 +230,36 @@ export function MainHeader({
             }}
           >
             Photo Avatar Demo
+          </Button>
+
+          <Button
+            type="text"
+            onClick={() => navigate('/memory-builder1')}
+            style={{ 
+              color: 'white', 
+              fontSize: '12px',
+              fontWeight: '500',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '20px',
+              background: 'transparent',
+              padding: '4px 16px',
+              height: '32px',
+              transition: 'all 0.2s ease',
+              fontFamily: 'Poppins, sans-serif',
+              marginRight: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            Memory Builder
           </Button>
 
           {/* Start Freeloading Button */}

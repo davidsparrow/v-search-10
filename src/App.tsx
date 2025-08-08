@@ -19,6 +19,7 @@ import { StarterJourney2 } from './pages/StarterJourney2'
 import { StarterJourney3 } from './pages/StarterJourney3'
 import { UserProfilePage } from './pages/UserProfilePage'
 import { PhotoAvatarDemoPage } from './pages/PhotoAvatarDemoPage'
+import MemoryBuilder1 from './pages/memory-builder/MemoryBuilder1'
 
 import { useCloudStore } from './store/cloudStore'
 import { supabase, participantService } from './lib/supabase'
@@ -175,6 +176,7 @@ function App() {
             <Route path="/user-profile" element={<UserProfilePage />} />
             <Route path="/photo-avatar-demo" element={<PhotoAvatarDemoPage />} />
             <Route path="/PhotoAvatarDemoPage" element={<PhotoAvatarDemoPage />} />
+            <Route path="/memory-builder1" element={<MemoryBuilder1 />} />
 
             <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Routes>

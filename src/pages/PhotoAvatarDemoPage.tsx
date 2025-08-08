@@ -46,12 +46,16 @@ export function PhotoAvatarDemoPage() {
     
     let displayWidth, displayHeight
     
-    if (naturalHeight <= 400) {
-      // Image is already small enough, use original size
+    if (naturalWidth <= 400 && naturalHeight <= 400) {
+      // Image is already small enough in both dimensions, use original size
       displayWidth = naturalWidth
       displayHeight = naturalHeight
+    } else if (aspectRatio > 1) {
+      // Wide image - constrain to 400px width
+      displayWidth = 400
+      displayHeight = 400 / aspectRatio
     } else {
-      // Image is taller than 400px, scale down to 400px height
+      // Tall image - constrain to 400px height
       displayHeight = 400
       displayWidth = 400 * aspectRatio
     }
