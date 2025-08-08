@@ -75,6 +75,7 @@ export default function MemoryBuilder1() {
   const [activeTab, setActiveTab] = useState('templates')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [isProcessingUpload, setIsProcessingUpload] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
 
   // Handle template selection
@@ -103,11 +104,6 @@ export default function MemoryBuilder1() {
   // Handle multiple file upload
   const handleMultipleFileUpload = async (fileList: File[]) => {
     if (fileList.length === 0) return
-    
-    if (fileList.length > 8) {
-      message.error('Maximum 8 photos allowed')
-      return
-    }
 
     setIsUploading(true)
     setUploadProgress(0)
@@ -117,32 +113,25 @@ export default function MemoryBuilder1() {
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i]
       
-      // Validate file
-      const validation = validateImageFile(file)
-      if (!validation.isValid) {
-        message.error(`${file.name}: ${validation.error}`)
-        continue
-      }
-
       try {
         const dataUrl = await fileToDataURL(file)
         photoUrls.push(dataUrl)
         setUploadProgress(Math.round(((i + 1) / fileList.length) * 100))
       } catch (error) {
-        message.error(`Failed to upload ${file.name}`)
         console.error('Upload error:', error)
       }
     }
 
-    setBuilderState(prev => ({ ...prev, allPhotos: photoUrls }))
+    setBuilderState(prev => {
+      const newPhotos = [...prev.allPhotos, ...photoUrls]
+      return { ...prev, allPhotos: newPhotos }
+    })
+    
     setIsUploading(false)
     setUploadProgress(0)
     
     if (photoUrls.length > 0) {
       message.success(`${photoUrls.length} photos uploaded successfully!`)
-      // Don't auto-switch - let user continue uploading
-      // setActiveTab('selection')
-      // setCurrentStep(3)
     }
   }
 
@@ -203,6 +192,18 @@ export default function MemoryBuilder1() {
     })
   }
 
+  const handleRemovePhoto = (index: number) => {
+    setBuilderState(prev => ({
+      ...prev,
+      allPhotos: prev.allPhotos.filter((_, i) => i !== index),
+      mainPhotoIndex: prev.mainPhotoIndex === index ? null : 
+                     prev.mainPhotoIndex && prev.mainPhotoIndex > index ? prev.mainPhotoIndex - 1 : prev.mainPhotoIndex,
+      selectedPhotoIndices: prev.selectedPhotoIndices
+        .filter(i => i !== index)
+        .map(i => i > index ? i - 1 : i)
+    }))
+  }
+
   const handleContinue = () => {
     if (!builderState.selectedTemplate) {
       alert('Please select a template first')
@@ -258,8 +259,9 @@ export default function MemoryBuilder1() {
 
 
         {/* Main Content */}
-        <div style={{ height: '100%', overflow: 'auto' }}>
+        <div style={{ height: 'calc(100% - 80px)', overflow: 'auto' }}>
           <Tabs 
+            key={activeTab}
             activeKey={activeTab} 
             onChange={setActiveTab}
             size="large"
@@ -304,7 +306,7 @@ export default function MemoryBuilder1() {
                               <div style={{ fontSize: '32px', marginBottom: '8px' }}>
                                 {template.previewImage}
                               </div>
-                              <Title level={5} style={{ marginBottom: '6px', fontSize: '14px' }}>
+                              <Title level={5} style={{ marginBottom: '6px', fontSize: '14px', color: '#1890ff' }}>
                                 {template.name}
                               </Title>
                               <Text type="secondary" style={{ fontSize: '10px', display: 'block' }}>
@@ -361,30 +363,65 @@ export default function MemoryBuilder1() {
                     </Paragraph>
 
                     <div style={{ textAlign: 'center', padding: '40px' }}>
-                      <Upload.Dragger
-                        multiple
-                        accept="image/*"
-                        beforeUpload={() => false}
-                        onChange={(info) => {
-                          const files = info.fileList.map(file => file.originFileObj as File).filter(Boolean)
-                          handleMultipleFileUpload(files)
+                      {/* Custom Drag & Drop Zone */}
+                      <div
+                        style={{
+                          border: '2px dashed #d9d9d9',
+                          borderRadius: '8px',
+                          padding: '40px',
+                          background: '#fafafa',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          marginBottom: '16px'
                         }}
-                        showUploadList={false}
-                        style={{ marginBottom: '16px' }}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          e.currentTarget.style.borderColor = '#1890ff'
+                          e.currentTarget.style.background = '#f0f8ff'
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          e.currentTarget.style.borderColor = '#d9d9d9'
+                          e.currentTarget.style.background = '#fafafa'
+                        }}
+                                                 onDrop={(e) => {
+                           e.preventDefault()
+                           e.currentTarget.style.borderColor = '#d9d9d9'
+                           e.currentTarget.style.background = '#fafafa'
+                           
+                           const files = Array.from(e.dataTransfer.files).filter(file => 
+                             file.type.startsWith('image/')
+                           )
+                           handleMultipleFileUpload(files)
+                         }}
+                        onClick={() => document.getElementById('custom-file-input')?.click()}
                       >
-                        <p className="ant-upload-drag-icon">
-                          <PictureOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-                        </p>
-                        <p className="ant-upload-text" style={{ fontSize: '18px', fontWeight: 'bold', color: '#666' }}>
+                        <PictureOutlined style={{ fontSize: '48px', color: '#1890ff', marginBottom: '16px' }} />
+                        <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#666', margin: '0 0 8px 0' }}>
                           {builderState.allPhotos.length === 0 
                             ? 'Click or drag photos here to upload'
                             : `${builderState.allPhotos.length}/8 images uploaded`
                           }
                         </p>
-                        <p className="ant-upload-hint" style={{ color: '#666' }}>
+                        <p style={{ color: '#666', margin: 0 }}>
                           Support for multiple selection. Upload up to 8 photos at once.
                         </p>
-                      </Upload.Dragger>
+                      </div>
+                      
+                      {/* Hidden file input for click functionality */}
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || [])
+                          handleMultipleFileUpload(files)
+                          // Clear the input
+                          e.target.value = ''
+                        }}
+                        style={{ display: 'none' }}
+                        id="custom-file-input"
+                      />
                     </div>
 
                     {builderState.allPhotos.length > 0 && (
@@ -401,7 +438,7 @@ export default function MemoryBuilder1() {
                           borderRadius: '8px'
                         }}>
                           {builderState.allPhotos.map((photo, index) => (
-                            <div key={index} style={{ textAlign: 'center' }}>
+                            <div key={index} style={{ textAlign: 'center', position: 'relative' }}>
                               <img
                                 src={photo}
                                 alt={`Photo ${index + 1}`}
@@ -413,6 +450,32 @@ export default function MemoryBuilder1() {
                                   border: '2px solid #d9d9d9'
                                 }}
                               />
+                              {/* Remove button */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: '4px',
+                                  right: '4px',
+                                  background: '#ff4d4f',
+                                  color: 'white',
+                                  borderRadius: '50%',
+                                  width: '20px',
+                                  height: '20px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  cursor: 'pointer',
+                                  zIndex: 10
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleRemovePhoto(index)
+                                }}
+                              >
+                                ×
+                              </div>
                               <Text style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
                                 Photo {index + 1}
                               </Text>
@@ -420,39 +483,13 @@ export default function MemoryBuilder1() {
                           ))}
                         </div>
 
-                        {/* Add more photos option */}
-                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                          <Upload
-                            multiple
-                            accept="image/*"
-                            beforeUpload={() => false}
-                            onChange={(info) => {
-                              const files = info.fileList.map(file => file.originFileObj as File).filter(Boolean)
-                              const totalFiles = builderState.allPhotos.length + files.length
-                              if (totalFiles <= 8) {
-                                handleMultipleFileUpload([...builderState.allPhotos.map(() => null), ...files].filter(Boolean) as File[])
-                              } else {
-                                message.error('Maximum 8 photos total allowed')
-                              }
-                            }}
-                            showUploadList={false}
-                            disabled={builderState.allPhotos.length >= 8}
-                          >
-                            <Button 
-                              icon={<UploadOutlined />}
-                              disabled={builderState.allPhotos.length >= 8}
-                            >
-                              Add More Photos ({builderState.allPhotos.length}/8)
-                            </Button>
-                          </Upload>
-                        </div>
+
 
                         {/* Continue Button */}
                         <div style={{ textAlign: 'center', marginTop: '32px' }}>
                           <Button
                             type="primary"
                             size="large"
-                            icon={<ArrowRightOutlined />}
                             onClick={() => {
                               setActiveTab('selection')
                               setCurrentStep(3)
@@ -556,7 +593,7 @@ export default function MemoryBuilder1() {
                     {builderState.mainPhotoIndex !== null && (
                       <div>
                         <Title level={5} style={{ marginBottom: '16px', color: '#52c41a' }}>
-                          Step 2: Choose Photos for Final Design (Max {selectedTemplate?.maxThumbnails || 8})
+                          Step 2: Choose Photos for Final Design ({builderState.selectedPhotoIndices.length}/{selectedTemplate?.maxThumbnails || 8})
                         </Title>
                         <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
                           Click photos to include them in your collage. Selected photos have yellow frames.
@@ -722,6 +759,149 @@ export default function MemoryBuilder1() {
           />
 
 
+        </div>
+
+        {/* Control Strip */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '80px',
+          background: 'rgba(255,255,255,0.95)',
+          borderTop: '1px solid #e8e8e8',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          zIndex: 100
+        }}>
+          {/* Left Side - Template Info & Thumbnail Reel */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            flex: 1
+          }}>
+            {/* Template Info */}
+            {selectedTemplate && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                minWidth: '200px'
+              }}>
+                <div style={{ fontSize: '24px' }}>
+                  {selectedTemplate.previewImage}
+                </div>
+                <div>
+                  <Text strong style={{ fontSize: '14px', color: '#1890ff' }}>
+                    {selectedTemplate.name}
+                  </Text>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: builderState.allPhotos.length <= selectedTemplate.maxThumbnails ? '#52c41a' : '#ff4d4f'
+                    }} />
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: builderState.selectedEmojis.length <= selectedTemplate.maxEmojis ? '#52c41a' : '#ff4d4f'
+                    }} />
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: '#d9d9d9'
+                    }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Thumbnail Reel */}
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              flex: 1,
+              padding: '0 16px'
+            }}>
+              {builderState.allPhotos.map((photo, index) => (
+                <div
+                  key={index}
+                  style={{
+                    position: 'relative',
+                    minWidth: '50px',
+                    height: '50px',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    border: '2px solid #d9d9d9',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={() => handleMainPhotoSelect(index)}
+                >
+                  <img
+                    src={photo}
+                    alt={`Photo ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  {builderState.mainPhotoIndex === index && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '2px',
+                      background: '#1890ff',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '16px',
+                      height: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontWeight: 'bold'
+                    }}>
+                      ✓
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side - Action Buttons */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            {activeTab === 'selection' && builderState.mainPhotoIndex !== null && (
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => {
+                  // Handle main image selection/replacement
+                  console.log('Main image action clicked')
+                }}
+                style={{
+                  borderRadius: '20px',
+                  fontSize: '12px',
+                  height: '32px'
+                }}
+              >
+                {builderState.mainPhotoIndex !== null ? 'Replace Main' : 'Select Main'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

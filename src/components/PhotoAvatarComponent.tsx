@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Button, Modal, Row, Col, Select, Upload, message, Slider, ColorPicker } from 'antd'
-import { UploadOutlined, CameraOutlined, PaletteOutlined } from '@ant-design/icons'
+import { UploadOutlined, CameraOutlined } from '@ant-design/icons'
 import {
   PhotoAvatarOptions,
   BorderPreset,
