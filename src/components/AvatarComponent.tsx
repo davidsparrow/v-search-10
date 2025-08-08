@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Button, Modal, Row, Col, Select, message } from 'antd'
-import { ReloadOutlined } from '@ant-design/icons'
+import { Button, Modal, Row, Col, Select, message, Tabs } from 'antd'
+import { ReloadOutlined, CameraOutlined } from '@ant-design/icons'
 import {
   generateAvatarUrl,
   generateAvatarOptions,
@@ -13,6 +13,7 @@ import {
   AVATAR_COLLECTIONS,
   AvatarCollection
 } from '../lib/avatarManager'
+import { PhotoAvatarComponent } from './PhotoAvatarComponent'
 
 interface AvatarComponentProps {
   size?: number
@@ -38,6 +39,7 @@ export function AvatarComponent({
   const [currentBaseColor, setCurrentBaseColor] = useState<string>('ffdbac')
   const [currentTopColor, setCurrentTopColor] = useState<string>('0905b5')
   const [currentCollection, setCurrentCollection] = useState<AvatarCollection>('croodles')
+  const [avatarMode, setAvatarMode] = useState<'generated' | 'photo'>('generated')
 
   // Load current avatar on component mount
   useEffect(() => {
@@ -243,213 +245,247 @@ export function AvatarComponent({
             Save Avatar
           </Button>
         ]}
-        width={800}
+        width={900}
       >
-        <div style={{ display: 'flex', gap: '24px' }}>
-          {/* Left side - Avatar preview and options */}
-          <div style={{ flex: 1 }}>
-            {/* Collection Selector */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
-                Avatar Collection
-              </label>
-              <Select
-                value={currentCollection}
-                onChange={(value: AvatarCollection) => {
-                  setCurrentCollection(value)
-                  // Regenerate options for the new collection
-                  setTimeout(() => {
-                    const options = generateAvatarOptions(6, value)
-                    setAvatarOptions(options)
-                  }, 100)
-                }}
-                style={{ width: '100%' }}
-                size="small"
-              >
-                {Object.entries(AVATAR_COLLECTIONS).map(([key, config]) => (
-                  <Select.Option key={key} value={key}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '16px' }}>{config.icon}</span>
-                      <span>{config.name}</span>
-                      <span style={{ fontSize: '10px', color: '#999', marginLeft: 'auto' }}>
-                        {config.description}
-                      </span>
-                    </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-
-            {/* Current avatar preview */}
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{
-                width: '128px',
-                height: '128px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                border: '2px solid #ddd',
-                margin: '0 auto',
-                background: '#f0f0f0'
-              }}>
-                {currentAvatarUrl && (
-                  <img
-                    src={currentAvatarUrl}
-                    alt="Avatar Preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain'
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Avatar options */}
-            <div style={{ marginBottom: '24px' }}>
-              <div style={{ marginBottom: '12px' }}>
-                <h4 style={{ margin: 0 }}>Choose an Avatar</h4>
-              </div>
-              <Row gutter={[8, 8]}>
-                {avatarOptions.map((avatar) => (
-                  <Col span={8} key={avatar.id}>
-                    <div
-                      style={{
-                        width: '100%',
-                        aspectRatio: '1',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        border: selectedAvatar === avatar.id ? '2px solid #1890ff' : '1px solid #ddd',
-                        cursor: 'pointer',
-                        position: 'relative'
-                      }}
-                      onClick={() => handleAvatarSelect(avatar.id)}
-                    >
-                      <img
-                        src={avatar.url}
-                        alt={avatar.name}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'contain'
+        <Tabs
+          defaultActiveKey="generated"
+          activeKey={avatarMode}
+          onChange={(key) => setAvatarMode(key as 'generated' | 'photo')}
+          items={[
+            {
+              key: 'generated',
+              label: (
+                <span>
+                  <ReloadOutlined style={{ marginRight: '8px' }} />
+                  Generated Avatars
+                </span>
+              ),
+              children: (
+                <div style={{ display: 'flex', gap: '24px' }}>
+                  {/* Left side - Avatar preview and options */}
+                  <div style={{ flex: 1 }}>
+                    {/* Collection Selector */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                        Avatar Collection
+                      </label>
+                      <Select
+                        value={currentCollection}
+                        onChange={(value: AvatarCollection) => {
+                          setCurrentCollection(value)
+                          // Regenerate options for the new collection
+                          setTimeout(() => {
+                            const options = generateAvatarOptions(6, value)
+                            setAvatarOptions(options)
+                          }, 100)
                         }}
-                      />
+                        style={{ width: '100%' }}
+                        size="small"
+                      >
+                        {Object.entries(AVATAR_COLLECTIONS).map(([key, config]) => (
+                          <Select.Option key={key} value={key}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontSize: '16px' }}>{config.icon}</span>
+                              <span>{config.name}</span>
+                              <span style={{ fontSize: '10px', color: '#999', marginLeft: 'auto' }}>
+                                {config.description}
+                              </span>
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
                     </div>
-                  </Col>
-                ))}
-              </Row>
-            </div>
 
-            {/* New Options button */}
-            <Button
-              type="dashed"
-              icon={<ReloadOutlined />}
-              onClick={generateNewOptions}
-              loading={isLoading}
-              style={{ width: '100%', marginBottom: '8px' }}
-            >
-              New Options
-            </Button>
-
-            {/* Random avatar button */}
-            <Button
-              type="dashed"
-              onClick={handleRandomAvatar}
-              style={{ width: '100%' }}
-            >
-              Generate Random Avatar
-            </Button>
-          </div>
-
-          {/* Right side - Customization options */}
-          <div style={{ flex: 1 }}>
-            <h4 style={{ marginBottom: '16px' }}>Customize Colors</h4>
-            
-            {/* Background Color */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
-                Background Color
-              </label>
-              <Select
-                value={currentBackgroundColor}
-                onChange={(value) => handleOptionChange('backgroundColor', value)}
-                style={{ width: '100%' }}
-                size="small"
-              >
-                {avatarCustomizationOptions.backgroundColor.map((color) => (
-                  <Select.Option key={color.value} value={color.value}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {/* Current avatar preview */}
+                    <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                       <div style={{
-                        width: '16px',
-                        height: '16px',
+                        width: '128px',
+                        height: '128px',
                         borderRadius: '50%',
-                        backgroundColor: `#${color.value}`,
-                        border: '1px solid #ddd'
-                      }} />
-                      {color.label}
+                        overflow: 'hidden',
+                        border: '2px solid #ddd',
+                        margin: '0 auto',
+                        background: '#f0f0f0'
+                      }}>
+                        {currentAvatarUrl && (
+                          <img
+                            src={currentAvatarUrl}
+                            alt="Avatar Preview"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain'
+                            }}
+                          />
+                        )}
+                      </div>
                     </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
 
-            {/* Skin Color */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
-                Skin Color
-              </label>
-              <Select
-                value={currentBaseColor}
-                onChange={(value) => handleOptionChange('baseColor', value)}
-                style={{ width: '100%' }}
-                size="small"
-              >
-                {avatarCustomizationOptions.baseColor.map((color) => (
-                  <Select.Option key={color.value} value={color.value}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '50%',
-                        backgroundColor: `#${color.value}`,
-                        border: '1px solid #ddd'
-                      }} />
-                      {color.label}
+                    {/* Avatar options */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <div style={{ marginBottom: '12px' }}>
+                        <h4 style={{ margin: 0 }}>Choose an Avatar</h4>
+                      </div>
+                      <Row gutter={[8, 8]}>
+                        {avatarOptions.map((avatar) => (
+                          <Col span={8} key={avatar.id}>
+                            <div
+                              style={{
+                                width: '100%',
+                                aspectRatio: '1',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                border: selectedAvatar === avatar.id ? '2px solid #1890ff' : '1px solid #ddd',
+                                cursor: 'pointer',
+                                position: 'relative'
+                              }}
+                              onClick={() => handleAvatarSelect(avatar.id)}
+                            >
+                              <img
+                                src={avatar.url}
+                                alt={avatar.name}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'contain'
+                                }}
+                              />
+                            </div>
+                          </Col>
+                        ))}
+                      </Row>
                     </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
 
-            {/* Hair Color */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
-                Hair Color
-              </label>
-              <Select
-                value={currentTopColor}
-                onChange={(value) => handleOptionChange('topColor', value)}
-                style={{ width: '100%' }}
-                size="small"
-              >
-                {avatarCustomizationOptions.topColor.map((color) => (
-                  <Select.Option key={color.value} value={color.value}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '50%',
-                        backgroundColor: `#${color.value}`,
-                        border: '1px solid #ddd'
-                      }} />
-                      {color.label}
+                    {/* New Options button */}
+                    <Button
+                      type="dashed"
+                      icon={<ReloadOutlined />}
+                      onClick={generateNewOptions}
+                      loading={isLoading}
+                      style={{ width: '100%', marginBottom: '8px' }}
+                    >
+                      New Options
+                    </Button>
+
+                    {/* Random avatar button */}
+                    <Button
+                      type="dashed"
+                      onClick={handleRandomAvatar}
+                      style={{ width: '100%' }}
+                    >
+                      Generate Random Avatar
+                    </Button>
+                  </div>
+
+                  {/* Right side - Customization options */}
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ marginBottom: '16px' }}>Customize Colors</h4>
+                    
+                    {/* Background Color */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                        Background Color
+                      </label>
+                      <Select
+                        value={currentBackgroundColor}
+                        onChange={(value) => handleOptionChange('backgroundColor', value)}
+                        style={{ width: '100%' }}
+                        size="small"
+                      >
+                        {avatarCustomizationOptions.backgroundColor.map((color) => (
+                          <Select.Option key={color.value} value={color.value}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '50%',
+                                backgroundColor: `#${color.value}`,
+                                border: '1px solid #ddd'
+                              }} />
+                              {color.label}
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
                     </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-          </div>
-        </div>
+
+                    {/* Skin Color */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                        Skin Color
+                      </label>
+                      <Select
+                        value={currentBaseColor}
+                        onChange={(value) => handleOptionChange('baseColor', value)}
+                        style={{ width: '100%' }}
+                        size="small"
+                      >
+                        {avatarCustomizationOptions.baseColor.map((color) => (
+                          <Select.Option key={color.value} value={color.value}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '50%',
+                                backgroundColor: `#${color.value}`,
+                                border: '1px solid #ddd'
+                              }} />
+                              {color.label}
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </div>
+
+                    {/* Hair Color */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                        Hair Color
+                      </label>
+                      <Select
+                        value={currentTopColor}
+                        onChange={(value) => handleOptionChange('topColor', value)}
+                        style={{ width: '100%' }}
+                        size="small"
+                      >
+                        {avatarCustomizationOptions.topColor.map((color) => (
+                          <Select.Option key={color.value} value={color.value}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '50%',
+                                backgroundColor: `#${color.value}`,
+                                border: '1px solid #ddd'
+                              }} />
+                              {color.label}
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              )
+            },
+            {
+              key: 'photo',
+              label: (
+                <span>
+                  <CameraOutlined style={{ marginRight: '8px' }} />
+                  Photo Upload
+                </span>
+              ),
+              children: (
+                <PhotoAvatarComponent
+                  size={128}
+                  onAvatarChange={onAvatarChange}
+                  showBackground={showBackground}
+                />
+              )
+            }
+          ]}
+        />
       </Modal>
     </div>
   )

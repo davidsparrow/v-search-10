@@ -18,6 +18,7 @@ import { StarterJourney1 } from './pages/StarterJourney1'
 import { StarterJourney2 } from './pages/StarterJourney2'
 import { StarterJourney3 } from './pages/StarterJourney3'
 import { UserProfilePage } from './pages/UserProfilePage'
+import { PhotoAvatarDemoPage } from './pages/PhotoAvatarDemoPage'
 
 import { useCloudStore } from './store/cloudStore'
 import { supabase, participantService } from './lib/supabase'
@@ -172,6 +173,8 @@ function App() {
             <Route path="/starter-journey-2" element={<StarterJourney2 />} />
             <Route path="/starter-journey-3" element={<StarterJourney3 />} />
             <Route path="/user-profile" element={<UserProfilePage />} />
+            <Route path="/photo-avatar-demo" element={<PhotoAvatarDemoPage />} />
+            <Route path="/PhotoAvatarDemoPage" element={<PhotoAvatarDemoPage />} />
 
             <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Routes>
