@@ -34,6 +34,32 @@ body {
   51%, 100% { opacity: 0; }
 }
 
+/* Typing animation link styles */
+.typing-animation-content a {
+  color: #1890ff !important; /* Same blue as "Bite Me" link */
+  text-decoration: underline;
+  text-decoration-color: #1890ff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.typing-animation-content a:hover {
+  color: #ffffff !important; /* White on hover */
+  text-decoration-color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* White theme specific styles */
+.white-theme .typing-animation-content {
+  color: #000000 !important; /* Black text for white theme */
+}
+
+.white-theme .typing-animation-content a:hover {
+  color: #1890ff !important; /* Blue on hover for white theme */
+  text-decoration-color: #1890ff;
+  text-shadow: 0 0 8px rgba(24, 144, 255, 0.3);
+}
+
 /* Two-tone icon effects */
 .icon-two-tone-dark {
   position: relative;

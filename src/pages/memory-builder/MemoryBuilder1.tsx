@@ -1,59 +1,25 @@
 import { useState } from 'react'
 import { Typography, Button, Row, Col, Space, Divider, Tabs, Upload, message, Badge } from 'antd'
 import { ArrowRightOutlined, PictureOutlined, AppstoreOutlined, UploadOutlined, CheckCircleOutlined, StarOutlined } from '@ant-design/icons'
+import { IoChevronBackCircle, IoChevronForwardCircleSharp } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
 import { MemoryBuilderHeader } from '../../components/headers/MemoryBuilderHeader'
 import { fileToDataURL, validateImageFile } from '../../lib/photoAvatarManager'
+import { TemplateRenderer } from '../../components/memory-builder/TemplateRenderer'
+import { MEMORY_TEMPLATES, MemoryTemplate } from '../../data/memoryTemplates'
 
 const { Title, Paragraph, Text } = Typography
 
 interface MemoryBuilderState {
-  selectedTemplate: string | null
+  selectedTemplate: MemoryTemplate | null
   allPhotos: string[]
   mainPhotoIndex: number | null
   selectedPhotoIndices: number[]
   selectedEmojis: string[]
+  selectedTextObjects: string[]
 }
 
-// Sample template data - will be moved to separate file later
-const SAMPLE_TEMPLATES = [
-  {
-    id: 'scattered-memories',
-    name: 'Scattered Memories',
-    description: 'Artistic scattered arrangement',
-    maxThumbnails: 6,
-    maxEmojis: 8,
-    previewImage: '🎨',
-    category: 'artistic'
-  },
-  {
-    id: 'grid-classic',
-    name: 'Classic Grid',
-    description: 'Clean organized grid',
-    maxThumbnails: 8,
-    maxEmojis: 12,
-    previewImage: '⬜',
-    category: 'structured'
-  },
-  {
-    id: 'cascade-flow',
-    name: 'Cascade Flow',
-    description: 'Waterfall arrangement',
-    maxThumbnails: 7,
-    maxEmojis: 10,
-    previewImage: '🌊',
-    category: 'artistic'
-  },
-  {
-    id: 'corner-clusters',
-    name: 'Corner Clusters',
-    description: 'Grouped corners design',
-    maxThumbnails: 8,
-    maxEmojis: 15,
-    previewImage: '📐',
-    category: 'structured'
-  }
-]
+// Templates now imported from memoryTemplates.ts
 
 // Sample emoji categories
 const EMOJI_CATEGORIES = [
@@ -70,7 +36,8 @@ export default function MemoryBuilder1() {
     allPhotos: [],
     mainPhotoIndex: null,
     selectedPhotoIndices: [],
-    selectedEmojis: []
+    selectedEmojis: [],
+    selectedTextObjects: []
   })
   const [activeTab, setActiveTab] = useState('templates')
   const [isUploading, setIsUploading] = useState(false)
@@ -78,9 +45,46 @@ export default function MemoryBuilder1() {
   const [isProcessingUpload, setIsProcessingUpload] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
 
+  // Navigation logic
+  const canGoBack = activeTab !== 'templates'
+  const canGoForward = () => {
+    switch (activeTab) {
+      case 'templates':
+        return builderState.selectedTemplate !== null
+      case 'photos':
+        return builderState.allPhotos.length > 0 // Allow forward as soon as 1 image is uploaded
+      case 'selection':
+        return builderState.mainPhotoIndex !== null
+      case 'emojis':
+        return true // Can skip emojis (0 elements allowed)
+      case 'text':
+        return true // Can skip text (0 elements allowed)
+      default:
+        return false
+    }
+  }
+
+  const handleBack = () => {
+    const tabOrder = ['templates', 'photos', 'selection', 'emojis', 'text']
+    const currentIndex = tabOrder.indexOf(activeTab)
+    if (currentIndex > 0) {
+      setActiveTab(tabOrder[currentIndex - 1])
+      setCurrentStep(currentIndex)
+    }
+  }
+
+  const handleForward = () => {
+    const tabOrder = ['templates', 'photos', 'selection', 'emojis', 'text']
+    const currentIndex = tabOrder.indexOf(activeTab)
+    if (currentIndex < tabOrder.length - 1) {
+      setActiveTab(tabOrder[currentIndex + 1])
+      setCurrentStep(currentIndex + 2)
+    }
+  }
+
   // Handle template selection
-  const handleTemplateSelect = (templateId: string) => {
-    setBuilderState(prev => ({ ...prev, selectedTemplate: templateId }))
+  const handleTemplateSelect = (template: MemoryTemplate) => {
+    setBuilderState(prev => ({ ...prev, selectedTemplate: template }))
     // Auto-switch to photos tab after template selection
     setActiveTab('photos')
     setCurrentStep(2)
@@ -135,17 +139,61 @@ export default function MemoryBuilder1() {
     }
   }
 
-  // Handle main photo selection
-  const handleMainPhotoSelect = (index: number) => {
-    setBuilderState(prev => ({ ...prev, mainPhotoIndex: index }))
+  // Handle thumbnail selection with proper logic
+  const handleThumbnailClick = (index: number) => {
+    setBuilderState(prev => {
+      const isMain = prev.mainPhotoIndex === index
+      const isSelected = prev.selectedPhotoIndices.includes(index)
+      const selectedTemplate = prev.selectedTemplate
+      // maxThumbnails is extras only, so total = maxThumbnails + 1 (for main)
+      const maxAllowed = (selectedTemplate?.maxThumbnails || 8) + 1
+      const totalSelected = (prev.mainPhotoIndex !== null ? 1 : 0) + prev.selectedPhotoIndices.length
+      
+      if (isMain) {
+        // If clicking the main image, deselect it as main and make it an extra
+        return {
+          ...prev,
+          mainPhotoIndex: null,
+          selectedPhotoIndices: [...prev.selectedPhotoIndices, index]
+        }
+      } else if (isSelected) {
+        // If it's currently selected as extra, remove it completely
+        return {
+          ...prev,
+          selectedPhotoIndices: prev.selectedPhotoIndices.filter(i => i !== index)
+        }
+      } else {
+        // If not selected at all, check if we can add more
+        if (totalSelected >= maxAllowed) {
+          // Maximum reached, show message and don't allow selection
+          message.warning(`Maximum ${maxAllowed} photos allowed for this template. Deselect an image first.`)
+          return prev
+        }
+        
+        if (prev.mainPhotoIndex === null) {
+          // No main image yet, make this the main image
+          return {
+            ...prev,
+            mainPhotoIndex: index
+          }
+        } else {
+          // Already have a main image, make this an extra image
+          return {
+            ...prev,
+            selectedPhotoIndices: [...prev.selectedPhotoIndices, index]
+          }
+        }
+      }
+    })
   }
 
   // Handle photo selection for final design
   const handlePhotoToggle = (index: number) => {
     setBuilderState(prev => {
       const isSelected = prev.selectedPhotoIndices.includes(index)
-      const selectedTemplate = SAMPLE_TEMPLATES.find(t => t.id === prev.selectedTemplate)
-      const maxAllowed = selectedTemplate?.maxThumbnails || 8
+      const selectedTemplate = prev.selectedTemplate
+      // maxThumbnails is extras only, so total = maxThumbnails + 1 (for main)
+      const maxAllowed = (selectedTemplate?.maxThumbnails || 8) + 1
       
       if (isSelected) {
         // Remove from selection
@@ -171,7 +219,7 @@ export default function MemoryBuilder1() {
   const handleEmojiToggle = (emoji: string) => {
     setBuilderState(prev => {
       const isSelected = prev.selectedEmojis.includes(emoji)
-      const selectedTemplate = SAMPLE_TEMPLATES.find(t => t.id === prev.selectedTemplate)
+      const selectedTemplate = prev.selectedTemplate
       const maxAllowed = selectedTemplate?.maxEmojis || 10
       
       if (isSelected) {
@@ -232,7 +280,7 @@ export default function MemoryBuilder1() {
     navigate('/memory-builder2')
   }
 
-  const selectedTemplate = SAMPLE_TEMPLATES.find(t => t.id === builderState.selectedTemplate)
+  const selectedTemplate = builderState.selectedTemplate
   const canContinue = builderState.selectedTemplate && 
                      builderState.allPhotos.length > 0 && 
                      builderState.mainPhotoIndex !== null &&
@@ -243,6 +291,11 @@ export default function MemoryBuilder1() {
       <MemoryBuilderHeader 
         currentStep={currentStep}
         onStepClick={handleStepClick}
+        selectedTemplateName={selectedTemplate?.displayName}
+        selectedTemplate={builderState.selectedTemplate}
+        selectedPhotosCount={(builderState.mainPhotoIndex !== null ? 1 : 0) + builderState.selectedPhotoIndices.length}
+        selectedEmojisCount={builderState.selectedEmojis.length}
+        selectedTextCount={builderState.selectedTextObjects.length}
       />
       
               {/* Main Content - Full Screen from Header to Footer */}
@@ -259,7 +312,7 @@ export default function MemoryBuilder1() {
 
 
         {/* Main Content */}
-        <div style={{ height: 'calc(100% - 80px)', overflow: 'auto' }}>
+        <div style={{ height: 'calc(100% - 100px)', overflow: 'auto' }}>
           <Tabs 
             key={activeTab}
             activeKey={activeTab} 
@@ -285,16 +338,16 @@ export default function MemoryBuilder1() {
                     </Paragraph>
 
                     <Row gutter={[12, 12]}>
-                      {SAMPLE_TEMPLATES.map(template => (
+                      {MEMORY_TEMPLATES.map(template => (
                         <Col key={template.id} xs={12} sm={8} lg={4}>
                           <div
-                            onClick={() => handleTemplateSelect(template.id)}
+                            onClick={() => handleTemplateSelect(template)}
                             style={{
-                              border: builderState.selectedTemplate === template.id 
+                              border: builderState.selectedTemplate?.id === template.id 
                                 ? '3px solid #1890ff' 
                                 : '1px solid #d9d9d9',
                               borderRadius: '8px',
-                              transform: builderState.selectedTemplate === template.id ? 'scale(1.02)' : 'scale(1)',
+                              transform: builderState.selectedTemplate?.id === template.id ? 'scale(1.02)' : 'scale(1)',
                               transition: 'all 0.2s ease',
                               background: 'white',
                               padding: '16px',
@@ -307,11 +360,8 @@ export default function MemoryBuilder1() {
                                 {template.previewImage}
                               </div>
                               <Title level={5} style={{ marginBottom: '6px', fontSize: '14px', color: '#1890ff' }}>
-                                {template.name}
+                                {template.displayName}
                               </Title>
-                              <Text type="secondary" style={{ fontSize: '10px', display: 'block' }}>
-                                {template.description}
-                              </Text>
                               <div style={{ marginTop: '6px' }}>
                                 <Text strong style={{ 
                                   fontSize: '10px', 
@@ -327,8 +377,15 @@ export default function MemoryBuilder1() {
                                 }}>
                                   😊 {template.maxEmojis}
                                 </Text>
+                                <Text strong style={{ 
+                                  fontSize: '10px', 
+                                  color: '#ff7875',
+                                  display: 'block'
+                                }}>
+                                  📝 {template.maxTextObjects}
+                                </Text>
                               </div>
-                              {builderState.selectedTemplate === template.id && (
+                              {builderState.selectedTemplate?.id === template.id && (
                                 <div style={{ marginTop: '6px' }}>
                                   <CheckCircleOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
                                 </div>
@@ -362,13 +419,13 @@ export default function MemoryBuilder1() {
                       Upload up to 8 photos at once. You'll choose which ones to use next.
                     </Paragraph>
 
-                    <div style={{ textAlign: 'center', padding: '40px' }}>
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
                       {/* Custom Drag & Drop Zone */}
                       <div
                         style={{
                           border: '2px dashed #d9d9d9',
                           borderRadius: '8px',
-                          padding: '40px',
+                          padding: '20px',
                           background: '#fafafa',
                           cursor: 'pointer',
                           transition: 'all 0.3s ease',
@@ -424,91 +481,7 @@ export default function MemoryBuilder1() {
                       />
                     </div>
 
-                    {builderState.allPhotos.length > 0 && (
-                      <div>
-                        {/* Photo Thumbnails */}
-                        <div style={{ 
-                          display: 'flex', 
-                          flexWrap: 'wrap', 
-                          gap: '12px',
-                          justifyContent: 'center',
-                          marginBottom: '24px',
-                          padding: '16px',
-                          background: '#f5f5f5',
-                          borderRadius: '8px'
-                        }}>
-                          {builderState.allPhotos.map((photo, index) => (
-                            <div key={index} style={{ textAlign: 'center', position: 'relative' }}>
-                              <img
-                                src={photo}
-                                alt={`Photo ${index + 1}`}
-                                style={{
-                                  width: '100px',
-                                  height: '100px',
-                                  objectFit: 'cover',
-                                  borderRadius: '8px',
-                                  border: '2px solid #d9d9d9'
-                                }}
-                              />
-                              {/* Remove button */}
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  top: '4px',
-                                  right: '4px',
-                                  background: '#ff4d4f',
-                                  color: 'white',
-                                  borderRadius: '50%',
-                                  width: '20px',
-                                  height: '20px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  cursor: 'pointer',
-                                  zIndex: 10
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleRemovePhoto(index)
-                                }}
-                              >
-                                ×
-                              </div>
-                              <Text style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
-                                Photo {index + 1}
-                              </Text>
-                            </div>
-                          ))}
-                        </div>
 
-
-
-                        {/* Continue Button */}
-                        <div style={{ textAlign: 'center', marginTop: '32px' }}>
-                          <Button
-                            type="primary"
-                            size="large"
-                            onClick={() => {
-                              setActiveTab('selection')
-                              setCurrentStep(3)
-                            }}
-                            disabled={builderState.allPhotos.length === 0}
-                            style={{ 
-                              minWidth: '200px',
-                              height: '48px',
-                              fontSize: '16px',
-                              borderRadius: '77px',
-                              background: builderState.allPhotos.length === 0 ? '#d9d9d9' : '#52c41a',
-                              borderColor: builderState.allPhotos.length === 0 ? '#d9d9d9' : '#52c41a'
-                            }}
-                          >
-                            Continue →
-                          </Button>
-                        </div>
-                      </div>
-                    )}
 
                     {isUploading && (
                       <div style={{ textAlign: 'center', marginTop: '16px' }}>
@@ -531,134 +504,33 @@ export default function MemoryBuilder1() {
                 ),
                 disabled: builderState.allPhotos.length === 0,
                 children: (
-                  <div>
-                    <Title level={4} style={{ marginBottom: '16px' }}>
-                      Select Your Main Photo & Photos for Final Design
-                    </Title>
-                    
-                    {/* Step 1: Select Main Photo */}
-                    <div style={{ marginBottom: '32px' }}>
-                      <Title level={5} style={{ marginBottom: '16px', color: '#1890ff' }}>
-                        Step 1: Choose Main Photo (Background)
-                      </Title>
-                      <div style={{ 
-                        display: 'flex', 
-                        flexWrap: 'wrap', 
-                        gap: '12px',
-                        justifyContent: 'center',
-                        padding: '16px',
-                        background: '#f0f9ff',
-                        borderRadius: '8px'
-                      }}>
-                        {builderState.allPhotos.map((photo, index) => (
-                          <div 
-                            key={index} 
-                            onClick={() => handleMainPhotoSelect(index)}
-                            style={{ 
-                              textAlign: 'center',
-                              cursor: 'pointer',
-                              padding: '8px',
-                              borderRadius: '8px',
-                              background: builderState.mainPhotoIndex === index ? '#1890ff' : 'transparent',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            <img
-                              src={photo}
-                              alt={`Photo ${index + 1}`}
-                              style={{
-                                width: '80px',
-                                height: '80px',
-                                objectFit: 'cover',
-                                borderRadius: '8px',
-                                border: builderState.mainPhotoIndex === index 
-                                  ? '3px solid white' 
-                                  : '2px solid #d9d9d9'
-                              }}
-                            />
-                            <Text style={{ 
-                              fontSize: '12px', 
-                              display: 'block', 
-                              marginTop: '4px',
-                              color: builderState.mainPhotoIndex === index ? 'white' : 'inherit'
-                            }}>
-                              {builderState.mainPhotoIndex === index ? '⭐ Main' : `Photo ${index + 1}`}
-                            </Text>
-                          </div>
-                        ))}
+                                  <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '200px',
+                  padding: '20px'
+                }}>
+                                      {selectedTemplate && (
+                    <div style={{ textAlign: 'center' }}>
+                      <img
+                        src={selectedTemplate.templateImageUrl}
+                        alt={`${selectedTemplate.displayName} Template`}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '50vh', // Reduced height to fit without scrolling
+                          width: 'auto',
+                          height: 'auto'
+                          // Removed borderRadius, boxShadow, and border for natural transparency
+                        }}
+                      />
+                      <div style={{ marginTop: '16px' }}>
+                        <Text type="secondary">
+                          Your photos and content will be placed into this template during the Preview step
+                        </Text>
                       </div>
                     </div>
-
-                    {/* Step 2: Select Photos for Final Design */}
-                    {builderState.mainPhotoIndex !== null && (
-                      <div>
-                        <Title level={5} style={{ marginBottom: '16px', color: '#52c41a' }}>
-                          Step 2: Choose Photos for Final Design ({builderState.selectedPhotoIndices.length}/{selectedTemplate?.maxThumbnails || 8})
-                        </Title>
-                        <Paragraph type="secondary" style={{ marginBottom: '16px' }}>
-                          Click photos to include them in your collage. Selected photos have yellow frames.
-                        </Paragraph>
-                        <div style={{ 
-                          display: 'flex', 
-                          flexWrap: 'wrap', 
-                          gap: '12px',
-                          justifyContent: 'center',
-                          padding: '16px',
-                          background: '#f6ffed',
-                          borderRadius: '8px'
-                        }}>
-                          {builderState.allPhotos.map((photo, index) => {
-                            if (index === builderState.mainPhotoIndex) return null // Don't show main photo here
-                            
-                            const isSelected = builderState.selectedPhotoIndices.includes(index)
-                            
-                            return (
-                              <div 
-                                key={index} 
-                                onClick={() => handlePhotoToggle(index)}
-                                style={{ 
-                                  textAlign: 'center',
-                                  cursor: 'pointer',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  background: isSelected ? '#fadb14' : 'transparent',
-                                  transition: 'all 0.2s ease'
-                                }}
-                              >
-                                <img
-                                  src={photo}
-                                  alt={`Photo ${index + 1}`}
-                                  style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    objectFit: 'cover',
-                                    borderRadius: '8px',
-                                    border: isSelected 
-                                      ? '3px solid #d4b106' 
-                                      : '2px solid #d9d9d9'
-                                  }}
-                                />
-                                <Text style={{ 
-                                  fontSize: '12px', 
-                                  display: 'block', 
-                                  marginTop: '4px',
-                                  color: isSelected ? '#613400' : 'inherit',
-                                  fontWeight: isSelected ? 'bold' : 'normal'
-                                }}>
-                                  {isSelected ? '✓ Selected' : `Photo ${index + 1}`}
-                                </Text>
-                              </div>
-                            )
-                          })}
-                        </div>
-                        
-                        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                          <Text strong style={{ color: '#52c41a' }}>
-                            {builderState.selectedPhotoIndices.length} of {selectedTemplate?.maxThumbnails || 8} photos selected
-                          </Text>
-                        </div>
-                      </div>
-                    )}
+                  )}
                   </div>
                 )
               },
@@ -767,140 +639,125 @@ export default function MemoryBuilder1() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: '80px',
+          minHeight: '100px', // Taller to accommodate bigger thumbnails
           background: 'rgba(255,255,255,0.95)',
           borderTop: '1px solid #e8e8e8',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 24px',
+          padding: '10px 16px',
           zIndex: 100
         }}>
-          {/* Left Side - Template Info & Thumbnail Reel */}
+          {/* Back Button */}
+          <div style={{ minWidth: '48px' }}>
+            {canGoBack && (
+              <IoChevronBackCircle
+                size={40}
+                style={{
+                  color: '#1890ff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={handleBack}
+              />
+            )}
+          </div>
+
+          {/* Center Content - Thumbnail Reel Only */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
-            flex: 1
+            justifyContent: 'center',
+            flex: 1,
+            padding: '0 16px',
+            minHeight: '80px' // Allow control strip to grow taller
           }}>
-            {/* Template Info */}
-            {selectedTemplate && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                minWidth: '200px'
-              }}>
-                <div style={{ fontSize: '24px' }}>
-                  {selectedTemplate.previewImage}
-                </div>
-                <div>
-                  <Text strong style={{ fontSize: '14px', color: '#1890ff' }}>
-                    {selectedTemplate.name}
-                  </Text>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '50%',
-                      background: builderState.allPhotos.length <= selectedTemplate.maxThumbnails ? '#52c41a' : '#ff4d4f'
-                    }} />
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '50%',
-                      background: builderState.selectedEmojis.length <= selectedTemplate.maxEmojis ? '#52c41a' : '#ff4d4f'
-                    }} />
-                    <div style={{
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '50%',
-                      background: '#d9d9d9'
-                    }} />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Thumbnail Reel */}
+            {/* Thumbnail Reel - Bigger thumbnails with delete buttons */}
             <div style={{
               display: 'flex',
-              gap: '8px',
-              overflowX: 'auto',
-              flex: 1,
-              padding: '0 16px'
+              gap: '12px',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}>
-              {builderState.allPhotos.map((photo, index) => (
-                <div
-                  key={index}
-                  style={{
-                    position: 'relative',
-                    minWidth: '50px',
-                    height: '50px',
-                    borderRadius: '6px',
-                    overflow: 'hidden',
-                    border: '2px solid #d9d9d9',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onClick={() => handleMainPhotoSelect(index)}
-                >
-                  <img
-                    src={photo}
-                    alt={`Photo ${index + 1}`}
+              {builderState.allPhotos.map((photo, index) => {
+                const isMain = builderState.mainPhotoIndex === index
+                const isSelected = builderState.selectedPhotoIndices.includes(index)
+                
+                return (
+                  <div
+                    key={index}
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
+                      position: 'relative',
+                      width: '80px', // Bigger thumbnails
+                      height: '80px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: `8px solid ${isMain ? '#fadb14' : isSelected ? '#52c41a' : '#d9d9d9'}`,
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s ease'
                     }}
-                  />
-                  {builderState.mainPhotoIndex === index && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '2px',
-                      right: '2px',
-                      background: '#1890ff',
-                      color: 'white',
-                      borderRadius: '50%',
-                      width: '16px',
-                      height: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      fontWeight: 'bold'
-                    }}>
-                      ✓
+                    onClick={() => handleThumbnailClick(index)}
+                  >
+                    <img
+                      src={photo}
+                      alt={`Photo ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    {/* Delete Button */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        background: '#ff4d4f',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        zIndex: 10,
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRemovePhoto(index)
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)'
+                      }}
+                    >
+                      ×
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )
+              })}
             </div>
           </div>
 
-          {/* Right Side - Action Buttons */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            {activeTab === 'selection' && builderState.mainPhotoIndex !== null && (
-              <Button
-                type="primary"
-                size="small"
-                onClick={() => {
-                  // Handle main image selection/replacement
-                  console.log('Main image action clicked')
-                }}
-                style={{
-                  borderRadius: '20px',
-                  fontSize: '12px',
-                  height: '32px'
-                }}
-              >
-                {builderState.mainPhotoIndex !== null ? 'Replace Main' : 'Select Main'}
-              </Button>
-            )}
+          {/* Forward Button */}
+          <div style={{ minWidth: '48px', display: 'flex', justifyContent: 'flex-end' }}>
+            <IoChevronForwardCircleSharp
+              size={40}
+              style={{
+                color: canGoForward() ? '#52c41a' : '#d9d9d9',
+                cursor: canGoForward() ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={canGoForward() ? handleForward : undefined}
+            />
           </div>
         </div>
       </div>

@@ -5,10 +5,16 @@ import { BiSolidSelectMultiple } from "react-icons/bi"
 import { BsEmojiDizzyFill } from "react-icons/bs"
 import { RxLetterCaseCapitalize } from "react-icons/rx"
 import { IoIosImages } from "react-icons/io"
+import { MemoryTemplate } from '../../data/memoryTemplates'
 
 interface MemoryBuilderHeaderProps {
   currentStep: number
   onStepClick: (step: number) => void
+  selectedTemplateName?: string
+  selectedTemplate?: MemoryTemplate | null
+  selectedPhotosCount?: number
+  selectedEmojisCount?: number
+  selectedTextCount?: number
 }
 
 const STEPS = [
@@ -16,11 +22,37 @@ const STEPS = [
   { number: 2, label: 'upload', icon: IoCloudUpload },
   { number: 3, label: 'select', icon: BiSolidSelectMultiple },
   { number: 4, label: 'objects', icon: BsEmojiDizzyFill },
-  { number: 5, label: 'words', icon: RxLetterCaseCapitalize },
+  { number: 5, label: 'text', icon: RxLetterCaseCapitalize },
   { number: 6, label: 'preview', icon: IoIosImages }
 ]
 
-export function MemoryBuilderHeader({ currentStep, onStepClick }: MemoryBuilderHeaderProps) {
+export function MemoryBuilderHeader({ 
+  currentStep, 
+  onStepClick, 
+  selectedTemplateName, 
+  selectedTemplate,
+  selectedPhotosCount = 0,
+  selectedEmojisCount = 0,
+  selectedTextCount = 0
+}: MemoryBuilderHeaderProps) {
+  
+  // Generate dynamic step labels with X/N format
+  const getStepLabel = (stepNumber: number, baseLabel: string) => {
+    if (!selectedTemplate) return baseLabel
+    
+    switch (stepNumber) {
+      case 3: // select photos
+        // maxThumbnails is extras only, so total = maxThumbnails + 1 (for main)
+        const maxPhotos = (selectedTemplate.maxThumbnails || 0) + 1
+        return `${baseLabel} ${selectedPhotosCount}/${maxPhotos}`
+      case 4: // objects (emojis)
+        return `${baseLabel} ${selectedEmojisCount}/${selectedTemplate.maxEmojis || 0}`
+      case 5: // text
+        return `${baseLabel} ${selectedTextCount}/${selectedTemplate.maxTextObjects || 0}`
+      default:
+        return baseLabel
+    }
+  }
   return (
     <div style={{
       position: 'fixed',
@@ -37,10 +69,11 @@ export function MemoryBuilderHeader({ currentStep, onStepClick }: MemoryBuilderH
       zIndex: 1000,
       borderBottom: '1px solid rgba(255,255,255,0.1)'
     }}>
-      {/* Logo */}
+      {/* Logo & Template Name */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
+        gap: '16px',
         marginLeft: '-5px'
       }}>
         <img
@@ -62,6 +95,16 @@ export function MemoryBuilderHeader({ currentStep, onStepClick }: MemoryBuilderH
           }}
           onClick={() => window.location.href = '/'}
         />
+        {selectedTemplateName && (
+          <div style={{
+            color: '#1890ff',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            fontFamily: 'Poppins, sans-serif'
+          }}>
+            {selectedTemplateName}
+          </div>
+        )}
       </div>
 
       {/* Step Navigation */}
@@ -114,7 +157,7 @@ export function MemoryBuilderHeader({ currentStep, onStepClick }: MemoryBuilderH
                 fontSize: '18px',
                 marginBottom: '2px'
               }} />
-              <span>{step.label}</span>
+              <span>{getStepLabel(step.number, step.label)}</span>
             </Button>
           )
         })}

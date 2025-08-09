@@ -310,10 +310,10 @@ export function MainHeader({
             type="text"
             onClick={user ? handleLogout : () => setIsLoginModalVisible(true)}
             style={{ 
-              color: 'white', 
+              color: currentTheme === 'white' ? '#1890ff' : 'white', 
               fontSize: '12px',
               fontWeight: '500',
-              border: '1px solid white',
+              border: currentTheme === 'white' ? '1px solid #1890ff' : '1px solid white',
               borderRadius: '20px',
               background: 'transparent',
               padding: '4px 16px',
@@ -322,21 +322,42 @@ export function MainHeader({
               fontFamily: 'Poppins, sans-serif'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)'
+              if (currentTheme === 'white') {
+                e.currentTarget.style.background = 'rgba(24, 144, 255, 0.1)'
+                e.currentTarget.style.borderColor = '#1890ff'
+                e.currentTarget.style.color = '#1890ff'
+              } else {
+                e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)'
+                e.currentTarget.style.color = 'white'
+              }
               e.currentTarget.style.transform = 'scale(1.02)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.borderColor = 'white'
+              if (currentTheme === 'white') {
+                e.currentTarget.style.borderColor = '#1890ff'
+                e.currentTarget.style.color = '#1890ff'
+              } else {
+                e.currentTarget.style.borderColor = 'white'
+                e.currentTarget.style.color = 'white'
+              }
               e.currentTarget.style.transform = 'scale(1)'
             }}
             onMouseDown={(e) => {
-              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.5)'
+              if (currentTheme === 'white') {
+                e.currentTarget.style.background = 'rgba(24, 144, 255, 0.2)'
+              } else {
+                e.currentTarget.style.background = 'rgba(128, 128, 128, 0.5)'
+              }
               e.currentTarget.style.transform = 'scale(0.98)'
             }}
             onMouseUp={(e) => {
-              e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
+              if (currentTheme === 'white') {
+                e.currentTarget.style.background = 'rgba(24, 144, 255, 0.1)'
+              } else {
+                e.currentTarget.style.background = 'rgba(128, 128, 128, 0.3)'
+              }
               e.currentTarget.style.transform = 'scale(1.02)'
             }}
           >
@@ -350,8 +371,52 @@ export function MainHeader({
               icon={<FaHamburger />}
               onClick={onMenuClick}
               style={{ 
-                color: theme.textSecondary, 
-                fontSize: '24px' 
+                color: currentTheme === 'white' ? '#000000' : '#ffffff', 
+                fontSize: '24px',
+                border: currentTheme === 'white' ? '1px solid transparent' : '1px solid transparent',
+                borderRadius: '20px',
+                background: 'transparent',
+                padding: '4px 8px',
+                height: '32px',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (currentTheme === 'white') {
+                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.color = '#000000'
+                } else {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                  e.currentTarget.style.color = '#ffffff'
+                }
+                e.currentTarget.style.transform = 'scale(1.02)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent'
+                if (currentTheme === 'white') {
+                  e.currentTarget.style.color = '#000000'
+                } else {
+                  e.currentTarget.style.color = '#ffffff'
+                }
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+              onMouseDown={(e) => {
+                if (currentTheme === 'white') {
+                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.2)'
+                } else {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
+                }
+                e.currentTarget.style.transform = 'scale(0.98)'
+              }}
+              onMouseUp={(e) => {
+                if (currentTheme === 'white') {
+                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'
+                } else {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                }
+                e.currentTarget.style.transform = 'scale(1.02)'
               }}
             />
           )}
